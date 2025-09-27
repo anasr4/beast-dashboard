@@ -822,17 +822,25 @@ def execute_test_bot_mode(execution_id, data):
             me_data = me_response.json()
             org_id = me_data['me']['organization_id']
 
-            accounts_response = requests.get(f'https://adsapi.snapchat.com/v1/organizations/{org_id}/adaccounts', headers=headers)
-            if accounts_response.status_code != 200:
-                raise Exception(f"Failed to get ad accounts: {accounts_response.text}")
+            # First try to get ad account ID from token manager
+            ad_account_id = tm.get_ad_account_id()
 
-            accounts = accounts_response.json().get('adaccounts', [])
-            if not accounts:
-                raise Exception("No ad accounts found")
+            if ad_account_id:
+                # Use the ad account ID from token manager
+                update_test_progress(10, "Creating campaign...", ad_account=f"Using token manager ad account: {ad_account_id}")
+            else:
+                # Fallback: get account info from API
+                accounts_response = requests.get(f'https://adsapi.snapchat.com/v1/organizations/{org_id}/adaccounts', headers=headers)
+                if accounts_response.status_code != 200:
+                    raise Exception(f"Failed to get ad accounts: {accounts_response.text}")
 
-            # Force use your specific ad account ID
-            ad_account_id = '27205503-c6b2-4aa7-89d1-3b8dd52f527d'
-            update_test_progress(10, "Creating campaign...", ad_account=ad_account_id)
+                accounts = accounts_response.json().get('adaccounts', [])
+                if not accounts:
+                    raise Exception("No ad accounts found")
+
+                # Use first available account as fallback
+                ad_account_id = accounts[0]['adaccount']['id']
+                update_test_progress(10, "Creating campaign...", ad_account=f"Using fallback ad account: {ad_account_id}")
 
         except Exception as e:
             raise Exception(f"Error getting account info: {str(e)}")
@@ -940,7 +948,7 @@ def execute_test_bot_mode(execution_id, data):
                 'media': [{
                     'name': video_file,
                     'type': 'VIDEO',
-                    'ad_account_id': '27205503-c6b2-4aa7-89d1-3b8dd52f527d'
+                    'ad_account_id': ad_account_id
                 }]
             }
 
@@ -1121,29 +1129,37 @@ def execute_optimized_beast_mode(execution_id, data):
 
         update_progress(10, 'account_info', 'Getting account info...', 'Retrieving Snapchat account information...')
 
-        # Get account info
+        # Get account info from token manager
         try:
-            me_response = requests.get('https://adsapi.snapchat.com/v1/me', headers=headers)
-            if me_response.status_code != 200:
-                update_progress(0, 'error', 'Account Error', f'Failed to get user info: {me_response.text}', error='Account access failed')
-                return
+            # First try to get ad account ID from token manager
+            ad_account_id = tm.get_ad_account_id()
 
-            me_data = me_response.json()
-            org_id = me_data['me']['organization_id']
+            if ad_account_id:
+                # Use the ad account ID from token manager
+                update_progress(15, 'creating_campaign', 'Creating campaign...', f'Using token manager ad account: {ad_account_id}')
+            else:
+                # Fallback: get account info from API
+                me_response = requests.get('https://adsapi.snapchat.com/v1/me', headers=headers)
+                if me_response.status_code != 200:
+                    update_progress(0, 'error', 'Account Error', f'Failed to get user info: {me_response.text}', error='Account access failed')
+                    return
 
-            accounts_response = requests.get(f'https://adsapi.snapchat.com/v1/organizations/{org_id}/adaccounts', headers=headers)
-            if accounts_response.status_code != 200:
-                update_progress(0, 'error', 'Account Error', f'Failed to get ad accounts: {accounts_response.text}', error='Ad account access failed')
-                return
+                me_data = me_response.json()
+                org_id = me_data['me']['organization_id']
 
-            accounts = accounts_response.json().get('adaccounts', [])
-            if not accounts:
-                update_progress(0, 'error', 'Account Error', 'No ad accounts found', error='No ad accounts available')
-                return
+                accounts_response = requests.get(f'https://adsapi.snapchat.com/v1/organizations/{org_id}/adaccounts', headers=headers)
+                if accounts_response.status_code != 200:
+                    update_progress(0, 'error', 'Account Error', f'Failed to get ad accounts: {accounts_response.text}', error='Ad account access failed')
+                    return
 
-            # Force use your specific ad account ID
-            ad_account_id = '27205503-c6b2-4aa7-89d1-3b8dd52f527d'
-            update_progress(15, 'creating_campaign', 'Creating campaign...', f'Using ad account: {ad_account_id}')
+                accounts = accounts_response.json().get('adaccounts', [])
+                if not accounts:
+                    update_progress(0, 'error', 'Account Error', 'No ad accounts found', error='No ad accounts available')
+                    return
+
+                # Use first available account as fallback
+                ad_account_id = accounts[0]['adaccount']['id']
+                update_progress(15, 'creating_campaign', 'Creating campaign...', f'Using fallback ad account: {ad_account_id}')
 
         except Exception as e:
             update_progress(0, 'error', 'Account Error', f'Error getting account info: {str(e)}', error=str(e))
