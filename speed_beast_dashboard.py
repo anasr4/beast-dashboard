@@ -894,8 +894,22 @@ def execute_test_bot_mode(execution_id, data):
             raise Exception(f"Ad set creation failed: {adset_response.text}")
 
         adset_result = adset_response.json()
-        adset_id = adset_result['adsquads'][0]['id']
-        adset_name = adset_result['adsquads'][0]['name']
+        print(f"[DEBUG] Test bot adset API response: {json.dumps(adset_result, indent=2)}")
+
+        # Check response structure properly
+        if 'adsquads' in adset_result and len(adset_result['adsquads']) > 0:
+            adsquad_item = adset_result['adsquads'][0]
+            if adsquad_item.get('sub_request_status') == 'SUCCESS':
+                if 'adsquad' in adsquad_item:
+                    adset_id = adsquad_item['adsquad']['id']
+                    adset_name = adsquad_item['adsquad']['name']
+                else:
+                    raise Exception(f"Test bot: No adsquad data in successful response")
+            else:
+                error_reason = adsquad_item.get('sub_request_error_reason', 'Unknown error')
+                raise Exception(f"Test bot adset creation failed: {error_reason}")
+        else:
+            raise Exception(f"Test bot: Invalid adset response structure")
 
         update_test_progress(50, "Loading videos and headlines...", adset_name=adset_name)
 
@@ -1242,9 +1256,30 @@ def execute_optimized_beast_mode(execution_id, data):
 
                 if ad_set_response.status_code == 200:
                     ad_set_result = ad_set_response.json()
-                    ad_set_id = ad_set_result['adsquads'][0]['adsquad']['id']
-                    ad_sets.append(ad_set_id)
-                    update_progress(20 + (ad_set_num * 5), 'creating_adsets', f'Ad set {str(ad_set_num)} created', f'Ad Set {str(ad_set_num)} created: {ad_set_id}')
+                    print(f"[DEBUG] Ad set {ad_set_num} API response: {json.dumps(ad_set_result, indent=2)}")
+
+                    # Check if we have adsquads in response
+                    if 'adsquads' in ad_set_result and len(ad_set_result['adsquads']) > 0:
+                        adsquad_item = ad_set_result['adsquads'][0]
+
+                        # Check sub_request_status
+                        if adsquad_item.get('sub_request_status') == 'SUCCESS':
+                            if 'adsquad' in adsquad_item and 'id' in adsquad_item['adsquad']:
+                                ad_set_id = adsquad_item['adsquad']['id']
+                                ad_sets.append(ad_set_id)
+                                update_progress(20 + (ad_set_num * 5), 'creating_adsets', f'Ad set {str(ad_set_num)} created', f'Ad Set {str(ad_set_num)} created: {ad_set_id}')
+                                print(f"[DEBUG] Ad set {ad_set_num} created successfully: {ad_set_id}")
+                            else:
+                                print(f"[ERROR] Ad set {ad_set_num}: No adsquad.id found in successful response")
+                                print(f"[ERROR] Available keys in adsquad: {list(adsquad_item.get('adsquad', {}).keys())}")
+                                update_progress(20 + (ad_set_num * 5), 'creating_adsets', f'Ad set {str(ad_set_num)} failed', f'Ad Set {str(ad_set_num)}: No ID in response')
+                        else:
+                            error_reason = adsquad_item.get('sub_request_error_reason', 'Unknown error')
+                            print(f"[ERROR] Ad set {ad_set_num} failed: {error_reason}")
+                            update_progress(20 + (ad_set_num * 5), 'creating_adsets', f'Ad set {str(ad_set_num)} failed', f'Ad Set {str(ad_set_num)}: {error_reason}')
+                    else:
+                        print(f"[ERROR] Ad set {ad_set_num}: No adsquads in response")
+                        update_progress(20 + (ad_set_num * 5), 'creating_adsets', f'Ad set {str(ad_set_num)} failed', f'Ad Set {str(ad_set_num)}: Invalid response structure')
                 else:
                     print(f"[DEBUG] Ad set {ad_set_num} creation failed. Status: {ad_set_response.status_code}, Response: {ad_set_response.text}")
                     update_progress(20 + (ad_set_num * 5), 'creating_adsets', f'Ad set {str(ad_set_num)} failed', f'Ad Set {str(ad_set_num)} creation failed: {ad_set_response.text}')
