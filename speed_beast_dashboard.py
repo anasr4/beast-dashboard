@@ -1248,53 +1248,30 @@ def execute_optimized_beast_mode(execution_id, data):
 
                 print(f"[DEBUG] Ad set {ad_set_num} JSON payload: {json.dumps(ad_set_data_api, indent=2)}")
 
-                # Use the SnapchatAPIClient method instead of direct API call (like yesterday's working code)
-                access_token = headers['Authorization'].replace('Bearer ', '')
-                api_client = SnapchatAPIClient(access_token, ad_account_id)
-
+                # RESTORE YESTERDAY'S WORKING METHOD: Direct API call (exactly like complete_beast_mode.py)
                 try:
-                    # Use the working API client method that handles response properly
-                    adsquad_data = ad_set_data_api['adsquads'][0]  # Extract the adsquad data
-                    print(f"[DEBUG] Ad set {ad_set_num} using SnapchatAPIClient.create_ad_squad() with campaign_id: {campaign_id}")
-                    ad_squad_result = api_client.create_ad_squad(campaign_id, adsquad_data)  # Use campaign_id, not ad_account_id
+                    headers = tm.get_headers()  # Refresh token
 
-                    print(f"[DEBUG] Ad set {ad_set_num} API client response: {json.dumps(ad_squad_result, indent=2)}")
-                    print(f"[DEBUG] Ad set {ad_set_num} response keys: {list(ad_squad_result.keys()) if isinstance(ad_squad_result, dict) else 'Not a dict'}")
+                    ad_set_response = requests.post(
+                        f'https://adsapi.snapchat.com/v1/campaigns/{campaign_id}/adsquads',
+                        headers=headers,
+                        json=ad_set_data_api
+                    )
 
-                    # The API client returns adsquads[0] directly, check multiple possible structures
-                    ad_set_id = None
+                    print(f"[DEBUG] Ad set {ad_set_num} HTTP status: {ad_set_response.status_code}")
 
-                    # API client returns adsquads[0] directly - check sub_request_status first
-                    if isinstance(ad_squad_result, dict):
-                        # Check if the request was successful
-                        if ad_squad_result.get('sub_request_status') == 'SUCCESS':
-                            # Success case: {'sub_request_status': 'SUCCESS', 'adsquad': {'id': '...', 'name': '...'}}
-                            if 'adsquad' in ad_squad_result and 'id' in ad_squad_result['adsquad']:
-                                ad_set_id = ad_squad_result['adsquad']['id']
-                                print(f"[DEBUG] Found adsquad ID in successful response: {ad_set_id}")
-                            else:
-                                print(f"[ERROR] Ad set {ad_set_num}: SUCCESS response but no adsquad data")
-                                update_progress(20 + (ad_set_num * 5), 'creating_adsets', f'Ad set {str(ad_set_num)} failed', f'Ad Set {str(ad_set_num)}: No adsquad in success response')
-                                continue
-                        else:
-                            # Error case: {'sub_request_status': 'ERROR', 'sub_request_error_reason': '...'}
-                            error_reason = ad_squad_result.get('sub_request_error_reason', f"Unknown error (status: {ad_squad_result.get('sub_request_status', 'Unknown')})")
-                            print(f"[ERROR] Ad set {ad_set_num} API request failed: {error_reason}")
-                            update_progress(20 + (ad_set_num * 5), 'creating_adsets', f'Ad set {str(ad_set_num)} failed', f'Ad Set {str(ad_set_num)}: {error_reason}')
-                            continue
-                    else:
-                        print(f"[ERROR] Ad set {ad_set_num}: API client returned non-dict response")
-                        update_progress(20 + (ad_set_num * 5), 'creating_adsets', f'Ad set {str(ad_set_num)} failed', f'Ad Set {str(ad_set_num)}: Invalid response type')
-                        continue
+                    if ad_set_response.status_code == 200:
+                        ad_set_result = ad_set_response.json()
+                        print(f"[DEBUG] Ad set {ad_set_num} response: {json.dumps(ad_set_result, indent=2)}")
 
-                    if ad_set_id:
+                        # EXACT WORKING PATTERN from yesterday's code
+                        ad_set_id = ad_set_result['adsquads'][0]['adsquad']['id']
                         ad_sets.append(ad_set_id)
                         update_progress(20 + (ad_set_num * 5), 'creating_adsets', f'Ad set {str(ad_set_num)} created', f'Ad Set {str(ad_set_num)} created: {ad_set_id}')
                         print(f"[DEBUG] Ad set {ad_set_num} created successfully: {ad_set_id}")
                     else:
-                        print(f"[ERROR] Ad set {ad_set_num}: Could not find adsquad ID in response")
-                        print(f"[ERROR] Full response: {ad_squad_result}")
-                        update_progress(20 + (ad_set_num * 5), 'creating_adsets', f'Ad set {str(ad_set_num)} failed', f'Ad Set {str(ad_set_num)}: No ID found')
+                        print(f"[ERROR] Ad set {ad_set_num} creation failed: {ad_set_response.text}")
+                        update_progress(20 + (ad_set_num * 5), 'creating_adsets', f'Ad set {str(ad_set_num)} failed', f'Ad Set {str(ad_set_num)} creation failed: {ad_set_response.text}')
 
                 except Exception as e:
                     import traceback
