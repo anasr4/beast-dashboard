@@ -10,12 +10,13 @@ from datetime import datetime, timedelta
 class TokenManager:
     def __init__(self):
         self.config_file = 'snapchat_tokens.json'
-        self.config = self.load_config()
 
-        # Default credentials - can be overridden in config
+        # Default credentials - set before loading config
         self.default_client_id = "26267fa4-831c-47fb-97b4-afca39be5877"
         self.default_client_secret = "84ec597b44ef3968088c"
         self.default_redirect_uri = "https://localhost:8000/auth/callback"
+
+        self.config = self.load_config()
 
     def load_config(self):
         """Load current token configuration"""
