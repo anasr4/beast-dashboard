@@ -1655,7 +1655,10 @@ def token_manager():
                 'expires_at': config.get('expires_at', 'Unknown'),
                 'is_expired': tm.is_token_expired(),
                 'client_id': config.get('client_id', '26267fa4-831c-47fb-97b4-afca39be5877'),
-                'has_refresh_token': bool(config.get('refresh_token'))
+                'has_refresh_token': bool(config.get('refresh_token')),
+                'ad_account_id': config.get('ad_account_id', ''),
+                'ad_account_name': config.get('ad_account_name', 'Not Set'),
+                'organization_id': config.get('organization_id', '')
             }
         else:
             token_info = {
@@ -1739,6 +1742,68 @@ def test_token_api():
         return jsonify({
             'success': False,
             'message': f'Error testing token: {str(e)}'
+        })
+
+@app.route('/api/ad-accounts/list', methods=['GET'])
+@require_auth
+def list_ad_accounts_api():
+    """API endpoint to list available ad accounts"""
+    try:
+        tm = TokenManager()
+        accounts = tm.list_available_ad_accounts()
+
+        if accounts:
+            return jsonify({
+                'success': True,
+                'accounts': accounts,
+                'current_account_id': tm.get_ad_account_id()
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'message': 'No ad accounts found or token invalid'
+            })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error listing ad accounts: {str(e)}'
+        })
+
+@app.route('/api/ad-accounts/set', methods=['POST'])
+@require_auth
+def set_ad_account_api():
+    """API endpoint to set ad account ID"""
+    try:
+        data = request.get_json()
+        ad_account_id = data.get('ad_account_id', '').strip()
+
+        if not ad_account_id:
+            return jsonify({
+                'success': False,
+                'message': 'Ad account ID is required'
+            })
+
+        tm = TokenManager()
+        success = tm.set_ad_account_id(ad_account_id)
+
+        if success:
+            # Get updated account info
+            account_info = tm.get_account_info()
+            return jsonify({
+                'success': True,
+                'message': 'Ad account set successfully',
+                'ad_account_id': account_info.get('ad_account_id'),
+                'ad_account_name': account_info.get('ad_account_name')
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'message': 'Failed to save ad account ID'
+            })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error setting ad account: {str(e)}'
         })
 
 @app.route('/api/token/update', methods=['POST'])
