@@ -892,7 +892,8 @@ def execute_test_bot_mode(execution_id, data):
         adsquad_data = adset_data['adsquads'][0]
 
         try:
-            adset_result = api_client.create_ad_squad(ad_account_id, adsquad_data)
+            print(f"[DEBUG] Test bot using campaign_id: {campaign_id}")
+            adset_result = api_client.create_ad_squad(campaign_id, adsquad_data)  # Use campaign_id, not ad_account_id
             print(f"[DEBUG] Test bot API client response: {json.dumps(adset_result, indent=2)}")
 
             # The API client returns the adsquad directly (like yesterday's working code)
@@ -1254,8 +1255,8 @@ def execute_optimized_beast_mode(execution_id, data):
                 try:
                     # Use the working API client method that handles response properly
                     adsquad_data = ad_set_data_api['adsquads'][0]  # Extract the adsquad data
-                    print(f"[DEBUG] Ad set {ad_set_num} using SnapchatAPIClient.create_ad_squad()")
-                    ad_squad_result = api_client.create_ad_squad(ad_account_id, adsquad_data)
+                    print(f"[DEBUG] Ad set {ad_set_num} using SnapchatAPIClient.create_ad_squad() with campaign_id: {campaign_id}")
+                    ad_squad_result = api_client.create_ad_squad(campaign_id, adsquad_data)  # Use campaign_id, not ad_account_id
 
                     print(f"[DEBUG] Ad set {ad_set_num} API client response: {json.dumps(ad_squad_result, indent=2)}")
 
