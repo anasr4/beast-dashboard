@@ -864,7 +864,7 @@ def execute_test_bot_mode(execution_id, data):
 
         update_test_progress(30, "Creating ad set...")
 
-        # 2. Create Ad Set
+        # 2. Create Ad Set (NO AGE TARGETING FOR CONVERSIONS)
         adset_data = {
             'adsquads': [{
                 'name': data['adsets']['base_name'],
@@ -874,14 +874,13 @@ def execute_test_bot_mode(execution_id, data):
                 'daily_budget_micro': int(float(data['adsets']['budget_per_adset'])) * 1000000,
                 'start_time': data['campaign']['start_date'],
                 'targeting': {
-                    'geos': [{'country_code': country} for country in data['adsets']['countries']],
-                    'demographics': [{
-                        'min_age': data['adsets']['min_age'],
-                        'max_age': data['adsets']['max_age']
-                    }]
+                    'geos': [{'country_code': country} for country in data['adsets']['countries']]
+                    # NO DEMOGRAPHICS/AGE for CONVERSIONS optimization
                 }
             }]
         }
+
+        print(f"[DEBUG] [TEST BOT] Skipping age targeting for CONVERSIONS optimization")
 
         print(f"[DEBUG] [TEST BOT] Creating ad set for campaign {campaign_id}")
         adset_response = requests.post(
@@ -1209,20 +1208,29 @@ def execute_optimized_beast_mode(execution_id, data):
 
                 headers = tm.get_headers()  # Refresh token
 
+                # For CONVERSIONS optimization, age targeting is not allowed
+                targeting_config = {
+                    'regulated_content': False,
+                    'geos': [{'country_code': country.lower()} for country in countries]
+                }
+
+                # Only add age demographics if NOT using CONVERSIONS
+                optimization_goal = 'CONVERSIONS'  # We're using conversions
+                if optimization_goal != 'CONVERSIONS':
+                    targeting_config['demographics'] = [{
+                        'min_age': min_age,
+                        'max_age': max_age
+                    }]
+                else:
+                    print(f"[DEBUG] Skipping age targeting for CONVERSIONS optimization")
+
                 ad_set_data_api = {
                     'adsquads': [{
                         'name': f'{campaign_name} - Ad Set {str(ad_set_num)}',
                         'status': 'ACTIVE',
                         'campaign_id': campaign_id,
                         'type': 'SNAP_ADS',
-                        'targeting': {
-                            'regulated_content': False,
-                            'demographics': [{
-                                'min_age': min_age,
-                                'max_age': max_age
-                            }],
-                            'geos': [{'country_code': country.lower()} for country in countries]
-                        },
+                        'targeting': targeting_config,
                         'placement_v2': {'config': 'AUTOMATIC'},
                         'billing_event': 'IMPRESSION',
                         'auto_bid': True,
