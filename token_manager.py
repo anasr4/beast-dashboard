@@ -106,9 +106,13 @@ class TokenManager:
             if response.status_code == 200:
                 token_info = response.json()
 
-                # Update config with new tokens
-                self.config['access_token'] = token_info.get('access_token')
-                self.config['refresh_token'] = token_info.get('refresh_token')
+                # Update config with new tokens (clean them)
+                access_token = token_info.get('access_token', '')
+                refresh_token = token_info.get('refresh_token', '')
+
+                # Clean tokens by removing whitespace and newlines
+                self.config['access_token'] = ''.join(access_token.split()) if access_token else None
+                self.config['refresh_token'] = ''.join(refresh_token.split()) if refresh_token else None
 
                 # Calculate expiration time
                 expires_in = token_info.get('expires_in', 3600)
@@ -209,10 +213,14 @@ class TokenManager:
             if response.status_code == 200:
                 token_info = response.json()
 
-                # Update config with new tokens
-                self.config['access_token'] = token_info.get('access_token')
-                if 'refresh_token' in token_info:
-                    self.config['refresh_token'] = token_info.get('refresh_token')
+                # Update config with new tokens (clean them)
+                access_token = token_info.get('access_token', '')
+                refresh_token = token_info.get('refresh_token', '')
+
+                # Clean tokens by removing whitespace and newlines
+                self.config['access_token'] = ''.join(access_token.split()) if access_token else None
+                if 'refresh_token' in token_info and refresh_token:
+                    self.config['refresh_token'] = ''.join(refresh_token.split())
 
                 # Calculate expiration time
                 expires_in = token_info.get('expires_in', 3600)
@@ -253,8 +261,11 @@ class TokenManager:
         if not token:
             return None
 
+        # Clean the token - remove any whitespace, newlines, or invalid characters
+        clean_token = ''.join(token.split())
+
         return {
-            'Authorization': f'Bearer {token}',
+            'Authorization': f'Bearer {clean_token}',
             'Content-Type': 'application/json'
         }
 
