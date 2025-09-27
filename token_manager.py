@@ -273,6 +273,123 @@ class TokenManager:
         """Get the stored ad account ID"""
         return self.config.get('ad_account_id') if self.config else None
 
+    def set_ad_account_id(self, ad_account_id):
+        """Set a specific ad account ID to target"""
+        if not self.config:
+            self.config = {}
+
+        self.config['ad_account_id'] = ad_account_id
+
+        # Also fetch and store the account name if we have a valid token
+        if self.get_valid_token():
+            try:
+                headers = self.get_headers()
+                response = requests.get(f'https://adsapi.snapchat.com/v1/adaccounts/{ad_account_id}', headers=headers)
+                if response.status_code == 200:
+                    account_data = response.json()
+                    account_name = account_data.get('adaccount', {}).get('name', 'Unknown')
+                    self.config['ad_account_name'] = account_name
+                    print(f"[SUCCESS] Set target ad account: {ad_account_id} ({account_name})")
+                else:
+                    print(f"[WARNING] Could not fetch account name for {ad_account_id}")
+            except Exception as e:
+                print(f"[WARNING] Error fetching account details: {e}")
+
+        return self.save_config(self.config)
+
+    def list_available_ad_accounts(self):
+        """List all available ad accounts for the current user"""
+        if not self.get_valid_token():
+            print("[ERROR] No valid token available")
+            return []
+
+        headers = self.get_headers()
+        if not headers:
+            print("[ERROR] Could not get valid headers")
+            return []
+
+        try:
+            # Get user info first
+            me_response = requests.get('https://adsapi.snapchat.com/v1/me', headers=headers)
+            if me_response.status_code != 200:
+                print(f"[ERROR] Failed to get user info: {me_response.text}")
+                return []
+
+            me_data = me_response.json()
+            org_id = me_data['me']['organization_id']
+
+            # Get all ad accounts
+            accounts_response = requests.get(
+                f'https://adsapi.snapchat.com/v1/organizations/{org_id}/adaccounts',
+                headers=headers
+            )
+            if accounts_response.status_code != 200:
+                print(f"[ERROR] Failed to get ad accounts: {accounts_response.text}")
+                return []
+
+            accounts = accounts_response.json().get('adaccounts', [])
+
+            account_list = []
+            print("\n=== AVAILABLE AD ACCOUNTS ===")
+            for i, account_item in enumerate(accounts, 1):
+                account = account_item['adaccount']
+                account_info = {
+                    'id': account['id'],
+                    'name': account.get('name', 'Unknown'),
+                    'status': account.get('status', 'Unknown'),
+                    'currency': account.get('currency', 'USD')
+                }
+                account_list.append(account_info)
+                current = " (CURRENT)" if account['id'] == self.get_ad_account_id() else ""
+                print(f"{i}. {account['id']} - {account.get('name', 'Unknown')} [{account.get('status', 'Unknown')}]{current}")
+
+            print("=" * 30)
+            return account_list
+
+        except Exception as e:
+            print(f"[ERROR] Failed to list ad accounts: {e}")
+            return []
+
+    def select_ad_account_interactive(self):
+        """Interactive selection of ad account"""
+        accounts = self.list_available_ad_accounts()
+        if not accounts:
+            print("[ERROR] No ad accounts available")
+            return False
+
+        try:
+            choice = input(f"\nSelect ad account (1-{len(accounts)}) or enter account ID directly: ").strip()
+
+            # Check if it's a number (selection from list)
+            if choice.isdigit():
+                choice_num = int(choice)
+                if 1 <= choice_num <= len(accounts):
+                    selected_account = accounts[choice_num - 1]
+                    if self.set_ad_account_id(selected_account['id']):
+                        print(f"[SUCCESS] Selected ad account: {selected_account['name']}")
+                        return True
+                    else:
+                        print("[ERROR] Failed to save ad account selection")
+                        return False
+                else:
+                    print("[ERROR] Invalid selection")
+                    return False
+            else:
+                # Direct account ID entry
+                if self.set_ad_account_id(choice):
+                    print(f"[SUCCESS] Set ad account ID: {choice}")
+                    return True
+                else:
+                    print("[ERROR] Failed to save ad account ID")
+                    return False
+
+        except KeyboardInterrupt:
+            print("\n[INFO] Selection cancelled")
+            return False
+        except Exception as e:
+            print(f"[ERROR] Selection failed: {e}")
+            return False
+
     def start_authorization(self):
         """Start the OAuth authorization flow"""
         auth_url = self.generate_auth_url()
@@ -349,14 +466,30 @@ def test_token_manager():
         except Exception as e:
             print(f"[ERROR] API test failed: {e}")
 
+        # Option to change ad account
+        print("\nOptions:")
+        print("1. Change ad account")
+        print("2. List all ad accounts")
+        print("3. Exit")
+
+        try:
+            option = input("Enter option (1-3): ").strip()
+            if option == "1":
+                tm.select_ad_account_interactive()
+            elif option == "2":
+                tm.list_available_ad_accounts()
+        except KeyboardInterrupt:
+            print("\n[INFO] Exiting...")
+
     else:
         print("[INFO] Authorization required")
         print("Choose an option:")
         print("1. Start OAuth authorization flow")
         print("2. Enter authorization code manually")
         print("3. Setup custom credentials")
+        print("4. Select/change ad account")
 
-        choice = input("Enter choice (1-3): ").strip()
+        choice = input("Enter choice (1-4): ").strip()
 
         if choice == "1":
             # Start full OAuth flow
@@ -399,6 +532,10 @@ def test_token_manager():
                 print("[SUCCESS] Credentials updated!")
             else:
                 print("[ERROR] Failed to update credentials")
+
+        elif choice == "4":
+            # Select/change ad account
+            tm.select_ad_account_interactive()
 
 if __name__ == "__main__":
     test_token_manager()
