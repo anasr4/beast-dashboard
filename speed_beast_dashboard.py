@@ -1297,7 +1297,10 @@ def execute_optimized_beast_mode(execution_id, data):
                         update_progress(20 + (ad_set_num * 5), 'creating_adsets', f'Ad set {str(ad_set_num)} failed', f'Ad Set {str(ad_set_num)}: No ID found')
 
                 except Exception as e:
+                    import traceback
                     print(f"[ERROR] Ad set {ad_set_num} creation failed: {str(e)}")
+                    print(f"[ERROR] Ad set {ad_set_num} full traceback:")
+                    print(traceback.format_exc())
                     update_progress(20 + (ad_set_num * 5), 'creating_adsets', f'Ad set {str(ad_set_num)} failed', f'Ad Set {str(ad_set_num)} failed: {str(e)}')
 
                 time.sleep(0.1)  # Rate limiting
@@ -1305,6 +1308,10 @@ def execute_optimized_beast_mode(execution_id, data):
             update_progress(45, 'uploading_media', 'Loading videos...', f'Created {len(ad_sets)} ad sets successfully')
 
         except Exception as e:
+            import traceback
+            print(f"[ERROR] Critical error in ad set creation: {str(e)}")
+            print(f"[ERROR] Full traceback:")
+            print(traceback.format_exc())
             update_progress(0, 'error', 'Ad Set Error', f'Error creating ad sets: {str(e)}', error=str(e))
             return
 
