@@ -1264,26 +1264,28 @@ def execute_optimized_beast_mode(execution_id, data):
                     # The API client returns adsquads[0] directly, check multiple possible structures
                     ad_set_id = None
 
-                    # Try different response structures based on API client return
+                    # API client returns adsquads[0] directly - check sub_request_status first
                     if isinstance(ad_squad_result, dict):
-                        if 'adsquad' in ad_squad_result and isinstance(ad_squad_result['adsquad'], dict) and 'id' in ad_squad_result['adsquad']:
-                            # Structure: {'adsquad': {'id': '...', 'name': '...'}}
-                            ad_set_id = ad_squad_result['adsquad']['id']
-                            print(f"[DEBUG] Found adsquad ID in nested structure: {ad_set_id}")
-                        elif 'id' in ad_squad_result:
-                            # Structure: {'id': '...', 'name': '...', 'sub_request_status': 'SUCCESS'}
-                            ad_set_id = ad_squad_result['id']
-                            print(f"[DEBUG] Found adsquad ID in direct structure: {ad_set_id}")
-                        elif 'sub_request_status' in ad_squad_result:
-                            # Check sub_request_status if present
-                            if ad_squad_result.get('sub_request_status') == 'SUCCESS' and 'adsquad' in ad_squad_result:
+                        # Check if the request was successful
+                        if ad_squad_result.get('sub_request_status') == 'SUCCESS':
+                            # Success case: {'sub_request_status': 'SUCCESS', 'adsquad': {'id': '...', 'name': '...'}}
+                            if 'adsquad' in ad_squad_result and 'id' in ad_squad_result['adsquad']:
                                 ad_set_id = ad_squad_result['adsquad']['id']
-                                print(f"[DEBUG] Found adsquad ID in sub_request structure: {ad_set_id}")
+                                print(f"[DEBUG] Found adsquad ID in successful response: {ad_set_id}")
                             else:
-                                error_reason = ad_squad_result.get('sub_request_error_reason', 'Unknown error')
-                                print(f"[ERROR] Ad set {ad_set_num} sub_request failed: {error_reason}")
-                                update_progress(20 + (ad_set_num * 5), 'creating_adsets', f'Ad set {str(ad_set_num)} failed', f'Ad Set {str(ad_set_num)}: {error_reason}')
+                                print(f"[ERROR] Ad set {ad_set_num}: SUCCESS response but no adsquad data")
+                                update_progress(20 + (ad_set_num * 5), 'creating_adsets', f'Ad set {str(ad_set_num)} failed', f'Ad Set {str(ad_set_num)}: No adsquad in success response')
                                 continue
+                        else:
+                            # Error case: {'sub_request_status': 'ERROR', 'sub_request_error_reason': '...'}
+                            error_reason = ad_squad_result.get('sub_request_error_reason', f"Unknown error (status: {ad_squad_result.get('sub_request_status', 'Unknown')})")
+                            print(f"[ERROR] Ad set {ad_set_num} API request failed: {error_reason}")
+                            update_progress(20 + (ad_set_num * 5), 'creating_adsets', f'Ad set {str(ad_set_num)} failed', f'Ad Set {str(ad_set_num)}: {error_reason}')
+                            continue
+                    else:
+                        print(f"[ERROR] Ad set {ad_set_num}: API client returned non-dict response")
+                        update_progress(20 + (ad_set_num * 5), 'creating_adsets', f'Ad set {str(ad_set_num)} failed', f'Ad Set {str(ad_set_num)}: Invalid response type')
+                        continue
 
                     if ad_set_id:
                         ad_sets.append(ad_set_id)
