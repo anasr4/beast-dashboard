@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Beast Mode Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .bots-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .bot-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .bot-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.2);
+        }
+
+        .bot-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: var(--accent-color);
+            border-radius: 20px 20px 0 0;
+        }
+
+        .bot-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .bot-icon {
+            font-size: 3rem;
+            margin-right: 20px;
+            filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.1));
+        }
+
+        .bot-info h3 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .bot-info p {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            font-weight: 400;
+        }
+
+        .bot-status {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #27ae60;
+            color: white;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-top: 15px;
+        }
+
+        .bot-features {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #ecf0f1;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+            color: #34495e;
+            font-size: 0.95rem;
+        }
+
+        .feature::before {
+            content: '✓';
+            margin-right: 10px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .special-highlight {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+        }
+
+        .special-highlight .bot-info h3,
+        .special-highlight .bot-info p {
+            color: white;
+        }
+
+        .special-highlight .bot-features {
+            border-top-color: rgba(255,255,255,0.2);
+        }
+
+        .special-highlight .feature {
+            color: rgba(255,255,255,0.9);
+        }
+
+        .special-highlight::before {
+            background: rgba(255,255,255,0.3);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 15px;
+            }
+
+            .header h1 {
+                font-size: 2.5rem;
+            }
+
+            .bots-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .bot-card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Enhanced Beast Mode Dashboard</h1>
+            <p>Advanced Snapchat Marketing Campaign Management System</p>
+        </div>
+
+        <div class="bots-grid">
+            <!-- Folder Beast Mode - Special Highlight -->
+            <div class="bot-card special-highlight" style="--accent-color: {{ bots.folder_beast.color }}">
+                <div class="bot-header">
+                    <div class="bot-icon">{{ bots.folder_beast.icon }}</div>
+                    <div class="bot-info">
+                        <h3>{{ bots.folder_beast.name }}</h3>
+                        <p>{{ bots.folder_beast.description }}</p>
+                    </div>
+                </div>
+                <div class="bot-status">{{ bots.folder_beast.status.title() }}</div>
+                <div class="bot-features">
+                    <div class="feature">Enhanced 3-Step Wizard Interface</div>
+                    <div class="feature">Campaign Details: Name, Objective, Budget</div>
+                    <div class="feature">Ad Sets: Saudi Arabia & UAE Targeting</div>
+                    <div class="feature">Age Range: 22-55+ Years</div>
+                    <div class="feature">File Upload: 200 Videos + CSV Headlines</div>
+                    <div class="feature">Complete Ad Details Management</div>
+                </div>
+                <a href="/folder-beast" class="cta-button">Launch Beast Mode →</a>
+            </div>
+
+            <!-- Other Bots -->
+            <div class="bot-card" style="--accent-color: {{ bots.single_ad.color }}">
+                <div class="bot-header">
+                    <div class="bot-icon">{{ bots.single_ad.icon }}</div>
+                    <div class="bot-info">
+                        <h3>{{ bots.single_ad.name }}</h3>
+                        <p>{{ bots.single_ad.description }}</p>
+                    </div>
+                </div>
+                <div class="bot-status">{{ bots.single_ad.status.title() }}</div>
+                <div class="bot-features">
+                    <div class="feature">Quick single ad creation</div>
+                    <div class="feature">Custom creative upload</div>
+                    <div class="feature">Instant deployment</div>
+                </div>
+                <a href="/single-ad" class="cta-button">Create Ad →</a>
+            </div>
+
+            <div class="bot-card" style="--accent-color: {{ bots.campaign_manager.color }}">
+                <div class="bot-header">
+                    <div class="bot-icon">{{ bots.campaign_manager.icon }}</div>
+                    <div class="bot-info">
+                        <h3>{{ bots.campaign_manager.name }}</h3>
+                        <p>{{ bots.campaign_manager.description }}</p>
+                    </div>
+                </div>
+                <div class="bot-status">{{ bots.campaign_manager.status.title() }}</div>
+                <div class="bot-features">
+                    <div class="feature">View active campaigns</div>
+                    <div class="feature">Edit campaign settings</div>
+                    <div class="feature">Pause/Resume campaigns</div>
+                </div>
+                <a href="/campaign-manager" class="cta-button">Manage →</a>
+            </div>
+
+            <div class="bot-card" style="--accent-color: {{ bots.token_manager.color }}">
+                <div class="bot-header">
+                    <div class="bot-icon">{{ bots.token_manager.icon }}</div>
+                    <div class="bot-info">
+                        <h3>{{ bots.token_manager.name }}</h3>
+                        <p>{{ bots.token_manager.description }}</p>
+                    </div>
+                </div>
+                <div class="bot-status">{{ bots.token_manager.status.title() }}</div>
+                <div class="bot-features">
+                    <div class="feature">Auto token refresh</div>
+                    <div class="feature">Token status monitoring</div>
+                    <div class="feature">Authentication management</div>
+                </div>
+                <a href="/token-manager" class="cta-button">Manage Tokens →</a>
+            </div>
+
+            <div class="bot-card" style="--accent-color: {{ bots.analytics_bot.color }}">
+                <div class="bot-header">
+                    <div class="bot-icon">{{ bots.analytics_bot.icon }}</div>
+                    <div class="bot-info">
+                        <h3>{{ bots.analytics_bot.name }}</h3>
+                        <p>{{ bots.analytics_bot.description }}</p>
+                    </div>
+                </div>
+                <div class="bot-status">{{ bots.analytics_bot.status.title() }}</div>
+                <div class="bot-features">
+                    <div class="feature">Real-time performance data</div>
+                    <div class="feature">ROI calculations</div>
+                    <div class="feature">Campaign insights</div>
+                </div>
+                <a href="/analytics-bot" class="cta-button">View Analytics →</a>
+            </div>
+
+            <div class="bot-card" style="--accent-color: {{ bots.bulk_uploader.color }}">
+                <div class="bot-header">
+                    <div class="bot-icon">{{ bots.bulk_uploader.icon }}</div>
+                    <div class="bot-info">
+                        <h3>{{ bots.bulk_uploader.name }}</h3>
+                        <p>{{ bots.bulk_uploader.description }}</p>
+                    </div>
+                </div>
+                <div class="bot-status">{{ bots.bulk_uploader.status.title() }}</div>
+                <div class="bot-features">
+                    <div class="feature">Bulk video uploads</div>
+                    <div class="feature">Progress tracking</div>
+                    <div class="feature">Error handling</div>
+                </div>
+                <a href="/bulk-uploader" class="cta-button">Upload Media →</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

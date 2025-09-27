@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 Create Campaign - Snapchat Beast</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .form-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #FFD700;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #FFD700;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .progress-container {
+            display: none;
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 25px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #4ECDC4, #44A08D);
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 15px;
+        }
+
+        .progress-text {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .progress-step {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            text-align: center;
+        }
+
+        .success-container {
+            display: none;
+            margin-top: 30px;
+            padding: 30px;
+            background: rgba(76, 175, 80, 0.2);
+            border: 2px solid #4CAF50;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .error-container {
+            display: none;
+            margin-top: 30px;
+            padding: 30px;
+            background: rgba(244, 67, 54, 0.2);
+            border: 2px solid #f44336;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .results-section {
+            display: none;
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .back-btn {
+            background: linear-gradient(45deg, #666, #888);
+            margin-right: 15px;
+            width: auto;
+            display: inline-block;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Create Snapchat Campaign</h1>
+            <p>Launch your campaign with PIXEL_PURCHASE optimization in one click!</p>
+        </div>
+
+        <div class="form-container">
+            <form id="campaignForm">
+                <div class="form-group">
+                    <label for="campaign_name">Campaign Name</label>
+                    <input type="text" id="campaign_name" name="campaign_name" value="Anas Sales Campaign" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="daily_budget">Daily Budget ($)</label>
+                        <input type="number" id="daily_budget" name="daily_budget" value="25" min="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="target_country">Target Country</label>
+                        <select id="target_country" name="target_country" required>
+                            <option value="SA" selected>Saudi Arabia</option>
+                            <option value="US">United States</option>
+                            <option value="GB">United Kingdom</option>
+                            <option value="CA">Canada</option>
+                            <option value="AU">Australia</option>
+                            <option value="AE">UAE</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="age_group">Age Group</label>
+                        <select id="age_group" name="age_group" required>
+                            <option value="22-55" selected>22-55</option>
+                            <option value="18-24">18-24</option>
+                            <option value="25-34">25-34</option>
+                            <option value="35-44">35-44</option>
+                            <option value="45-55">45-55</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="media_file">Media File Path</label>
+                        <input type="text" id="media_file" name="media_file" value="test_image.jpg" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="headline">Headline</label>
+                    <input type="text" id="headline" name="headline" value="free shipping" maxlength="34" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="cta_type">Call to Action</label>
+                        <select id="cta_type" name="cta_type" required>
+                            <option value="SHOP_NOW" selected>Shop Now</option>
+                            <option value="LEARN_MORE">Learn More</option>
+                            <option value="SIGN_UP">Sign Up</option>
+                            <option value="DOWNLOAD">Download</option>
+                            <option value="GET_NOW">Get Now</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="brand_name">Brand Name</label>
+                        <input type="text" id="brand_name" name="brand_name" value="anas" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="landing_url">Landing Page URL</label>
+                    <input type="url" id="landing_url" name="landing_url" value="https://sallagcc.com" required>
+                </div>
+
+                <a href="/" class="btn back-btn">← Back to Dashboard</a>
+                <button type="submit" class="btn" id="submitBtn">🚀 Launch Campaign</button>
+            </form>
+
+            <!-- Progress Section -->
+            <div class="progress-container" id="progressContainer">
+                <div class="progress-text" id="progressText">Preparing automation...</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-step" id="progressStep">Initializing...</div>
+            </div>
+
+            <!-- Success Section -->
+            <div class="success-container" id="successContainer">
+                <h3>🎉 CAMPAIGN CREATED SUCCESSFULLY!</h3>
+                <p>Your campaign is now live in Snapchat Ads Manager with PIXEL_PURCHASE optimization!</p>
+
+                <div class="results-section" id="resultsSection">
+                    <h4>Campaign Details:</h4>
+                    <div id="campaignResults"></div>
+                </div>
+
+                <button class="btn" onclick="location.href='/'">🏠 Back to Dashboard</button>
+                <button class="btn" onclick="createAnother()">🔄 Create Another</button>
+            </div>
+
+            <!-- Error Section -->
+            <div class="error-container" id="errorContainer">
+                <h3>❌ Campaign Creation Failed</h3>
+                <p id="errorMessage">An error occurred during campaign creation.</p>
+                <button class="btn" onclick="retryCreation()">🔄 Try Again</button>
+                <button class="btn back-btn" onclick="location.href='/'">🏠 Back to Dashboard</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let statusCheckInterval;
+
+        document.getElementById('campaignForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            startCampaignCreation();
+        });
+
+        function startCampaignCreation() {
+            const form = document.getElementById('campaignForm');
+            const formData = new FormData(form);
+
+            // Hide form and show progress
+            form.style.display = 'none';
+            document.getElementById('progressContainer').style.display = 'block';
+
+            // Submit form
+            fetch('/start_automation', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Start checking status
+                    statusCheckInterval = setInterval(checkStatus, 2000);
+                } else {
+                    showError(data.error || 'Failed to start automation');
+                }
+            })
+            .catch(error => {
+                showError('Network error: ' + error.message);
+            });
+        }
+
+        function checkStatus() {
+            fetch('/status')
+                .then(response => response.json())
+                .then(data => {
+                    updateProgress(data.progress, data.current_step);
+
+                    if (data.completed && data.progress >= 100) {
+                        clearInterval(statusCheckInterval);
+                        showSuccess(data.results);
+                    } else if (data.error) {
+                        clearInterval(statusCheckInterval);
+                        showError(data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Status check error:', error);
+                });
+        }
+
+        function updateProgress(progress, step) {
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('progressText').textContent = `Progress: ${progress}%`;
+            document.getElementById('progressStep').textContent = step || 'Processing...';
+        }
+
+        function showSuccess(results) {
+            document.getElementById('progressContainer').style.display = 'none';
+            document.getElementById('successContainer').style.display = 'block';
+
+            // Display results
+            if (results) {
+                let resultsHtml = '';
+                if (results.campaign) {
+                    resultsHtml += `<div class="result-item"><span>Campaign ID:</span><span>${results.campaign.campaign.id}</span></div>`;
+                }
+                if (results.ad_squad) {
+                    resultsHtml += `<div class="result-item"><span>Ad Squad ID:</span><span>${results.ad_squad.adsquad.id}</span></div>`;
+                }
+                if (results.creative) {
+                    resultsHtml += `<div class="result-item"><span>Creative ID:</span><span>${results.creative.creative.id}</span></div>`;
+                }
+                if (results.ad) {
+                    resultsHtml += `<div class="result-item"><span>Ad ID:</span><span>${results.ad.ad.id}</span></div>`;
+                }
+
+                if (resultsHtml) {
+                    document.getElementById('resultsSection').style.display = 'block';
+                    document.getElementById('campaignResults').innerHTML = resultsHtml;
+                }
+            }
+        }
+
+        function showError(error) {
+            document.getElementById('progressContainer').style.display = 'none';
+            document.getElementById('errorContainer').style.display = 'block';
+            document.getElementById('errorMessage').textContent = error;
+        }
+
+        function createAnother() {
+            // Reset form
+            document.getElementById('successContainer').style.display = 'none';
+            document.getElementById('campaignForm').style.display = 'block';
+            document.getElementById('campaignForm').reset();
+
+            // Reset default values
+            document.getElementById('campaign_name').value = 'Anas Sales Campaign';
+            document.getElementById('daily_budget').value = '25';
+            document.getElementById('target_country').value = 'SA';
+            document.getElementById('age_group').value = '22-55';
+            document.getElementById('media_file').value = 'test_image.jpg';
+            document.getElementById('headline').value = 'free shipping';
+            document.getElementById('cta_type').value = 'SHOP_NOW';
+            document.getElementById('brand_name').value = 'anas';
+            document.getElementById('landing_url').value = 'https://sallagcc.com';
+        }
+
+        function retryCreation() {
+            document.getElementById('errorContainer').style.display = 'none';
+            document.getElementById('campaignForm').style.display = 'block';
+        }
+    </script>
+</body>
+</html>

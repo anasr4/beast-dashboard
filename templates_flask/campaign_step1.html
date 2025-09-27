@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 Step 1: Campaign Setup - Snapchat Beast</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a1a 25%, #2d2d2d 50%, #1a1a1a 75%, #0c0c0c 100%);
+            background-size: 400% 400%;
+            animation: subtleGradient 15s ease infinite;
+            min-height: 100vh;
+            color: #ffffff;
+            line-height: 1.6;
+        }
+
+        @keyframes subtleGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 40px;
+            border-radius: 24px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            background: linear-gradient(45deg, #FFD700, #FFA500, #FF6B35);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+            text-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            color: #e0e0e0;
+        }
+
+        .progress-bar {
+            background: rgba(255, 255, 255, 0.1);
+            height: 8px;
+            border-radius: 20px;
+            margin: 30px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            height: 100%;
+            width: 33%;
+            border-radius: 20px;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 40px;
+            gap: 20px;
+        }
+
+        .step {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 20px 25px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .step.active {
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            transform: scale(1.02);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.2);
+        }
+
+        .step.completed {
+            background: rgba(76, 175, 80, 0.1);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .step.active .step-number {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: #000;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 40px;
+            align-items: start;
+        }
+
+        .form-container {
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 24px;
+            padding: 40px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .section {
+            margin-bottom: 40px;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 30px;
+            border-radius: 16px;
+            border-left: 4px solid #FFD700;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 25px;
+            color: #FFD700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+        }
+
+        .objective-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        .objective-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .objective-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 215, 0, 0.5);
+            background: rgba(255, 215, 0, 0.05);
+            box-shadow: 0 15px 30px rgba(255, 215, 0, 0.1);
+        }
+
+        .objective-card.selected {
+            background: rgba(255, 215, 0, 0.1);
+            border-color: #FFD700;
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
+        }
+
+        .objective-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .objective-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #ffffff;
+        }
+
+        .objective-description {
+            font-size: 0.95rem;
+            opacity: 0.8;
+            line-height: 1.5;
+            color: #e0e0e0;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #FFD700;
+            font-size: 1rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.4);
+            color: #ffffff;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #FFD700;
+            background: rgba(0, 0, 0, 0.6);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .preview-panel {
+            position: sticky;
+            top: 20px;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 30px;
+            border-radius: 20px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            height: fit-content;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .preview-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 25px;
+            color: #FFD700;
+            text-align: center;
+        }
+
+        .preview-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.95rem;
+        }
+
+        .preview-item:last-child {
+            border-bottom: none;
+        }
+
+        .preview-label {
+            font-weight: 600;
+            opacity: 0.8;
+            color: #e0e0e0;
+        }
+
+        .preview-value {
+            color: #FFD700;
+            font-weight: 500;
+        }
+
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn {
+            padding: 16px 32px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+            min-width: 160px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: #000;
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(255, 215, 0, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+
+            .objective-cards {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .header h1 {
+                font-size: 2.2rem;
+            }
+
+            .step-indicator {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .navigation-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Campaign & Objective Setup</h1>
+            <p>Create your ultimate Snapchat campaign with advanced targeting</p>
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+        </div>
+
+        <div class="step-indicator">
+            <div class="step active">
+                <div class="step-number">1</div>
+                <div>
+                    <div style="font-weight: 600;">Campaign Setup</div>
+                    <div style="font-size: 0.9rem; opacity: 0.8;">Basic information & objective</div>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <div>
+                    <div style="font-weight: 600;">Ad Set Configuration</div>
+                    <div style="font-size: 0.9rem; opacity: 0.8;">Targeting & budget</div>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <div>
+                    <div style="font-weight: 600;">Creative Setup</div>
+                    <div style="font-size: 0.9rem; opacity: 0.8;">Videos & headlines</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="form-container">
+                <form id="campaignForm">
+
+                    <!-- Campaign Information -->
+                    <div class="section">
+                        <div class="section-title">
+                            📊 Campaign Information
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="campaign_name">Campaign Name</label>
+                                <input type="text" id="campaign_name" name="campaign_name"
+                                       value="Beast Mode Sales Campaign"
+                                       placeholder="Enter campaign name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="campaign_status">Campaign Status</label>
+                                <select id="campaign_status" name="campaign_status" required>
+                                    <option value="PAUSED" selected>PAUSED (Recommended)</option>
+                                    <option value="ACTIVE">ACTIVE</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="buy_model">Buy Model</label>
+                            <select id="buy_model" name="buy_model" required>
+                                <option value="AUCTION" selected>AUCTION</option>
+                                <option value="RESERVED">RESERVED</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Campaign Objective -->
+                    <div class="section">
+                        <div class="section-title">
+                            🎯 Campaign Objective
+                        </div>
+
+                        <div class="objective-cards">
+                            <div class="objective-card selected" data-objective="SALES">
+                                <div class="objective-icon">💰</div>
+                                <div class="objective-title">Sales</div>
+                                <div class="objective-description">Drive purchases and conversions on your website with pixel tracking</div>
+                            </div>
+                            <div class="objective-card" data-objective="TRAFFIC">
+                                <div class="objective-icon">🌐</div>
+                                <div class="objective-title">Traffic</div>
+                                <div class="objective-description">Send more people to your website or landing page</div>
+                            </div>
+                            <div class="objective-card" data-objective="APP_INSTALLS">
+                                <div class="objective-icon">📱</div>
+                                <div class="objective-title">App Installs</div>
+                                <div class="objective-description">Get more downloads for your mobile application</div>
+                            </div>
+                            <div class="objective-card" data-objective="BRAND_AWARENESS">
+                                <div class="objective-icon">🎨</div>
+                                <div class="objective-title">Brand Awareness</div>
+                                <div class="objective-description">Increase awareness and reach for your brand</div>
+                            </div>
+                            <div class="objective-card" data-objective="VIDEO_VIEWS">
+                                <div class="objective-icon">🎬</div>
+                                <div class="objective-title">Video Views</div>
+                                <div class="objective-description">Get more views on your video content</div>
+                            </div>
+                            <div class="objective-card" data-objective="LEAD_GENERATION">
+                                <div class="objective-icon">🎯</div>
+                                <div class="objective-title">Lead Generation</div>
+                                <div class="objective-description">Collect leads and build your customer database</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Budget & Schedule -->
+                    <div class="section">
+                        <div class="section-title">
+                            💳 Budget & Schedule
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="daily_budget">Daily Budget ($)</label>
+                                <input type="number" id="daily_budget" name="daily_budget"
+                                       value="100" min="20" step="10" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="start_time">Start Date & Time (Optional)</label>
+                                <input type="datetime-local" id="start_time" name="start_time">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Navigation -->
+                    <div class="navigation-buttons">
+                        <a href="/" class="btn btn-secondary">← Back to Dashboard</a>
+                        <button type="button" onclick="nextStep()" class="btn btn-primary">
+                            Next: Ad Set Setup →
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+
+            <!-- Preview Panel -->
+            <div class="preview-panel">
+                <div class="preview-title">📋 Campaign Preview</div>
+                <div class="preview-item">
+                    <span class="preview-label">Campaign Name:</span>
+                    <span class="preview-value" id="previewCampaignName">Beast Mode Sales Campaign</span>
+                </div>
+                <div class="preview-item">
+                    <span class="preview-label">Objective:</span>
+                    <span class="preview-value" id="previewObjective">Sales</span>
+                </div>
+                <div class="preview-item">
+                    <span class="preview-label">Daily Budget:</span>
+                    <span class="preview-value" id="previewBudget">$100</span>
+                </div>
+                <div class="preview-item">
+                    <span class="preview-label">Status:</span>
+                    <span class="preview-value" id="previewStatus">PAUSED</span>
+                </div>
+                <div class="preview-item">
+                    <span class="preview-label">Buy Model:</span>
+                    <span class="preview-value" id="previewBuyModel">AUCTION</span>
+                </div>
+
+                <div style="margin-top: 30px; padding: 20px; background: rgba(255, 215, 0, 0.1); border-radius: 12px; border-left: 4px solid #FFD700;">
+                    <div style="font-weight: 600; color: #FFD700; margin-bottom: 8px;">🔥 Next Steps</div>
+                    <div style="font-size: 0.9rem; opacity: 0.9; line-height: 1.5;">
+                        Configure your ad sets with advanced targeting, then upload your creative assets for the ultimate campaign automation.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Auto-save functionality
+        function saveFormData() {
+            const formData = new FormData(document.getElementById('campaignForm'));
+            const data = Object.fromEntries(formData.entries());
+
+            // Get selected objective
+            const selectedObjective = document.querySelector('.objective-card.selected');
+            if (selectedObjective) {
+                data.objective = selectedObjective.dataset.objective;
+            }
+
+            sessionStorage.setItem('campaignData', JSON.stringify(data));
+            updatePreview();
+        }
+
+        // Load saved data
+        function loadFormData() {
+            const saved = sessionStorage.getItem('campaignData');
+            if (saved) {
+                const data = JSON.parse(saved);
+
+                // Restore form values
+                Object.keys(data).forEach(key => {
+                    const element = document.getElementById(key);
+                    if (element) {
+                        element.value = data[key];
+                    }
+                });
+
+                // Restore selected objective
+                if (data.objective) {
+                    document.querySelectorAll('.objective-card').forEach(card => {
+                        card.classList.remove('selected');
+                        if (card.dataset.objective === data.objective) {
+                            card.classList.add('selected');
+                        }
+                    });
+                }
+            }
+
+            updatePreview();
+        }
+
+        // Update preview
+        function updatePreview() {
+            const formData = new FormData(document.getElementById('campaignForm'));
+            const data = Object.fromEntries(formData.entries());
+
+            document.getElementById('previewCampaignName').textContent = data.campaign_name || 'Beast Mode Sales Campaign';
+            document.getElementById('previewBudget').textContent = '$' + (data.daily_budget || '100');
+            document.getElementById('previewStatus').textContent = data.campaign_status || 'PAUSED';
+            document.getElementById('previewBuyModel').textContent = data.buy_model || 'AUCTION';
+
+            // Update objective
+            const selectedObjective = document.querySelector('.objective-card.selected');
+            if (selectedObjective) {
+                document.getElementById('previewObjective').textContent =
+                    selectedObjective.querySelector('.objective-title').textContent;
+            }
+        }
+
+        // Objective card selection
+        document.querySelectorAll('.objective-card').forEach(card => {
+            card.addEventListener('click', function() {
+                document.querySelectorAll('.objective-card').forEach(c => c.classList.remove('selected'));
+                this.classList.add('selected');
+                saveFormData();
+            });
+        });
+
+        // Auto-save on form changes
+        document.getElementById('campaignForm').addEventListener('input', saveFormData);
+        document.getElementById('campaignForm').addEventListener('change', saveFormData);
+
+        // Navigation
+        function nextStep() {
+            saveFormData();
+
+            // Validation
+            const form = document.getElementById('campaignForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            // Navigate to step 2
+            window.location.href = '/campaign/step2';
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadFormData();
+        });
+    </script>
+</body>
+</html>

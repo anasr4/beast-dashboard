@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Beast Mode - 200 Videos → 200 Ads</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #000;
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+            background-image: radial-gradient(circle at 50% 50%, #1a0000 0%, #000000 100%);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #1a0000 0%, #330000 50%, #1a0000 100%);
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(255, 0, 0, 0.2);
+            overflow: hidden;
+            border: 1px solid #ff1a1a;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ff0000 0%, #cc0000 50%, #990000 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            font-weight: 900;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.8);
+            position: relative;
+            z-index: 2;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 2;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section-container {
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid #ff1a1a;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .section-container:hover {
+            border-color: #ff4444;
+            box-shadow: 0 10px 20px rgba(255, 26, 26, 0.3);
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, #ff1a1a 0%, #cc0000 100%);
+            padding: 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .section-header:hover {
+            background: linear-gradient(135deg, #ff3333 0%, #dd0000 100%);
+        }
+
+        .section-header h3 {
+            font-size: 1.4rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .edit-icon {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .edit-icon:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .section-content {
+            padding: 30px;
+            display: none;
+            background: rgba(0, 0, 0, 0.4);
+        }
+
+        .section-content.active {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #ff6666;
+            font-size: 1rem;
+        }
+
+        .modern-input {
+            width: 100%;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #ff1a1a;
+            border-radius: 10px;
+            color: white;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .modern-input:focus {
+            border-color: #ff4444;
+            box-shadow: 0 0 15px rgba(255, 26, 26, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .modern-input::placeholder {
+            color: #666;
+        }
+
+        .modern-select {
+            width: 100%;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #ff1a1a;
+            border-radius: 10px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .modern-select:focus {
+            border-color: #ff4444;
+            box-shadow: 0 0 15px rgba(255, 26, 26, 0.4);
+        }
+
+        .modern-select option {
+            background: #000;
+            color: white;
+        }
+
+        .file-upload-area {
+            border: 3px dashed #ff1a1a;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .file-upload-area:hover {
+            border-color: #ff4444;
+            background: rgba(255, 26, 26, 0.1);
+        }
+
+        .file-upload-area.active {
+            border-color: #00ff00;
+            background: rgba(0, 255, 0, 0.1);
+        }
+
+        .modern-btn {
+            background: linear-gradient(135deg, #ff0000 0%, #cc0000 50%, #990000 100%);
+            color: white;
+            border: none;
+            padding: 18px 35px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(255, 0, 0, 0.3);
+        }
+
+        .modern-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .modern-btn:hover::before {
+            left: 100%;
+        }
+
+        .modern-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 0, 0, 0.4);
+        }
+
+        .modern-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .modern-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .launch-btn {
+            width: 100%;
+            font-size: 1.2rem;
+            padding: 25px;
+            margin-top: 30px;
+            background: linear-gradient(135deg, #ff0000 0%, #ff3333 50%, #ff0000 100%);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 5px 15px rgba(255, 0, 0, 0.3); }
+            50% { box-shadow: 0 8px 25px rgba(255, 0, 0, 0.6); }
+            100% { box-shadow: 0 5px 15px rgba(255, 0, 0, 0.3); }
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 2px solid #ff1a1a;
+            padding: 12px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-bottom: 30px;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 26, 26, 0.2);
+            transform: translateX(-5px);
+        }
+
+        .info-box {
+            background: rgba(255, 26, 26, 0.1);
+            border: 2px solid #ff1a1a;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border-left: 6px solid #ff0000;
+        }
+
+        .info-box h3 {
+            color: #ff6666;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .info-box p {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .progress-container {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #ff1a1a;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            display: none;
+        }
+
+        .progress-bar {
+            background: rgba(0, 0, 0, 0.8);
+            height: 15px;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            border: 1px solid #ff1a1a;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #ff0000, #ff6666, #ff0000);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s;
+            animation: progressGlow 2s infinite;
+        }
+
+        @keyframes progressGlow {
+            0% { box-shadow: 0 0 5px rgba(255, 0, 0, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(255, 0, 0, 0.8); }
+            100% { box-shadow: 0 0 5px rgba(255, 0, 0, 0.5); }
+        }
+
+        .status-text {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: #ff6666;
+        }
+
+        .success-section {
+            background: rgba(0, 255, 0, 0.1);
+            border: 2px solid #00ff00;
+            padding: 30px;
+            border-radius: 15px;
+            display: none;
+        }
+
+        .file-path-display {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid #ff1a1a;
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 10px;
+            font-family: monospace;
+            font-size: 14px;
+            color: #ff6666;
+        }
+
+        .validation-message {
+            color: #ff4444;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .success-message {
+            color: #00ff00;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔥 Modern Beast Mode</h1>
+            <p>200 Videos Folder + CSV Headlines → 1 Campaign, 5 Ad Sets, 200 Ads</p>
+        </div>
+
+        <div class="content">
+            <a href="/" class="back-btn">← Back to Dashboard</a>
+
+            <div class="info-box">
+                <h3>📋 Beast Mode Requirements:</h3>
+                <p>• Folder with 200 video files (.mp4, .mov, .avi, etc.)</p>
+                <p>• CSV file with 200 headlines (one per line)</p>
+                <p>• Campaign configuration settings</p>
+                <p><strong>Output:</strong> 1 Campaign → 5 Ad Sets → 200 Ads (40 ads per ad set)</p>
+            </div>
+
+            <form id="folderBeastForm">
+                <!-- Campaign Section -->
+                <div class="section-container">
+                    <div class="section-header" onclick="toggleSection('campaign')">
+                        <h3>🎯 Campaign Configuration</h3>
+                        <div class="edit-icon">✏️</div>
+                    </div>
+                    <div class="section-content" id="campaign-content">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="campaign_name">Campaign Name:</label>
+                                <input type="text" id="campaign_name" name="campaign_name"
+                                       class="modern-input" value="Beast Mode - 200 Ads Campaign" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="daily_budget">Daily Budget ($):</label>
+                                <input type="number" id="daily_budget" name="daily_budget"
+                                       class="modern-input" value="500" min="20" required>
+                                <div class="validation-message" id="budget-validation"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="brand_name">Brand Name:</label>
+                                <input type="text" id="brand_name" name="brand_name"
+                                       class="modern-input" placeholder="Enter your brand name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="landing_url">Landing URL:</label>
+                                <input type="url" id="landing_url" name="landing_url"
+                                       class="modern-input" value="https://www.sallagcc.com/ksagm" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ad Set Section -->
+                <div class="section-container">
+                    <div class="section-header" onclick="toggleSection('adset')">
+                        <h3>📊 Ad Set Configuration</h3>
+                        <div class="edit-icon">⚙️</div>
+                    </div>
+                    <div class="section-content" id="adset-content">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="target_country">Target Country:</label>
+                                <select id="target_country" name="target_country" class="modern-select" required>
+                                    <option value="SA">🇸🇦 Saudi Arabia</option>
+                                    <option value="AE">🇦🇪 United Arab Emirates</option>
+                                    <option value="US">🇺🇸 United States</option>
+                                    <option value="GB">🇬🇧 United Kingdom</option>
+                                    <option value="CA">🇨🇦 Canada</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="cta_type">Call to Action:</label>
+                                <select id="cta_type" name="cta_type" class="modern-select" required>
+                                    <option value="SHOP_NOW">🛒 Shop Now</option>
+                                    <option value="LEARN_MORE">📖 Learn More</option>
+                                    <option value="SIGN_UP">✏️ Sign Up</option>
+                                    <option value="DOWNLOAD">⬇️ Download</option>
+                                    <option value="INSTALL_NOW">📱 Install Now</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="min_age">Minimum Age:</label>
+                                <input type="number" id="min_age" name="min_age"
+                                       class="modern-input" value="22" min="18" max="65" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="max_age">Maximum Age:</label>
+                                <input type="number" id="max_age" name="max_age"
+                                       class="modern-input" value="55" min="18" max="65" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ads Section -->
+                <div class="section-container">
+                    <div class="section-header" onclick="toggleSection('ads')">
+                        <h3>📹 Ads Configuration</h3>
+                        <div class="edit-icon">🎬</div>
+                    </div>
+                    <div class="section-content" id="ads-content">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="videos_folder">Videos Folder (200 videos):</label>
+                                <div class="file-upload-area" onclick="document.getElementById('videos_folder').click()">
+                                    <div style="font-size: 3rem; margin-bottom: 15px;">📁</div>
+                                    <div>Click to select folder with 200 videos</div>
+                                    <div style="font-size: 0.9rem; opacity: 0.7; margin-top: 10px;">
+                                        Supports: .mp4, .mov, .avi, .mkv, .wmv, .flv
+                                    </div>
+                                </div>
+                                <input type="text" id="videos_folder" name="videos_folder"
+                                       class="modern-input" style="margin-top: 15px;"
+                                       placeholder="C:\path\to\your\200videos" required>
+                                <div class="file-path-display" id="videos-path-display" style="display: none;"></div>
+                                <div class="validation-message" id="videos-validation"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="headlines_csv">Headlines CSV (200 headlines):</label>
+                                <div class="file-upload-area" onclick="document.getElementById('headlines_csv').click()">
+                                    <div style="font-size: 3rem; margin-bottom: 15px;">📄</div>
+                                    <div>Click to select CSV with 200 headlines</div>
+                                    <div style="font-size: 0.9rem; opacity: 0.7; margin-top: 10px;">
+                                        One headline per line
+                                    </div>
+                                </div>
+                                <input type="text" id="headlines_csv" name="headlines_csv"
+                                       class="modern-input" style="margin-top: 15px;"
+                                       placeholder="C:\path\to\headlines.csv" required>
+                                <div class="file-path-display" id="csv-path-display" style="display: none;"></div>
+                                <div class="validation-message" id="csv-validation"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="modern-btn launch-btn" id="startBtn">
+                    🚀 Launch Beast Mode (200 Ads)
+                </button>
+            </form>
+
+            <div class="progress-container" id="progressContainer">
+                <h3>🔄 Creating 200 Ads...</h3>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="status-text" id="statusText">Starting...</div>
+                <div class="status-text" id="adsCount">Ads created: 0/200</div>
+                <div class="status-text" id="videosUploaded">Videos uploaded: 0/200</div>
+            </div>
+
+            <div class="success-section" id="successSection">
+                <h3>✅ Beast Mode Complete!</h3>
+                <p id="successMessage">200 ads have been created successfully!</p>
+                <div id="resultsInfo" style="margin-top: 20px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Section toggle functionality
+        function toggleSection(sectionName) {
+            const content = document.getElementById(sectionName + '-content');
+            const isActive = content.classList.contains('active');
+
+            // Close all sections
+            document.querySelectorAll('.section-content').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Open clicked section if it wasn't active
+            if (!isActive) {
+                content.classList.add('active');
+            }
+        }
+
+        // Auto-open first section on load
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('campaign-content').classList.add('active');
+        });
+
+        // Form validation
+        document.getElementById('daily_budget').addEventListener('input', function() {
+            const budget = parseInt(this.value);
+            const validation = document.getElementById('budget-validation');
+
+            if (budget < 20) {
+                validation.textContent = 'Minimum budget is $20/day for Snapchat ads';
+                validation.className = 'validation-message';
+            } else {
+                validation.textContent = 'Budget looks good!';
+                validation.className = 'success-message';
+            }
+        });
+
+        // File path display
+        document.getElementById('videos_folder').addEventListener('input', function() {
+            const display = document.getElementById('videos-path-display');
+            if (this.value) {
+                display.textContent = 'Folder: ' + this.value;
+                display.style.display = 'block';
+            } else {
+                display.style.display = 'none';
+            }
+        });
+
+        document.getElementById('headlines_csv').addEventListener('input', function() {
+            const display = document.getElementById('csv-path-display');
+            if (this.value) {
+                display.textContent = 'CSV: ' + this.value;
+                display.style.display = 'block';
+            } else {
+                display.style.display = 'none';
+            }
+        });
+
+        // Form submission
+        const form = document.getElementById('folderBeastForm');
+        const progressContainer = document.getElementById('progressContainer');
+        const successSection = document.getElementById('successSection');
+        const progressFill = document.getElementById('progressFill');
+        const statusText = document.getElementById('statusText');
+        const adsCount = document.getElementById('adsCount');
+        const videosUploaded = document.getElementById('videosUploaded');
+        const startBtn = document.getElementById('startBtn');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(form);
+
+            startBtn.disabled = true;
+            startBtn.innerHTML = '🔄 Launching Beast Mode...';
+
+            try {
+                const response = await fetch('/folder-beast/execute-real', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.execution_id) {
+                    progressContainer.style.display = 'block';
+                    startMonitoring(result.execution_id);
+                } else {
+                    alert('Error: ' + (result.error || 'Unknown error'));
+                    startBtn.disabled = false;
+                    startBtn.innerHTML = '🚀 Launch Beast Mode (200 Ads)';
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+                startBtn.disabled = false;
+                startBtn.innerHTML = '🚀 Launch Beast Mode (200 Ads)';
+            }
+        });
+
+        function startMonitoring(executionId) {
+            const interval = setInterval(async () => {
+                try {
+                    const response = await fetch(`/api/execution-status/${executionId}`);
+                    const status = await response.json();
+
+                    progressFill.style.width = status.progress + '%';
+                    statusText.textContent = status.stage || status.status;
+                    adsCount.textContent = `Ads created: ${status.ads_created || 0}/200`;
+                    videosUploaded.textContent = `Videos uploaded: ${status.videos_uploaded || 0}/200`;
+
+                    if (status.status === 'completed' || status.progress >= 100) {
+                        clearInterval(interval);
+                        progressContainer.style.display = 'none';
+                        successSection.style.display = 'block';
+
+                        const resultsInfo = document.getElementById('resultsInfo');
+                        resultsInfo.innerHTML = `
+                            <p><strong>Campaign:</strong> ${status.campaign_name || 'Created Successfully'}</p>
+                            <p><strong>Total Ads:</strong> ${status.ads_created || 200}</p>
+                            <p><strong>Ad Sets:</strong> 5</p>
+                            <p><strong>Status:</strong> All ads are PAUSED (ready to activate)</p>
+                            <p><strong>Landing URL:</strong> ${form.landing_url.value}</p>
+                            <p><strong>Execution Time:</strong> ${status.execution_time ? Math.round(status.execution_time) + 's' : 'N/A'}</p>
+                        `;
+                    }
+
+                    if (status.error) {
+                        clearInterval(interval);
+                        alert('Error: ' + status.error);
+                        startBtn.disabled = false;
+                        startBtn.innerHTML = '🚀 Launch Beast Mode (200 Ads)';
+                        progressContainer.style.display = 'none';
+                    }
+                } catch (error) {
+                    console.error('Status check error:', error);
+                }
+            }, 2000);
+        }
+
+        // Interactive effects
+        document.querySelectorAll('.modern-input, .modern-select').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'scale(1.02)';
+            });
+
+            input.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'scale(1)';
+            });
+        });
+
+        // Age validation
+        document.getElementById('min_age').addEventListener('input', function() {
+            const maxAge = document.getElementById('max_age');
+            if (parseInt(this.value) >= parseInt(maxAge.value)) {
+                maxAge.value = parseInt(this.value) + 1;
+            }
+        });
+
+        document.getElementById('max_age').addEventListener('input', function() {
+            const minAge = document.getElementById('min_age');
+            if (parseInt(this.value) <= parseInt(minAge.value)) {
+                minAge.value = parseInt(this.value) - 1;
+            }
+        });
+    </script>
+</body>
+</html>

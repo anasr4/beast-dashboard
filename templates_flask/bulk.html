@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bulk Campaign Upload - SnapBot Pro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        .navbar {
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(255,252,0,0.2);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #FFFC00, #FF6B35);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-link {
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: linear-gradient(135deg, #FFFC00, #FF6B35);
+            color: #000;
+            transform: translateY(-2px);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .page-title {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #FFFC00, #FF6B35);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.8;
+        }
+
+        .upload-section {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 40px;
+        }
+
+        .upload-area {
+            border: 3px dashed rgba(255,252,0,0.3);
+            border-radius: 20px;
+            padding: 60px 40px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+            background: rgba(255,252,0,0.05);
+        }
+
+        .upload-area:hover {
+            border-color: #FFFC00;
+            background: rgba(255,252,0,0.1);
+            transform: translateY(-5px);
+        }
+
+        .upload-area.dragover {
+            border-color: #FF6B35;
+            background: rgba(255,107,53,0.1);
+        }
+
+        .upload-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .upload-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #FFFC00;
+        }
+
+        .upload-description {
+            opacity: 0.8;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .upload-button {
+            background: linear-gradient(135deg, #FFFC00, #FF6B35);
+            color: #000;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1.1rem;
+        }
+
+        .upload-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255,252,0,0.3);
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .template-section {
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            margin-bottom: 25px;
+            color: #FFFC00;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .template-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .template-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .template-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255,255,255,0.1);
+            border-color: rgba(255,252,0,0.3);
+        }
+
+        .template-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .template-name {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: #FFFC00;
+        }
+
+        .template-description {
+            opacity: 0.8;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+
+        .template-button {
+            background: transparent;
+            color: #FFFC00;
+            border: 2px solid #FFFC00;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .template-button:hover {
+            background: #FFFC00;
+            color: #000;
+        }
+
+        .progress-section {
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 40px;
+            display: none;
+        }
+
+        .progress-bar {
+            background: rgba(255,255,255,0.1);
+            border-radius: 25px;
+            height: 20px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(135deg, #FFFC00, #FF6B35);
+            height: 100%;
+            border-radius: 25px;
+            transition: width 0.3s;
+            width: 0%;
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 15px;
+            opacity: 0.8;
+        }
+
+        .results-section {
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 40px;
+            margin-top: 40px;
+            display: none;
+        }
+
+        .result-item {
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .result-status {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .status-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .status-error {
+            background: #dc3545;
+            color: white;
+        }
+
+        .status-processing {
+            background: #ffc107;
+            color: #000;
+        }
+
+        .back-button {
+            position: fixed;
+            top: 120px;
+            left: 30px;
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            border: none;
+            padding: 15px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .back-button:hover {
+            background: rgba(255,252,0,0.2);
+            transform: translateX(-5px);
+        }
+
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 2.5rem;
+            }
+
+            .template-options {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-links {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">🤖 SnapBot Pro</div>
+            <div class="nav-links">
+                <a href="/" class="nav-link">Dashboard</a>
+                <a href="/create" class="nav-link">Create Campaign</a>
+                <a href="/campaigns" class="nav-link">Campaigns</a>
+                <a href="/bulk" class="nav-link active">Bulk Upload</a>
+                <a href="/settings" class="nav-link">Settings</a>
+            </div>
+        </div>
+    </nav>
+
+    <button class="back-button" onclick="window.location.href='/'" title="Back to Dashboard">
+        ←
+    </button>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">📦 Bulk Campaign Upload</h1>
+            <p class="page-subtitle">Upload multiple campaigns at once using CSV files</p>
+        </div>
+
+        <!-- Upload Section -->
+        <div class="upload-section">
+            <div class="upload-area" onclick="document.getElementById('csvFile').click()" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragenter="handleDragEnter(event)" ondragleave="handleDragLeave(event)">
+                <span class="upload-icon">📁</span>
+                <h3 class="upload-title">Drop your CSV file here</h3>
+                <p class="upload-description">
+                    Drag and drop your campaign CSV file or click to browse.<br>
+                    Maximum file size: 10MB | Supported format: CSV
+                </p>
+                <button class="upload-button" type="button">
+                    Choose CSV File
+                </button>
+                <input type="file" id="csvFile" class="file-input" accept=".csv" onchange="handleFileSelect(event)">
+            </div>
+        </div>
+
+        <!-- Template Section -->
+        <div class="template-section">
+            <h2 class="section-title">
+                <span>📋</span>
+                CSV Templates
+            </h2>
+            <div class="template-options">
+                <div class="template-card">
+                    <span class="template-icon">📄</span>
+                    <h3 class="template-name">Basic Template</h3>
+                    <p class="template-description">Simple template with essential campaign fields</p>
+                    <a href="#" class="template-button" onclick="downloadTemplate('basic')">Download</a>
+                </div>
+                <div class="template-card">
+                    <span class="template-icon">📊</span>
+                    <h3 class="template-name">Advanced Template</h3>
+                    <p class="template-description">Complete template with all targeting options</p>
+                    <a href="#" class="template-button" onclick="downloadTemplate('advanced')">Download</a>
+                </div>
+                <div class="template-card">
+                    <span class="template-icon">🎯</span>
+                    <h3 class="template-name">E-commerce Template</h3>
+                    <p class="template-description">Optimized for online store campaigns</p>
+                    <a href="#" class="template-button" onclick="downloadTemplate('ecommerce')">Download</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress Section -->
+        <div class="progress-section" id="progressSection">
+            <h2 class="section-title">
+                <span>⏳</span>
+                Processing Campaigns
+            </h2>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">
+                Processing 0 of 0 campaigns...
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="results-section" id="resultsSection">
+            <h2 class="section-title">
+                <span>✅</span>
+                Upload Results
+            </h2>
+            <div id="resultsList">
+                <!-- Results will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedFile = null;
+
+        function handleDragOver(e) {
+            e.preventDefault();
+        }
+
+        function handleDragEnter(e) {
+            e.preventDefault();
+            document.querySelector('.upload-area').classList.add('dragover');
+        }
+
+        function handleDragLeave(e) {
+            e.preventDefault();
+            document.querySelector('.upload-area').classList.remove('dragover');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            document.querySelector('.upload-area').classList.remove('dragover');
+
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        }
+
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (file) {
+                handleFile(file);
+            }
+        }
+
+        function handleFile(file) {
+            if (!file.name.toLowerCase().endsWith('.csv')) {
+                alert('Please select a CSV file.');
+                return;
+            }
+
+            if (file.size > 10 * 1024 * 1024) {
+                alert('File size must be less than 10MB.');
+                return;
+            }
+
+            selectedFile = file;
+
+            // Update upload area
+            document.querySelector('.upload-title').textContent = `✅ ${file.name}`;
+            document.querySelector('.upload-description').innerHTML = `
+                File selected: ${(file.size / 1024).toFixed(1)} KB<br>
+                Click "Start Upload" to process campaigns
+            `;
+            document.querySelector('.upload-button').textContent = 'Start Upload';
+            document.querySelector('.upload-button').onclick = startUpload;
+        }
+
+        function startUpload() {
+            if (!selectedFile) {
+                alert('Please select a CSV file first.');
+                return;
+            }
+
+            // Show progress section
+            document.getElementById('progressSection').style.display = 'block';
+
+            // Simulate upload progress
+            let progress = 0;
+            const totalCampaigns = Math.floor(Math.random() * 10) + 5; // Random number between 5-15
+
+            document.getElementById('progressText').textContent = `Processing 0 of ${totalCampaigns} campaigns...`;
+
+            const interval = setInterval(() => {
+                progress += Math.random() * 20;
+                if (progress > 100) progress = 100;
+
+                document.getElementById('progressFill').style.width = progress + '%';
+
+                const processed = Math.floor((progress / 100) * totalCampaigns);
+                document.getElementById('progressText').textContent = `Processing ${processed} of ${totalCampaigns} campaigns...`;
+
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    showResults(totalCampaigns);
+                }
+            }, 500);
+        }
+
+        function showResults(totalCampaigns) {
+            document.getElementById('resultsSection').style.display = 'block';
+
+            const resultsList = document.getElementById('resultsList');
+            resultsList.innerHTML = '';
+
+            for (let i = 1; i <= totalCampaigns; i++) {
+                const status = Math.random() > 0.8 ? 'error' : 'success';
+                const statusText = status === 'success' ? 'Created' : 'Failed';
+
+                const resultItem = document.createElement('div');
+                resultItem.className = 'result-item';
+                resultItem.innerHTML = `
+                    <div>
+                        <strong>Campaign ${i}</strong>
+                        <div style="opacity: 0.7; font-size: 0.9rem;">
+                            ${status === 'success' ? `ID: SC-${Math.random().toString(36).substr(2, 9).toUpperCase()}` : 'Validation error: Missing required field'}
+                        </div>
+                    </div>
+                    <div class="result-status status-${status}">${statusText}</div>
+                `;
+                resultsList.appendChild(resultItem);
+            }
+
+            // Scroll to results
+            document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function downloadTemplate(type) {
+            let csvContent = '';
+
+            if (type === 'basic') {
+                csvContent = 'campaign_name,budget,countries,age_groups,genders,headline,cta_type,landing_url\n';
+                csvContent += 'Summer Sale 2024,25,US,25-34,MALE|FEMALE,Amazing Deals!,SHOP_NOW,https://example.com\n';
+                csvContent += 'Winter Collection,30,US|CA,18-24,FEMALE,New Collection,LEARN_MORE,https://example.com/winter\n';
+            } else if (type === 'advanced') {
+                csvContent = 'campaign_name,budget,objective,countries,age_groups,genders,interests,headline,cta_type,landing_url,brand_name,media_type\n';
+                csvContent += 'Advanced Campaign,50,WEB_VIEW,US|CA|GB,25-34|35-44,MALE|FEMALE,fashion|shopping,Premium Products,SHOP_NOW,https://example.com,Brand Name,IMAGE\n';
+            } else if (type === 'ecommerce') {
+                csvContent = 'campaign_name,budget,product_category,countries,age_groups,genders,headline,cta_type,landing_url,brand_name,discount_code\n';
+                csvContent += 'Product Launch,40,electronics,US,25-34,MALE,Latest Tech Gadgets,SHOP_NOW,https://store.com,TechBrand,SAVE20\n';
+            }
+
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = `snapchat_campaign_${type}_template.csv`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Folder Beast Mode - 200 Videos → 200 Ads</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #000000 100%);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #000000 0%, #333333 50%, #000000 100%);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .form-section {
+            background: rgba(0,0,0,0.3);
+            border: 2px solid rgba(0, 245, 255, 0.3);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #FF6B35;
+        }
+
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            background: #000;
+            border: 2px solid #FF6B35;
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 10px;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .progress-container {
+            background: #2d2d2d;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            display: none;
+        }
+
+        .progress-bar {
+            background: #000;
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #FF6B35, #F7931E);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .status-text {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .back-btn {
+            background: #333;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .info-box {
+            background: #2d2d2d;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #FF6B35;
+        }
+
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .success-section {
+            background: #2d2d2d;
+            padding: 30px;
+            border-radius: 15px;
+            display: none;
+            border: 2px solid #00FF80;
+        }
+
+        select option {
+            background: #1a1a1a !important;
+            color: #ffffff !important;
+            padding: 10px !important;
+            border: none !important;
+        }
+
+        select option:hover,
+        select option:focus,
+        select option:checked {
+            background: #00f5ff !important;
+            color: #000000 !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔥 Folder Beast Mode</h1>
+            <p>200 Videos Folder + CSV Headlines → 1 Campaign, 5 Ad Sets, 200 Ads</p>
+        </div>
+
+        <div class="content">
+            <a href="/" class="back-btn">← Back to Dashboard</a>
+
+            <div class="info-box">
+                <h3>📋 Requirements:</h3>
+                <p>1. Folder with 200 video files (.mp4, .mov, .avi, etc.)</p>
+                <p>2. CSV file with 200 headlines (one per line)</p>
+                <p>3. Campaign settings</p>
+                <p><strong>Result:</strong> 1 Campaign → 5 Ad Sets → 200 Ads (40 ads per ad set)</p>
+            </div>
+
+            <div class="form-section">
+                <h3>🎯 Folder Beast Configuration</h3>
+                <form id="folderBeastForm">
+                    <div class="two-columns">
+                        <div class="form-group">
+                            <label for="videos_folder">Videos Folder Path:</label>
+                            <input type="text" id="videos_folder" name="videos_folder"
+                                   placeholder="C:\path\to\your\200videos" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="headlines_csv">Headlines CSV Path:</label>
+                            <input type="text" id="headlines_csv" name="headlines_csv"
+                                   placeholder="C:\path\to\headlines.csv" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="campaign_name">Campaign Name:</label>
+                        <input type="text" id="campaign_name" name="campaign_name"
+                               value="Folder Beast - 200 Ads Campaign" required>
+                    </div>
+
+                    <div class="two-columns">
+                        <div class="form-group">
+                            <label for="daily_budget">Daily Budget ($):</label>
+                            <input type="number" id="daily_budget" name="daily_budget"
+                                   value="500" min="1" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="brand_name">Brand Name:</label>
+                            <input type="text" id="brand_name" name="brand_name"
+                                   placeholder="Enter your brand name" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="landing_url">Landing URL:</label>
+                        <input type="text" id="landing_url" name="landing_url"
+                               value="https://www.sallagcc.com/ksagm" required>
+                    </div>
+
+                    <div class="two-columns">
+                        <div class="form-group">
+                            <label for="cta_type">Call to Action:</label>
+                            <select id="cta_type" name="cta_type" style="width: 100%; padding: 12px; background: #000; border: 2px solid #FF6B35; border-radius: 8px; color: white;">
+                                <option value="SHOP_NOW">Shop Now</option>
+                                <option value="LEARN_MORE">Learn More</option>
+                                <option value="SIGN_UP">Sign Up</option>
+                                <option value="DOWNLOAD">Download</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="target_country">Target Country:</label>
+                            <select id="target_country" name="target_country" style="width: 100%; padding: 12px; background: #000; border: 2px solid #FF6B35; border-radius: 8px; color: white;">
+                                <option value="SA">Saudi Arabia</option>
+                                <option value="US">United States</option>
+                                <option value="GB">United Kingdom</option>
+                                <option value="CA">Canada</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn" id="startBtn">🚀 Launch Folder Beast Mode</button>
+                </form>
+            </div>
+
+            <div class="progress-container" id="progressContainer">
+                <h3>🔄 Creating 200 Ads...</h3>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="status-text" id="statusText">Starting...</div>
+                <div class="status-text" id="adsCount">Ads created: 0/200</div>
+                <div class="status-text" id="videosUploaded">Videos uploaded: 0/200</div>
+            </div>
+
+            <div class="success-section" id="successSection">
+                <h3>✅ Folder Beast Mode Complete!</h3>
+                <p id="successMessage">200 ads have been created successfully!</p>
+                <div id="resultsInfo" style="margin-top: 20px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('folderBeastForm');
+        const progressContainer = document.getElementById('progressContainer');
+        const successSection = document.getElementById('successSection');
+        const progressFill = document.getElementById('progressFill');
+        const statusText = document.getElementById('statusText');
+        const adsCount = document.getElementById('adsCount');
+        const videosUploaded = document.getElementById('videosUploaded');
+        const startBtn = document.getElementById('startBtn');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(form);
+
+            startBtn.disabled = true;
+            startBtn.textContent = '🔄 Starting...';
+
+            try {
+                const response = await fetch('/start_folder_beast', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    progressContainer.style.display = 'block';
+                    startMonitoring();
+                } else {
+                    alert('Error: ' + result.error);
+                    startBtn.disabled = false;
+                    startBtn.textContent = '🚀 Launch Folder Beast Mode';
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+                startBtn.disabled = false;
+                startBtn.textContent = '🚀 Launch Folder Beast Mode';
+            }
+        });
+
+        function startMonitoring() {
+            const interval = setInterval(async () => {
+                try {
+                    const response = await fetch('/folder_beast_status');
+                    const status = await response.json();
+
+                    progressFill.style.width = status.progress_percent + '%';
+                    statusText.textContent = status.current_step;
+                    adsCount.textContent = `Ads created: ${status.ads_created}/200`;
+                    videosUploaded.textContent = `Videos uploaded: ${status.videos_uploaded || 0}/200`;
+
+                    if (status.completed) {
+                        clearInterval(interval);
+                        progressContainer.style.display = 'none';
+                        successSection.style.display = 'block';
+
+                        const resultsInfo = document.getElementById('resultsInfo');
+                        resultsInfo.innerHTML = `
+                            <p><strong>Campaign:</strong> ${status.campaign_name || 'Created'}</p>
+                            <p><strong>Total Ads:</strong> ${status.ads_created}</p>
+                            <p><strong>Ad Sets:</strong> 5</p>
+                            <p><strong>Status:</strong> All ads are PAUSED (ready to activate)</p>
+                            <p><strong>Landing URL:</strong> https://www.sallagcc.com/ksagm</p>
+                        `;
+                    }
+
+                    if (status.error) {
+                        clearInterval(interval);
+                        alert('Error: ' + status.error);
+                        startBtn.disabled = false;
+                        startBtn.textContent = '🚀 Launch Folder Beast Mode';
+                        progressContainer.style.display = 'none';
+                    }
+                } catch (error) {
+                    console.error('Status check error:', error);
+                }
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beast Mode Dashboard - Modern Interface</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+            color: white;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(45, 45, 45, 0.8);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            color: #00ff88;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            color: #cccccc;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            background: rgba(45, 45, 45, 0.8);
+            border-radius: 10px;
+            padding: 5px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .tab.active {
+            background: #00ff88;
+            color: #1a1a1a;
+        }
+
+        .tab:hover {
+            background: rgba(0, 255, 136, 0.2);
+        }
+
+        .section {
+            display: none;
+            background: rgba(45, 45, 45, 0.8);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #00ff88;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #444;
+            border-radius: 8px;
+            background: #1a1a1a;
+            color: white;
+            font-size: 16px;
+        }
+
+        .form-group input:focus {
+            border-color: #00ff88;
+            outline: none;
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #00ff88, #00cc6a);
+            color: #1a1a1a;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 255, 136, 0.3);
+        }
+
+        .btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .progress-container {
+            margin: 20px 0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #333;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff88, #00cc6a);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .status-card {
+            background: rgba(26, 26, 26, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #00ff88;
+        }
+
+        .status-card h3 {
+            color: #00ff88;
+            margin-bottom: 10px;
+        }
+
+        .status-card .value {
+            font-size: 2em;
+            font-weight: bold;
+            color: white;
+        }
+
+        .logs {
+            background: #1a1a1a;
+            border-radius: 10px;
+            padding: 20px;
+            height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            border: 2px solid #333;
+        }
+
+        .log-entry {
+            margin-bottom: 5px;
+            color: #ccc;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .table th, .table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #444;
+        }
+
+        .table th {
+            background: #333;
+            color: #00ff88;
+            font-weight: bold;
+        }
+
+        .table tr:hover {
+            background: rgba(0, 255, 136, 0.1);
+        }
+
+        .structure-info {
+            background: rgba(26, 26, 26, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #00ff88;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+
+            .status-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Beast Mode Dashboard</h1>
+            <p>Snapchat Campaign Automation with 200 Ads - Modern Interface</p>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" onclick="showSection('config')">📋 Campaign Configuration</div>
+            <div class="tab" onclick="showSection('adsets')">📊 Ad Sets Details</div>
+            <div class="tab" onclick="showSection('ads')">🎭 Ads Details</div>
+        </div>
+
+        <!-- Configuration Section -->
+        <div id="config" class="section active">
+            <h2>📁 File Selection</h2>
+            <div class="form-group">
+                <label>Video Folder (200 videos):</label>
+                <input type="text" id="video_folder" value="C:\Users\PC\Desktop\200 vdieos" placeholder="Select video folder path">
+            </div>
+            <div class="form-group">
+                <label>Headlines CSV File:</label>
+                <input type="text" id="csv_file" value="D:\snapchat_headlines_khaleeji_200 (1) - snapchat_headlines_khaleeji_200 (1).csv.csv" placeholder="Select CSV file path">
+            </div>
+
+            <h2>⚙️ Campaign Settings</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="form-group">
+                    <label>Campaign Name:</label>
+                    <input type="text" id="campaign_name" value="vatoline" placeholder="Enter campaign name">
+                </div>
+                <div class="form-group">
+                    <label>Brand Name:</label>
+                    <input type="text" id="brand_name" value="vatoline" placeholder="Enter brand name">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Website URL:</label>
+                <input type="text" id="website_url" value="https://sallagcc.com" placeholder="Enter website URL">
+            </div>
+
+            <div class="structure-info">
+                <h3>📊 Campaign Structure:</h3>
+                <ul>
+                    <li>• 1 Campaign → 5 Ad Sets → 40 Ads per set = 200 Total Ads</li>
+                    <li>• Budget: $100/day total ($20/day per ad set)</li>
+                    <li>• All ads start PAUSED (manual activation required)</li>
+                </ul>
+            </div>
+
+            <h2>🎮 Campaign Controls</h2>
+            <button class="btn" onclick="launchCampaign()" id="launchBtn">🚀 Launch Beast Mode</button>
+            <button class="btn" onclick="checkCampaign()">📊 Check Campaign Status</button>
+            <button class="btn" onclick="refreshToken()">🔄 Refresh Token</button>
+
+            <h2>📈 Real-time Status</h2>
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressBar"></div>
+                </div>
+                <p id="currentStep">Ready to launch...</p>
+            </div>
+
+            <div class="status-grid">
+                <div class="status-card">
+                    <h3>Campaign ID</h3>
+                    <div class="value" id="campaignId">-</div>
+                </div>
+                <div class="status-card">
+                    <h3>Media Created</h3>
+                    <div class="value" id="mediaCreated">0</div>
+                </div>
+                <div class="status-card">
+                    <h3>Ads Created</h3>
+                    <div class="value" id="adsCreated">0</div>
+                </div>
+                <div class="status-card">
+                    <h3>Status</h3>
+                    <div class="value" id="campaignStatus">Ready</div>
+                </div>
+            </div>
+
+            <h2>📝 Live Logs</h2>
+            <div class="logs" id="logs">
+                <div class="log-entry">Beast Mode Dashboard Ready</div>
+                <div class="log-entry">Configure your settings and click 'Launch Beast Mode' to start</div>
+            </div>
+        </div>
+
+        <!-- Ad Sets Section -->
+        <div id="adsets" class="section">
+            <h2>📊 Ad Sets Overview</h2>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Ad Set #</th>
+                        <th>Name</th>
+                        <th>ID</th>
+                        <th>Status</th>
+                        <th>Budget</th>
+                        <th>Ads Count</th>
+                    </tr>
+                </thead>
+                <tbody id="adsetsTable">
+                    <tr><td colspan="6">No ad sets created yet. Launch a campaign first.</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Ads Section -->
+        <div id="ads" class="section">
+            <h2>🎭 Individual Ads Overview</h2>
+            <div style="margin-bottom: 20px;">
+                <input type="text" id="adsFilter" placeholder="Filter ads..." style="width: 300px; display: inline-block;">
+                <button class="btn" onclick="filterAds()">🔍 Filter</button>
+                <button class="btn" onclick="refreshAds()">🔄 Refresh</button>
+            </div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Ad #</th>
+                        <th>Name</th>
+                        <th>ID</th>
+                        <th>Status</th>
+                        <th>Creative ID</th>
+                        <th>Headline</th>
+                        <th>Video File</th>
+                    </tr>
+                </thead>
+                <tbody id="adsTable">
+                    <tr><td colspan="7">No ads created yet. Launch a campaign first.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let updateInterval;
+
+        function showSection(sectionId) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => section.classList.remove('active'));
+
+            // Hide all tabs
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            // Show selected section and tab
+            document.getElementById(sectionId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function launchCampaign() {
+            const config = {
+                video_folder: document.getElementById('video_folder').value,
+                csv_file: document.getElementById('csv_file').value,
+                campaign_name: document.getElementById('campaign_name').value,
+                brand_name: document.getElementById('brand_name').value,
+                website_url: document.getElementById('website_url').value
+            };
+
+            fetch('/api/launch', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(config)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('launchBtn').disabled = true;
+                    document.getElementById('launchBtn').textContent = '🔄 Running...';
+                    startStatusUpdates();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            });
+        }
+
+        function startStatusUpdates() {
+            updateInterval = setInterval(updateStatus, 1000);
+        }
+
+        function updateStatus() {
+            fetch('/api/status')
+                .then(response => response.json())
+                .then(data => {
+                    // Update progress bar
+                    document.getElementById('progressBar').style.width = data.progress + '%';
+                    document.getElementById('currentStep').textContent = data.current_step;
+
+                    // Update status cards
+                    document.getElementById('campaignId').textContent = data.campaign_id || '-';
+                    document.getElementById('mediaCreated').textContent = data.media_created;
+                    document.getElementById('adsCreated').textContent = data.ads_created;
+                    document.getElementById('campaignStatus').textContent = data.running ? 'Running' : 'Complete';
+
+                    // Update logs
+                    const logsContainer = document.getElementById('logs');
+                    logsContainer.innerHTML = data.logs.map(log =>
+                        `<div class="log-entry">${log}</div>`
+                    ).join('');
+                    logsContainer.scrollTop = logsContainer.scrollHeight;
+
+                    // Update tables if campaign is complete
+                    if (!data.running && data.progress === 100) {
+                        updateAdSetsTable();
+                        updateAdsTable();
+                        document.getElementById('launchBtn').disabled = false;
+                        document.getElementById('launchBtn').textContent = '🚀 Launch Beast Mode';
+                        clearInterval(updateInterval);
+                    }
+                });
+        }
+
+        function updateAdSetsTable() {
+            const tbody = document.getElementById('adsetsTable');
+            tbody.innerHTML = '';
+            for (let i = 1; i <= 5; i++) {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${i}</td>
+                        <td>vatoline - Ad Set ${i}</td>
+                        <td>adset-${i}-id</td>
+                        <td>PAUSED</td>
+                        <td>$20/day</td>
+                        <td>40</td>
+                    </tr>
+                `;
+            }
+        }
+
+        function updateAdsTable() {
+            const tbody = document.getElementById('adsTable');
+            tbody.innerHTML = '';
+            for (let i = 1; i <= 200; i++) {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${i}</td>
+                        <td>vatoline - Ad ${i}</td>
+                        <td>ad-${i}-id</td>
+                        <td>PAUSED</td>
+                        <td>creative-${i}</td>
+                        <td>Headline for ad ${i}</td>
+                        <td>video_${i.toString().padStart(3, '0')}.mp4</td>
+                    </tr>
+                `;
+            }
+        }
+
+        function filterAds() {
+            const filter = document.getElementById('adsFilter').value.toLowerCase();
+            const rows = document.querySelectorAll('#adsTable tr');
+
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(filter) ? '' : 'none';
+            });
+        }
+
+        function refreshAds() {
+            document.getElementById('adsFilter').value = '';
+            updateAdsTable();
+        }
+
+        function checkCampaign() {
+            const campaignId = document.getElementById('campaignId').textContent;
+            if (campaignId && campaignId !== '-') {
+                fetch(`/api/check_campaign/${campaignId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.exists) {
+                            alert(`Campaign found!\nName: ${data.name}\nStatus: ${data.status}\nID: ${data.id}`);
+                        } else {
+                            alert('Campaign not found in Snapchat Ads Manager');
+                        }
+                    });
+            } else {
+                alert('No campaign ID available');
+            }
+        }
+
+        function refreshToken() {
+            // Implement token refresh
+            alert('Token refresh functionality would be implemented here');
+        }
+    </script>
+</body>
+</html>

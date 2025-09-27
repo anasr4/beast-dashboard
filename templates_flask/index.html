@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snapchat Campaign Creator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #000000 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #ffffff;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #000000 0%, #333333 50%, #000000 100%); border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .form-container {
+            padding: 40px;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px solid rgba(0, 245, 255, 0.3);
+            border-radius: 15px;
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .form-section h3 {
+            color: #ffffff;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            border-bottom: 2px solid #00f5ff;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="url"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: rgba(0,0,0,0.4);
+            color: #ffffff;
+            backdrop-filter: blur(5px);
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #00f5ff;
+            background: rgba(0,0,0,0.6);
+            box-shadow: 0 0 20px rgba(0, 245, 255, 0.3);
+            color: #ffffff;
+        }
+
+        select option {
+            background: #1a1a1a;
+            color: #ffffff;
+            padding: 10px;
+            border: none;
+        }
+
+        select option:hover,
+        select option:focus,
+        select option:checked {
+            background: #00f5ff;
+            color: #000000;
+        }
+
+        .file-upload {
+            border: 3px dashed #00f5ff;
+            border-radius: 15px;
+            padding: 30px;
+            background: rgba(0, 245, 255, 0.05);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .file-upload:hover {
+            border-color: #ffffff;
+            background: rgba(0, 245, 255, 0.1);
+        }
+
+        .file-upload input {
+            display: none;
+        }
+
+        .file-upload-text {
+            font-size: 1.1rem;
+            color: #ffffff;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
+
+        .btn-publish {
+            background: linear-gradient(135deg, #00f5ff 0%, #0080ff 50%, #00f5ff 100%);
+            border: 2px solid rgba(0, 245, 255, 0.3);
+            color: #000000;
+            font-weight: 700;
+            padding: 18px 40px;
+            font-size: 1.3rem;
+            border-radius: 50px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 5px 20px rgba(0, 245, 255, 0.4);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-publish::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-publish:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 245, 255, 0.6);
+            background: linear-gradient(135deg, #ffffff 0%, #00f5ff 50%, #ffffff 100%);
+        }
+
+        .btn-publish:hover::before {
+            left: 100%;
+        }
+
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+
+        .flash-message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .flash-error {
+            background-color: rgba(220, 53, 69, 0.1);
+            border: 1px solid rgba(220, 53, 69, 0.3);
+            color: #dc3545;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid #00f5ff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📱 Snapchat Campaign Creator</h1>
+            <p>Create and publish Snapchat ads in seconds - Updated Dashboard!</p>
+
+            <!-- Navigation Menu - NEW BOTS ADDED -->
+            <div style="margin-top: 30px; display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; padding: 20px; border: 3px solid #00f5ff; border-radius: 15px; background: rgba(0, 245, 255, 0.1); backdrop-filter: blur(10px);">
+                <a href="/beast-mode" style="background: linear-gradient(135deg, #00f5ff, #0080ff); color: #000000; padding: 12px 24px; border-radius: 25px; text-decoration: none; font-weight: bold; transition: all 0.3s ease; box-shadow: 0 5px 15px rgba(0, 245, 255, 0.3);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(0, 245, 255, 0.5)';" onmouseout="this.style.transform='translateY(0px)'; this.style.boxShadow='0 5px 15px rgba(0, 245, 255, 0.3)';">
+                    🔥 Beast Mode
+                </a>
+                <a href="/simple-test" style="background: #4CAF50; color: white; padding: 10px 20px; border-radius: 25px; text-decoration: none; font-weight: bold;">
+                    🧪 Simple Test
+                </a>
+                <a href="/videos-maker" style="background: #9C27B0; color: white; padding: 10px 20px; border-radius: 25px; text-decoration: none; font-weight: bold;">
+                    🎬 Videos Maker
+                </a>
+                <a href="/folder-beast-mode" style="background: #FF5722; color: white; padding: 10px 20px; border-radius: 25px; text-decoration: none; font-weight: bold;">
+                    📁 Folder Beast
+                </a>
+            </div>
+        </div>
+
+        <div class="form-container">
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for message in messages %}
+                            <div class="flash-message flash-error">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST" action="/create_campaign" enctype="multipart/form-data" id="campaignForm">
+
+                <!-- Campaign Info -->
+                <div class="form-section">
+                    <h3>🎯 Campaign Details</h3>
+                    <div class="form-group">
+                        <label for="campaign_name">Campaign Name *</label>
+                        <input type="text" id="campaign_name" name="campaign_name" required
+                               placeholder="e.g., Summer Sale 2024">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="budget">Daily Budget (USD) *</label>
+                        <input type="number" id="budget" name="budget" min="20" required
+                               placeholder="25">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="objective">Campaign Objective</label>
+                        <select id="objective" name="objective">
+                            <option value="WEB_VIEW">Website Views</option>
+                            <option value="AWARENESS">Brand Awareness</option>
+                            <option value="APP_INSTALL">App Install</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Targeting -->
+                <div class="form-section">
+                    <h3>🎯 Targeting</h3>
+
+                    <div class="form-group">
+                        <label>Countries *</label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="us" name="countries" value="US" checked>
+                                <label for="us">United States</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="ca" name="countries" value="CA">
+                                <label for="ca">Canada</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="gb" name="countries" value="GB">
+                                <label for="gb">United Kingdom</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="au" name="countries" value="AU">
+                                <label for="au">Australia</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Age Groups</label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="age1" name="age_groups" value="18-24">
+                                <label for="age1">18-24</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="age2" name="age_groups" value="25-34" checked>
+                                <label for="age2">25-34</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="age3" name="age_groups" value="35-44">
+                                <label for="age3">35-44</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="age4" name="age_groups" value="45-54">
+                                <label for="age4">45-54</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Gender</label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="male" name="genders" value="MALE" checked>
+                                <label for="male">Male</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="female" name="genders" value="FEMALE" checked>
+                                <label for="female">Female</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Creative -->
+                <div class="form-section">
+                    <h3>🎨 Creative</h3>
+
+                    <div class="form-group">
+                        <label>Upload Media *</label>
+                        <div class="file-upload" onclick="document.getElementById('media_file').click()">
+                            <input type="file" id="media_file" name="media_file" accept=".jpg,.jpeg,.png,.gif" required>
+                            <div class="file-upload-text">
+                                📁 Click to upload image<br>
+                                <small>Supports: JPG, PNG, GIF (Max 16MB)</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="headline">Headline *</label>
+                        <input type="text" id="headline" name="headline" required
+                               placeholder="Your catchy headline here">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cta_type">Call to Action</label>
+                        <select id="cta_type" name="cta_type">
+                            <option value="SHOP_NOW">Shop Now</option>
+                            <option value="LEARN_MORE">Learn More</option>
+                            <option value="INSTALL_NOW">Install Now</option>
+                            <option value="SIGN_UP">Sign Up</option>
+                            <option value="WATCH_MORE">Watch More</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="landing_url">Landing Page URL *</label>
+                        <input type="url" id="landing_url" name="landing_url" required
+                               placeholder="https://yourwebsite.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="brand_name">Brand Name (Optional)</label>
+                        <input type="text" id="brand_name" name="brand_name"
+                               placeholder="Your Brand Name">
+                    </div>
+                </div>
+
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>Creating your Snapchat campaign...</p>
+                </div>
+
+                <button type="submit" class="btn-publish" id="publishBtn">
+                    🚀 Publish Campaign Now
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // File upload preview
+        document.getElementById('media_file').addEventListener('change', function(e) {
+            const fileName = e.target.files[0]?.name;
+            if (fileName) {
+                document.querySelector('.file-upload-text').innerHTML =
+                    `✅ ${fileName}<br><small>Click to change file</small>`;
+            }
+        });
+
+        // Form submission with loading
+        document.getElementById('campaignForm').addEventListener('submit', function() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('publishBtn').style.display = 'none';
+        });
+    </script>
+</body>
+</html>

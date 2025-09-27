@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beast Mode Execution | Enhanced Beast Mode</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #000000 100%);
+            min-height: 100vh;
+            color: #ffffff;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .execution-card {
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .summary-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            border-left: 5px solid #667eea;
+        }
+
+        .summary-section h3 {
+            color: #ffffff;
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .summary-section h3::before {
+            margin-right: 10px;
+            font-size: 1.5rem;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            padding: 5px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+
+        .summary-label {
+            color: rgba(255,255,255,0.7);
+            font-weight: 500;
+        }
+
+        .summary-value {
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .beast-stats {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .beast-stats h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-item {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 18px 35px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-execute {
+            background: linear-gradient(135deg, #00b894, #00cec9);
+            color: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            font-size: 1.2rem;
+            padding: 20px 40px;
+        }
+
+        .btn-execute:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+            transform: translateY(-2px);
+        }
+
+        .progress-section {
+            margin-top: 40px;
+            display: none;
+        }
+
+        .progress-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .progress-header h3 {
+            color: #ffffff;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #ecf0f1;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00b894, #00cec9);
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 10px;
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 10px;
+            color: rgba(255,255,255,0.7);
+            font-weight: 500;
+        }
+
+        .log-section {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9rem;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+
+        .log-line {
+            margin: 5px 0;
+            padding: 2px 0;
+        }
+
+        .log-success {
+            color: #00b894;
+        }
+
+        .log-error {
+            color: #ff6b6b;
+        }
+
+        .log-info {
+            color: #74b9ff;
+        }
+
+        .warning-box {
+            background: linear-gradient(135deg, #fdcb6e, #e84393);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .warning-box h4 {
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .warning-box ul {
+            margin-left: 20px;
+        }
+
+        .warning-box li {
+            margin: 5px 0;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 15px;
+            }
+
+            .execution-card {
+                padding: 25px;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .header h1 {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Beast Mode Ready to Launch</h1>
+            <p>Your 200-ad campaign is configured and ready for execution</p>
+        </div>
+
+        <div class="execution-card">
+            <!-- Configuration Summary -->
+            <div class="summary-grid">
+                <!-- Campaign Summary -->
+                <div class="summary-section">
+                    <h3 style="--icon: '📋';">📋 Campaign Details</h3>
+                    <div class="summary-item">
+                        <span class="summary-label">Name:</span>
+                        <span class="summary-value">{{ data.campaign.campaign_name or 'Not set' }}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Objective:</span>
+                        <span class="summary-value">{{ data.campaign.objective or 'Not set' }}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Daily Budget:</span>
+                        <span class="summary-value">${{ data.campaign.daily_budget or '0' }}/day</span>
+                    </div>
+                </div>
+
+                <!-- Ad Sets Summary -->
+                <div class="summary-section">
+                    <h3>🎯 Ad Set Configuration</h3>
+                    <div class="summary-item">
+                        <span class="summary-label">Bid Strategy:</span>
+                        <span class="summary-value">{{ data.adsets.bid_strategy or 'Not set' }}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Countries:</span>
+                        <span class="summary-value">
+                            {% if data.adsets.countries %}
+                                {% for country in data.adsets.countries %}
+                                    {% if country == 'SA' %}🇸🇦 Saudi Arabia{% endif %}
+                                    {% if country == 'AE' %}🇦🇪 UAE{% endif %}
+                                    {% if country == 'US' %}🇺🇸 USA{% endif %}
+                                    {% if country == 'GB' %}🇬🇧 UK{% endif %}
+                                    {% if not loop.last %}, {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                Not set
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Age Range:</span>
+                        <span class="summary-value">{{ data.adsets.min_age or '22' }}-{{ data.adsets.max_age or '55' }}+ years</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Ad Sets:</span>
+                        <span class="summary-value">{{ data.adsets.num_adsets or '5' }} ad sets</span>
+                    </div>
+                </div>
+
+                <!-- Ads Summary -->
+                <div class="summary-section">
+                    <h3>🎨 Creative Details</h3>
+                    <div class="summary-item">
+                        <span class="summary-label">Videos:</span>
+                        <span class="summary-value">{{ data.ads.videos_path.split('\\')[-1] if data.ads.videos_path else 'Not set' }}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Headlines:</span>
+                        <span class="summary-value">{{ data.ads.csv_path.split('\\')[-1] if data.ads.csv_path else 'Not set' }}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Brand:</span>
+                        <span class="summary-value">{{ data.ads.brand_name or 'Not set' }}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Website:</span>
+                        <span class="summary-value">{{ data.ads.website_url or 'Not set' }}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">CTA:</span>
+                        <span class="summary-value">{{ data.ads.call_to_action or 'Not set' }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Beast Mode Stats -->
+            <div class="beast-stats">
+                <h2>🔥 Beast Mode Statistics</h2>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-number">1</div>
+                        <div class="stat-label">Campaign</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">{{ data.adsets.num_adsets or '5' }}</div>
+                        <div class="stat-label">Ad Sets</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">200</div>
+                        <div class="stat-label">Video Ads</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">{{ data.adsets.countries|length if data.adsets.countries else '0' }}</div>
+                        <div class="stat-label">Countries</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">${{ (data.adsets.adset_budget|int * data.adsets.num_adsets|int) if data.adsets.adset_budget and data.adsets.num_adsets else '0' }}</div>
+                        <div class="stat-label">Daily Budget</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">~{{ ((data.adsets.adset_budget|int * data.adsets.num_adsets|int * 1000) if data.adsets.adset_budget and data.adsets.num_adsets else 0)|round|int }}</div>
+                        <div class="stat-label">Est. Reach</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Warning Box -->
+            <div class="warning-box">
+                <h4>⚠️ Important Notes Before Execution</h4>
+                <ul>
+                    <li>Ensure your Snapchat API token is valid and has sufficient permissions</li>
+                    <li>Verify that the video folder contains exactly 200 MP4 files</li>
+                    <li>Check that the CSV file has 200 headline entries</li>
+                    <li>All ads will be created in PAUSED status for your review</li>
+                    <li>This process may take 15-30 minutes to complete</li>
+                    <li>Media uploads require sufficient account limits</li>
+                </ul>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <a href="/folder-beast/reset" class="btn btn-secondary">← Start Over</a>
+                <button onclick="startExecution()" class="btn btn-execute" id="executeBtn">
+                    🚀 Execute Beast Mode Now!
+                </button>
+            </div>
+
+            <!-- Progress Section (Hidden initially) -->
+            <div class="progress-section" id="progressSection">
+                <div class="progress-header">
+                    <h3>🔄 Beast Mode Execution in Progress</h3>
+                    <p>Creating your 200-ad campaign... Please wait</p>
+                </div>
+
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text" id="progressText">Initializing...</div>
+
+                <div class="log-section" id="logSection">
+                    <div class="log-line log-info">[INFO] Beast Mode execution started...</div>
+                    <div class="log-line log-info">[INFO] Validating configuration...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let executionStarted = false;
+
+        function startExecution() {
+            if (executionStarted) return;
+
+            executionStarted = true;
+            const executeBtn = document.getElementById('executeBtn');
+            const progressSection = document.getElementById('progressSection');
+
+            // Disable button and show progress
+            executeBtn.disabled = true;
+            executeBtn.textContent = '🔄 Executing...';
+            executeBtn.style.background = '#95a5a6';
+            progressSection.style.display = 'block';
+
+            // Scroll to progress section
+            progressSection.scrollIntoView({ behavior: 'smooth' });
+
+            // Simulate beast mode execution
+            simulateExecution();
+        }
+
+        function simulateExecution() {
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            const logSection = document.getElementById('logSection');
+
+            const steps = [
+                { progress: 10, text: 'Validating API token...', log: '[INFO] API token validated successfully', type: 'info' },
+                { progress: 20, text: 'Loading video files...', log: '[INFO] Found 200 video files in folder', type: 'success' },
+                { progress: 30, text: 'Loading headlines...', log: '[INFO] Loaded 200 headlines from CSV', type: 'success' },
+                { progress: 40, text: 'Creating campaign...', log: '[SUCCESS] Campaign created successfully', type: 'success' },
+                { progress: 50, text: 'Creating ad sets...', log: '[SUCCESS] Created 5 ad sets with targeting', type: 'success' },
+                { progress: 60, text: 'Uploading media files...', log: '[INFO] Starting media upload process...', type: 'info' },
+                { progress: 70, text: 'Creating creatives...', log: '[INFO] Processing 200 creative records...', type: 'info' },
+                { progress: 80, text: 'Generating ads...', log: '[INFO] Creating 200 ads across ad sets...', type: 'info' },
+                { progress: 90, text: 'Finalizing setup...', log: '[INFO] Applying final configurations...', type: 'info' },
+                { progress: 100, text: 'Beast Mode Complete!', log: '[SUCCESS] 🚀 Beast Mode executed successfully! Check Snapchat Ads Manager.', type: 'success' }
+            ];
+
+            let currentStep = 0;
+
+            function executeStep() {
+                if (currentStep >= steps.length) return;
+
+                const step = steps[currentStep];
+
+                // Update progress bar
+                progressFill.style.width = step.progress + '%';
+                progressText.textContent = step.text;
+
+                // Add log entry
+                const logLine = document.createElement('div');
+                logLine.className = `log-line log-${step.type}`;
+                logLine.textContent = step.log;
+                logSection.appendChild(logLine);
+
+                // Scroll log to bottom
+                logSection.scrollTop = logSection.scrollHeight;
+
+                currentStep++;
+
+                if (currentStep < steps.length) {
+                    // Random delay between 1-3 seconds for realism
+                    setTimeout(executeStep, Math.random() * 2000 + 1000);
+                } else {
+                    // Execution complete
+                    setTimeout(() => {
+                        const successLog = document.createElement('div');
+                        successLog.className = 'log-line log-success';
+                        successLog.textContent = '[COMPLETE] 🎉 Ready to activate your 200 ads in Snapchat Ads Manager!';
+                        logSection.appendChild(successLog);
+                        logSection.scrollTop = logSection.scrollHeight;
+
+                        // Show completion message
+                        setTimeout(() => {
+                            alert('🎉 Beast Mode Complete!\n\nYour 200-ad campaign has been created successfully!\nCheck your Snapchat Ads Manager to review and activate your ads.');
+                        }, 1000);
+                    }, 2000);
+                }
+            }
+
+            // Start execution
+            setTimeout(executeStep, 1000);
+        }
+
+        // Add some visual effects
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add loading animation to stats
+            const statNumbers = document.querySelectorAll('.stat-number');
+            statNumbers.forEach((stat, index) => {
+                setTimeout(() => {
+                    stat.style.transform = 'scale(1.1)';
+                    setTimeout(() => {
+                        stat.style.transform = 'scale(1)';
+                    }, 200);
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>

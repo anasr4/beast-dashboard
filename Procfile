@@ -1,0 +1,1 @@
+web: python speed_beast_dashboard.py

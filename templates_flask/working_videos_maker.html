@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Videos Maker - Professional Video Generator</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a1a 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(255, 0, 0, 0.3);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .upload-section {
+            background: #2a2a2a;
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #404040;
+            transition: all 0.3s ease;
+        }
+
+        .upload-section:hover {
+            border-color: #ff0000;
+            box-shadow: 0 5px 20px rgba(255, 0, 0, 0.2);
+        }
+
+        .settings-section {
+            background: #2a2a2a;
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #404040;
+        }
+
+        .drop-zone {
+            border: 3px dashed #666;
+            border-radius: 10px;
+            padding: 40px 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .drop-zone.dragover {
+            border-color: #ff0000;
+            background-color: rgba(255, 0, 0, 0.1);
+        }
+
+        .drop-zone:hover {
+            border-color: #ff0000;
+            background-color: rgba(255, 0, 0, 0.05);
+        }
+
+        .drop-zone i {
+            font-size: 3em;
+            color: #ff0000;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .setting-group {
+            margin-bottom: 20px;
+        }
+
+        .setting-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #ff0000;
+        }
+
+        .range-container {
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        .range-input {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #404040;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .range-input::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ff0000;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .range-value {
+            position: absolute;
+            right: 0;
+            top: -30px;
+            background: #ff0000;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+
+        .generate-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 0, 0, 0.4);
+        }
+
+        .generate-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .progress-section {
+            background: #2a2a2a;
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #404040;
+            margin-bottom: 30px;
+            display: none;
+        }
+
+        .progress-section.active {
+            display: block;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .progress-title {
+            font-size: 1.5em;
+            color: #ff0000;
+            font-weight: bold;
+        }
+
+        .progress-stats {
+            display: flex;
+            gap: 20px;
+            font-size: 0.9em;
+        }
+
+        .stat {
+            background: #404040;
+            padding: 8px 12px;
+            border-radius: 6px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #404040;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff0000, #ff4444);
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 10px;
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-weight: bold;
+            font-size: 0.9em;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+        }
+
+        .current-status {
+            background: #1a1a1a;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-left: 4px solid #ff0000;
+        }
+
+        .charts-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .chart-container {
+            background: #1a1a1a;
+            border-radius: 10px;
+            padding: 15px;
+            height: 300px;
+        }
+
+        .results-section {
+            background: #2a2a2a;
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #404040;
+            display: none;
+        }
+
+        .results-section.active {
+            display: block;
+        }
+
+        .success-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .success-icon {
+            font-size: 4em;
+            color: #00ff00;
+            margin-bottom: 15px;
+        }
+
+        .results-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .result-stat {
+            background: #1a1a1a;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #404040;
+        }
+
+        .result-stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #ff0000;
+            margin-bottom: 5px;
+        }
+
+        .result-stat-label {
+            color: #ccc;
+            font-size: 0.9em;
+        }
+
+        .download-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #00ff00 0%, #00cc00 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 255, 0, 0.4);
+        }
+
+        .video-list {
+            max-height: 200px;
+            overflow-y: auto;
+            background: #1a1a1a;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        .video-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #404040;
+        }
+
+        .video-item:last-child {
+            border-bottom: none;
+        }
+
+        .back-btn {
+            background: #666;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .back-btn:hover {
+            background: #777;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎬 Videos Maker Pro</h1>
+            <p>Professional Video Generator - Create up to 500 unique video variations</p>
+        </div>
+
+        <!-- Upload and Settings Section -->
+        <div id="uploadSection" class="main-content">
+            <div class="upload-section">
+                <h3>📁 Upload Video</h3>
+                <div class="drop-zone" id="dropZone">
+                    <i>🎥</i>
+                    <p><strong>Drop your video here</strong></p>
+                    <p>or click to browse</p>
+                    <p style="color: #999; font-size: 0.9em; margin-top: 10px;">
+                        Supported: MP4, AVI, MOV (Max 100MB)
+                    </p>
+                </div>
+                <input type="file" id="videoFile" class="file-input" accept="video/*">
+                <div id="fileInfo" style="display: none; background: #1a1a1a; padding: 15px; border-radius: 8px; margin-top: 15px;">
+                    <p><strong>Selected File:</strong></p>
+                    <p id="fileName"></p>
+                    <p id="fileSize"></p>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h3>⚙️ Generation Settings</h3>
+
+                <div class="setting-group">
+                    <label for="numVideos">Number of Videos:</label>
+                    <div class="range-container">
+                        <input type="range" id="numVideos" class="range-input" min="1" max="500" value="200">
+                        <span class="range-value" id="numVideosValue">200</span>
+                    </div>
+                </div>
+
+                <div class="setting-group">
+                    <label for="maxSize">Max Size per Video (MB):</label>
+                    <div class="range-container">
+                        <input type="range" id="maxSize" class="range-input" min="2" max="8" value="6" step="0.5">
+                        <span class="range-value" id="maxSizeValue">6</span>
+                    </div>
+                </div>
+
+                <div class="setting-group">
+                    <label>Estimated Time:</label>
+                    <div style="background: #1a1a1a; padding: 10px; border-radius: 6px;">
+                        <span id="estimatedTime">~3.3 minutes</span>
+                    </div>
+                </div>
+
+                <button class="generate-btn" id="generateBtn" onclick="startGeneration()">
+                    🚀 Generate Videos
+                </button>
+            </div>
+        </div>
+
+        <!-- Progress Section -->
+        <div id="progressSection" class="progress-section">
+            <div class="progress-header">
+                <div class="progress-title">🎬 Generating Videos...</div>
+                <div class="progress-stats">
+                    <div class="stat">
+                        <strong id="videosCreated">0</strong>/<span id="totalVideos">200</span> Videos
+                    </div>
+                    <div class="stat">
+                        <strong id="currentProgress">0</strong>% Complete
+                    </div>
+                    <div class="stat">
+                        Time: <strong id="elapsedTime">00:00</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+                <div class="progress-text" id="progressText">0%</div>
+            </div>
+
+            <div class="current-status" id="currentStatus">
+                Initializing video generation system...
+            </div>
+
+            <div class="charts-container">
+                <div class="chart-container">
+                    <canvas id="progressChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="sizeChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="resultsSection" class="results-section">
+            <div class="success-header">
+                <div class="success-icon">✅</div>
+                <h2>Videos Generated Successfully!</h2>
+            </div>
+
+            <div class="results-stats">
+                <div class="result-stat">
+                    <div class="result-stat-value" id="finalVideoCount">0</div>
+                    <div class="result-stat-label">Videos Created</div>
+                </div>
+                <div class="result-stat">
+                    <div class="result-stat-value" id="finalTotalSize">0</div>
+                    <div class="result-stat-label">Total Size (MB)</div>
+                </div>
+                <div class="result-stat">
+                    <div class="result-stat-value" id="finalAvgSize">0</div>
+                    <div class="result-stat-label">Avg Size (MB)</div>
+                </div>
+                <div class="result-stat">
+                    <div class="result-stat-value" id="finalProcessTime">0</div>
+                    <div class="result-stat-label">Process Time</div>
+                </div>
+            </div>
+
+            <button class="download-btn" id="downloadBtn" onclick="downloadVideos()">
+                ⬇️ Download ZIP File
+            </button>
+
+            <div class="video-list" id="videoList">
+                <!-- Video list will be populated here -->
+            </div>
+
+            <button class="back-btn" onclick="resetGenerator()">🔄 Generate More Videos</button>
+        </div>
+    </div>
+
+    <script>
+        let currentTaskId = null;
+        let selectedFile = null;
+        let startTime = null;
+        let progressChart = null;
+        let sizeChart = null;
+        let progressData = [];
+        let sizeData = [];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            setupEventListeners();
+            updateEstimatedTime();
+            initializeCharts();
+        });
+
+        function setupEventListeners() {
+            const dropZone = document.getElementById('dropZone');
+            const fileInput = document.getElementById('videoFile');
+            const numVideos = document.getElementById('numVideos');
+            const maxSize = document.getElementById('maxSize');
+
+            // File upload
+            dropZone.addEventListener('click', () => fileInput.click());
+            dropZone.addEventListener('dragover', handleDragOver);
+            dropZone.addEventListener('drop', handleDrop);
+            fileInput.addEventListener('change', handleFileSelect);
+
+            // Settings
+            numVideos.addEventListener('input', function() {
+                document.getElementById('numVideosValue').textContent = this.value;
+                updateEstimatedTime();
+            });
+
+            maxSize.addEventListener('input', function() {
+                document.getElementById('maxSizeValue').textContent = this.value;
+            });
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('dragover');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        }
+
+        function handleFileSelect(e) {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        }
+
+        function handleFile(file) {
+            if (!file.type.startsWith('video/')) {
+                alert('Please select a video file');
+                return;
+            }
+
+            selectedFile = file;
+            const fileInfo = document.getElementById('fileInfo');
+            const fileName = document.getElementById('fileName');
+            const fileSize = document.getElementById('fileSize');
+
+            fileName.textContent = file.name;
+            fileSize.textContent = (file.size / (1024 * 1024)).toFixed(1) + ' MB';
+            fileInfo.style.display = 'block';
+
+            document.getElementById('generateBtn').disabled = false;
+        }
+
+        function updateEstimatedTime() {
+            const numVideos = document.getElementById('numVideos').value;
+            const estimatedMinutes = (numVideos * 1.0 / 60).toFixed(1);
+            document.getElementById('estimatedTime').textContent = `~${estimatedMinutes} minutes`;
+        }
+
+        function initializeCharts() {
+            // Progress Chart
+            const progressCtx = document.getElementById('progressChart').getContext('2d');
+            progressChart = new Chart(progressCtx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Progress %',
+                        data: [],
+                        borderColor: '#ff0000',
+                        backgroundColor: 'rgba(255, 0, 0, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Generation Progress',
+                            color: '#ffffff'
+                        },
+                        legend: {
+                            labels: {
+                                color: '#ffffff'
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                color: '#ffffff'
+                            },
+                            grid: {
+                                color: '#404040'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#ffffff'
+                            },
+                            grid: {
+                                color: '#404040'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Size Chart
+            const sizeCtx = document.getElementById('sizeChart').getContext('2d');
+            sizeChart = new Chart(sizeCtx, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Video Size (MB)',
+                        data: [],
+                        backgroundColor: 'rgba(255, 0, 0, 0.8)',
+                        borderColor: '#ff0000',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Video Sizes',
+                            color: '#ffffff'
+                        },
+                        legend: {
+                            labels: {
+                                color: '#ffffff'
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: '#ffffff'
+                            },
+                            grid: {
+                                color: '#404040'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#ffffff'
+                            },
+                            grid: {
+                                color: '#404040'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        async function startGeneration() {
+            if (!selectedFile) {
+                alert('Please select a video file first');
+                return;
+            }
+
+            // Hide upload section, show progress
+            document.getElementById('uploadSection').style.display = 'none';
+            document.getElementById('progressSection').classList.add('active');
+
+            const numVideos = document.getElementById('numVideos').value;
+            const maxSize = document.getElementById('maxSize').value;
+
+            document.getElementById('totalVideos').textContent = numVideos;
+            startTime = Date.now();
+
+            // Reset charts
+            progressData = [];
+            sizeData = [];
+            progressChart.data.labels = [];
+            progressChart.data.datasets[0].data = [];
+            sizeChart.data.labels = [];
+            sizeChart.data.datasets[0].data = [];
+            progressChart.update();
+            sizeChart.update();
+
+            // Start timer
+            const timer = setInterval(() => {
+                const elapsed = Date.now() - startTime;
+                const minutes = Math.floor(elapsed / 60000);
+                const seconds = Math.floor((elapsed % 60000) / 1000);
+                document.getElementById('elapsedTime').textContent =
+                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }, 1000);
+
+            try {
+                // Upload file and start generation
+                const formData = new FormData();
+                formData.append('video', selectedFile);
+                formData.append('num_videos', numVideos);
+                formData.append('max_size_mb', maxSize);
+
+                const response = await fetch('/videos-maker/generate', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    currentTaskId = result.task_id;
+                    pollProgress(timer);
+                } else {
+                    throw new Error(result.error || 'Generation failed');
+                }
+            } catch (error) {
+                clearInterval(timer);
+                alert('Error: ' + error.message);
+                resetGenerator();
+            }
+        }
+
+        async function pollProgress(timer) {
+            try {
+                const response = await fetch(`/videos-maker/status/${currentTaskId}`);
+                const status = await response.json();
+
+                // Update progress
+                updateProgressDisplay(status);
+
+                if (status.completed) {
+                    clearInterval(timer);
+                    if (status.success) {
+                        showResults(status);
+                    } else {
+                        alert('Generation failed: ' + (status.error || 'Unknown error'));
+                        resetGenerator();
+                    }
+                } else {
+                    // Continue polling
+                    setTimeout(() => pollProgress(timer), 1000);
+                }
+            } catch (error) {
+                clearInterval(timer);
+                alert('Error checking progress: ' + error.message);
+                resetGenerator();
+            }
+        }
+
+        function updateProgressDisplay(status) {
+            const progress = status.progress_percent || 0;
+            const videosCreated = status.videos_generated || 0;
+            const currentStep = status.current_step || 'Processing...';
+
+            // Update progress bar
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('progressText').textContent = Math.round(progress) + '%';
+            document.getElementById('currentProgress').textContent = Math.round(progress);
+
+            // Update video count
+            document.getElementById('videosCreated').textContent = videosCreated;
+
+            // Update status
+            document.getElementById('currentStatus').textContent = currentStep;
+
+            // Update charts
+            const timeLabel = new Date().toLocaleTimeString();
+
+            progressChart.data.labels.push(timeLabel);
+            progressChart.data.datasets[0].data.push(progress);
+
+            if (progressChart.data.labels.length > 20) {
+                progressChart.data.labels.shift();
+                progressChart.data.datasets[0].data.shift();
+            }
+
+            progressChart.update('none');
+
+            // Update size chart if we have video data
+            if (status.videos && status.videos.length > sizeChart.data.labels.length) {
+                const newVideos = status.videos.slice(sizeChart.data.labels.length);
+                newVideos.forEach((video, index) => {
+                    const videoNum = sizeChart.data.labels.length + index + 1;
+                    sizeChart.data.labels.push(`Video ${videoNum}`);
+                    sizeChart.data.datasets[0].data.push(video.size_mb);
+                });
+
+                if (sizeChart.data.labels.length > 10) {
+                    sizeChart.data.labels.shift();
+                    sizeChart.data.datasets[0].data.shift();
+                }
+
+                sizeChart.update('none');
+            }
+        }
+
+        function showResults(status) {
+            // Hide progress, show results
+            document.getElementById('progressSection').classList.remove('active');
+            document.getElementById('resultsSection').classList.add('active');
+
+            // Update result stats
+            document.getElementById('finalVideoCount').textContent = status.videos_generated;
+            document.getElementById('finalTotalSize').textContent = (status.total_size_mb || 0).toFixed(1);
+            document.getElementById('finalAvgSize').textContent =
+                status.videos_generated > 0 ? ((status.total_size_mb || 0) / status.videos_generated).toFixed(1) : '0';
+            document.getElementById('finalProcessTime').textContent =
+                Math.round((status.processing_time || 0)) + 's';
+
+            // Populate video list
+            const videoList = document.getElementById('videoList');
+            videoList.innerHTML = '';
+
+            if (status.videos && status.videos.length > 0) {
+                status.videos.forEach((video, index) => {
+                    const videoItem = document.createElement('div');
+                    videoItem.className = 'video-item';
+                    videoItem.innerHTML = `
+                        <span>${video.filename}</span>
+                        <span>${video.size_mb.toFixed(1)} MB</span>
+                    `;
+                    videoList.appendChild(videoItem);
+                });
+            }
+        }
+
+        function downloadVideos() {
+            if (currentTaskId) {
+                window.open(`/videos-maker/download/${currentTaskId}`, '_blank');
+            }
+        }
+
+        function resetGenerator() {
+            // Reset all sections
+            document.getElementById('uploadSection').style.display = 'grid';
+            document.getElementById('progressSection').classList.remove('active');
+            document.getElementById('resultsSection').classList.remove('active');
+
+            // Reset variables
+            currentTaskId = null;
+            selectedFile = null;
+            startTime = null;
+
+            // Reset form
+            document.getElementById('videoFile').value = '';
+            document.getElementById('fileInfo').style.display = 'none';
+            document.getElementById('generateBtn').disabled = true;
+
+            // Reset charts
+            if (progressChart) {
+                progressChart.data.labels = [];
+                progressChart.data.datasets[0].data = [];
+                progressChart.update();
+            }
+
+            if (sizeChart) {
+                sizeChart.data.labels = [];
+                sizeChart.data.datasets[0].data = [];
+                sizeChart.update();
+            }
+        }
+    </script>
+</body>
+</html>

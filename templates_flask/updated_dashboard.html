@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 Updated Beast Mode Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #000;
+            background-image: radial-gradient(circle at 50% 50%, #1a0000 0%, #000000 100%);
+            min-height: 100vh;
+            color: white;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 8px rgba(255,0,0,0.8);
+            background: linear-gradient(45deg, #ff0000, #ff6666);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 900;
+        }
+
+        .header p {
+            font-size: 1.3em;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .optimization-badge {
+            display: inline-block;
+            background: linear-gradient(45deg, #ff0000, #cc0000);
+            padding: 15px 25px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 1.1em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 8px 20px rgba(255, 0, 0, 0.4);
+            animation: pulse 2s infinite;
+            border: 2px solid #ff4444;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .bots-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .bot-card {
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 2px solid #ff1a1a;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(255, 26, 26, 0.2);
+        }
+
+        .bot-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .bot-card:hover::before {
+            left: 100%;
+        }
+
+        .bot-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(255, 0, 0, 0.4);
+            border-color: #ff4444;
+            background: rgba(255, 26, 26, 0.1);
+        }
+
+        .bot-card.folder-beast {
+            background: linear-gradient(135deg, rgba(255, 0, 0, 0.3), rgba(255, 100, 100, 0.2));
+            border: 3px solid #ff0000;
+            position: relative;
+            box-shadow: 0 15px 35px rgba(255, 0, 0, 0.4);
+        }
+
+        .optimized-label {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: linear-gradient(45deg, #ff0000, #cc0000);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+            text-transform: uppercase;
+            box-shadow: 0 5px 15px rgba(255, 0, 0, 0.4);
+            animation: glow 2s infinite;
+        }
+
+        @keyframes glow {
+            0% { box-shadow: 0 5px 15px rgba(255, 0, 0, 0.4); }
+            50% { box-shadow: 0 5px 25px rgba(255, 0, 0, 0.8); }
+            100% { box-shadow: 0 5px 15px rgba(255, 0, 0, 0.4); }
+        }
+
+        .bot-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .bot-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .bot-description {
+            opacity: 0.8;
+            font-size: 1em;
+            margin-bottom: 20px;
+        }
+
+        .bot-status {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status-ready {
+            background: rgba(255, 0, 0, 0.2);
+            border: 2px solid #ff0000;
+            color: #ff4444;
+            font-weight: bold;
+        }
+
+        .features-list {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 40px 0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .features-list h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 2em;
+            color: #ff4444;
+            text-shadow: 2px 2px 8px rgba(255, 0, 0, 0.6);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .feature-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            border-left: 4px solid #ff0000;
+        }
+
+        .feature-item h3 {
+            color: #ff6666;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .feature-item p {
+            opacity: 0.9;
+            line-height: 1.5;
+        }
+
+        .stats-banner {
+            background: linear-gradient(45deg, rgba(255, 107, 107, 0.2), rgba(255, 142, 83, 0.2));
+            border-radius: 15px;
+            padding: 25px;
+            margin: 30px 0;
+            text-align: center;
+            border: 2px solid rgba(255, 107, 107, 0.3);
+        }
+
+        .stats-banner h2 {
+            font-size: 1.8em;
+            margin-bottom: 15px;
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #ff6b6b;
+        }
+
+        .stat-label {
+            font-size: 1em;
+            opacity: 0.8;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .footer p {
+            opacity: 0.7;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Updated Beast Mode Dashboard</h1>
+            <p>Advanced Snapchat Campaign Automation Suite</p>
+            <div class="optimization-badge">⚡ OPTIMIZED - 200 ADS IN 10 MINUTES!</div>
+        </div>
+
+        <div class="stats-banner">
+            <h2>🏆 Performance Stats</h2>
+            <div class="stats-row">
+                <div class="stat-item">
+                    <div class="stat-number">10x</div>
+                    <div class="stat-label">Faster Execution</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">200</div>
+                    <div class="stat-label">Ads Per Campaign</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">100%</div>
+                    <div class="stat-label">Progress Tracking</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">5</div>
+                    <div class="stat-label">Ad Sets</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bots-grid">
+            {% for bot_id, bot in bots.items() %}
+            <div class="bot-card {% if bot_id == 'folder_beast' %}folder-beast{% endif %}"
+                 onclick="location.href='/{{ bot_id.replace('_', '-') }}'">
+                {% if bot_id == 'folder_beast' %}
+                <div class="optimized-label">OPTIMIZED</div>
+                {% endif %}
+                <span class="bot-icon">{{ bot.icon }}</span>
+                <h2 class="bot-title">{{ bot.name }}</h2>
+                <p class="bot-description">{{ bot.description }}</p>
+                <div class="bot-status status-{{ bot.status }}">{{ bot.status }}</div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="features-list">
+            <h2>🔥 New Features & Optimizations</h2>
+            <div class="features-grid">
+                <div class="feature-item">
+                    <h3>⚡ Speed Optimization</h3>
+                    <p>Reduced execution time from 45 minutes to under 10 minutes with smart delay optimization and batch processing.</p>
+                </div>
+                <div class="feature-item">
+                    <h3>📊 Real-Time Progress</h3>
+                    <p>Live progress strip showing percentage completion, stage tracking, and detailed statistics updates every second.</p>
+                </div>
+                <div class="feature-item">
+                    <h3>🎯 Smart Media Processing</h3>
+                    <p>Intelligent media status checking with automatic retry logic for faster ad creation as videos become ready.</p>
+                </div>
+                <div class="feature-item">
+                    <h3>🔄 Auto Token Refresh</h3>
+                    <p>Automatic token management prevents expiration during long operations, ensuring uninterrupted execution.</p>
+                </div>
+                <div class="feature-item">
+                    <h3>📈 Enhanced Analytics</h3>
+                    <p>Detailed execution logs, timing metrics, and success/failure tracking for better campaign insights.</p>
+                </div>
+                <div class="feature-item">
+                    <h3>🚀 3-Step Wizard</h3>
+                    <p>Streamlined campaign creation process with intuitive step-by-step guidance and data validation.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>🚀 Updated Beast Mode Dashboard - Optimized for Speed & Reliability</p>
+            <p>Running on http://localhost:8000 | Saudi Arabia + UAE Targeting | Age 22-55+</p>
+        </div>
+    </div>
+
+    <script>
+        // Add some interactive effects
+        document.addEventListener('DOMContentLoaded', function() {
+            const botCards = document.querySelectorAll('.bot-card');
+
+            botCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-10px) scale(1.02)';
+                });
+
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+
+            // Add click animation
+            botCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    this.style.transform = 'translateY(-5px) scale(0.98)';
+                    setTimeout(() => {
+                        this.style.transform = 'translateY(-10px) scale(1.02)';
+                    }, 150);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

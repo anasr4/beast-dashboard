@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Compressor - Beast Mode Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #000000 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #ffffff;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #000000 0%, #333333 50%, #000000 100%);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .form-container {
+            padding: 40px;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px solid #f0f0f0;
+            border-radius: 15px;
+            background: rgba(255,255,255,0.02);
+        }
+
+        .form-section h3 {
+            color: #ffffff;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            border-bottom: 2px solid #FFFC00;
+            padding-bottom: 10px;
+        }
+
+        .upload-area {
+            border: 3px dashed #FFFC00;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+            background: rgba(255, 252, 0, 0.05);
+        }
+
+        .upload-area:hover {
+            border-color: #fff;
+            background: rgba(255, 252, 0, 0.1);
+        }
+
+        .upload-area input[type="file"] {
+            display: none;
+        }
+
+        .file-upload-text {
+            font-size: 1.1rem;
+            color: #ffffff;
+            margin-bottom: 20px;
+        }
+
+        input[type="number"] {
+            width: 100px;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            text-align: center;
+            margin: 0 10px;
+        }
+
+        input[type="number"]:focus {
+            border-color: #FFFC00;
+            outline: none;
+        }
+
+        .btn-compress {
+            background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 20px;
+        }
+
+        .btn-compress:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(247, 147, 30, 0.3);
+        }
+
+        .btn-compress:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .progress-container {
+            display: none;
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 25px;
+            background-color: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #FFFC00, #FF6B35);
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 15px;
+        }
+
+        .progress-text {
+            text-align: center;
+            margin: 10px 0;
+            font-weight: bold;
+            color: #ffffff;
+            font-size: 1.1rem;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
+            margin: 5px;
+            min-width: 120px;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #FFFC00;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #cccccc;
+            margin-top: 5px;
+        }
+
+        .btn-download {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .btn-download:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(40, 167, 69, 0.3);
+        }
+
+        .error {
+            color: #dc3545;
+            background-color: rgba(220, 53, 69, 0.1);
+            border: 1px solid rgba(220, 53, 69, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .feature-list {
+            background: rgba(255,255,255,0.02);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .feature-list h3 {
+            color: #FFFC00;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        .feature-list ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .feature-list li {
+            padding: 8px 0;
+            position: relative;
+            padding-left: 25px;
+            color: #ffffff;
+        }
+
+        .feature-list li:before {
+            content: "✓";
+            color: #28a745;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+
+        .back-btn {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 12px 24px;
+            border-radius: 25px;
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,0.2);
+            text-decoration: none;
+            color: white;
+        }
+
+        .variants-input-group {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .variants-input-group label {
+            color: #ffffff;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .variants-input-group span {
+            color: #cccccc;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎬 Video Compressor</h1>
+            <p>Transform 1 video into multiple optimized variants - Beast Mode!</p>
+        </div>
+
+        <div class="form-container">
+            <a href="/" class="back-btn">← Back to Dashboard</a>
+
+            <div class="feature-list">
+                <h3>🚀 Features:</h3>
+                <ul>
+                    <li>Compress 1 video into multiple different variants</li>
+                    <li>All variants under 8MB each for optimal performance</li>
+                    <li>Maintains original aspect ratio (no distortion!)</li>
+                    <li>H.264 encoding with optimized settings</li>
+                    <li>Smart resolutions based on original video format</li>
+                    <li>Portrait videos: Up to 1080x1920 (recommended format)</li>
+                    <li>Landscape videos: Proper scaling with aspect ratio</li>
+                    <li>Smart file sizes from 2MB to 7.5MB range</li>
+                    <li>ZIP download with all variants included</li>
+                    <li>Choose from 1 to 1000 variants (Beast Mode!)</li>
+                </ul>
+            </div>
+
+            <div class="form-section">
+                <h3>📁 Upload Your Video</h3>
+                <div class="upload-area" onclick="document.getElementById('videoFile').click()">
+                    <input type="file" id="videoFile" accept="video/*">
+                    <div class="file-upload-text">
+                        📁 Click to upload video<br>
+                        <small>Supports: MP4, AVI, MOV, MKV and more</small>
+                    </div>
+                </div>
+
+                <div class="variants-input-group">
+                    <label for="numVariants">Number of variants:</label>
+                    <input type="number" id="numVariants" value="200" min="1" max="1000">
+                    <span>(1-1000)</span>
+                </div>
+
+                <button class="btn-compress" id="compressBtn" onclick="startCompression()">
+                    🚀 Start Compression
+                </button>
+            </div>
+
+            <div class="progress-container" id="progressContainer">
+                <h3>🔄 Compressing Videos...</h3>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text" id="progressText">0%</div>
+                <div class="progress-text" id="statusText">Initializing...</div>
+
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-number" id="variantsCreated">0</div>
+                        <div class="stat-label">Variants Created</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="totalSize">0</div>
+                        <div class="stat-label">Total Size (MB)</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="processingTime">0</div>
+                        <div class="stat-label">Time (seconds)</div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-download" id="downloadBtn" onclick="downloadVariants()">
+                📥 Download All Variants (ZIP)
+            </button>
+
+            <div class="error" id="errorMessage"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentTaskId = null;
+        let progressInterval = null;
+
+        // File upload preview
+        document.getElementById('videoFile').addEventListener('change', function(e) {
+            const fileName = e.target.files[0]?.name;
+            if (fileName) {
+                document.querySelector('.file-upload-text').innerHTML =
+                    `✅ ${fileName}<br><small>Click to change file</small>`;
+            }
+        });
+
+        function startCompression() {
+            const fileInput = document.getElementById('videoFile');
+            const file = fileInput.files[0];
+            const numVariants = document.getElementById('numVariants').value;
+
+            if (!file) {
+                showError('Please select a video file first');
+                return;
+            }
+
+            if (!numVariants || numVariants < 1 || numVariants > 1000) {
+                showError('Please enter a valid number of variants (1-1000)');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('video', file);
+            formData.append('num_variants', numVariants);
+
+            // Show progress container
+            document.getElementById('progressContainer').style.display = 'block';
+            document.getElementById('compressBtn').disabled = true;
+            document.getElementById('downloadBtn').style.display = 'none';
+            document.getElementById('errorMessage').style.display = 'none';
+
+            // Update progress title
+            document.getElementById('progressContainer').querySelector('h3').textContent =
+                `🔄 Compressing Videos (${numVariants} variants)...`;
+
+            // Start compression
+            fetch('/compress', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    currentTaskId = data.task_id;
+                    startProgressMonitoring();
+                } else {
+                    showError(data.error);
+                    resetUI();
+                }
+            })
+            .catch(error => {
+                showError('Error starting compression: ' + error.message);
+                resetUI();
+            });
+        }
+
+        function startProgressMonitoring() {
+            progressInterval = setInterval(() => {
+                fetch('/compression-progress')
+                .then(response => response.json())
+                .then(data => {
+                    updateProgress(data);
+
+                    if (data.completed) {
+                        clearInterval(progressInterval);
+                        if (data.success) {
+                            document.getElementById('downloadBtn').style.display = 'block';
+                            document.getElementById('downloadBtn').onclick = () => {
+                                window.location.href = data.download_url;
+                            };
+                        } else {
+                            showError(data.error || 'Compression failed');
+                        }
+                        document.getElementById('compressBtn').disabled = false;
+                    }
+                })
+                .catch(error => {
+                    console.error('Progress monitoring error:', error);
+                });
+            }, 1000);
+        }
+
+        function updateProgress(data) {
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            const statusText = document.getElementById('statusText');
+            const variantsCreated = document.getElementById('variantsCreated');
+            const totalSize = document.getElementById('totalSize');
+            const processingTime = document.getElementById('processingTime');
+
+            progressFill.style.width = data.progress + '%';
+            progressText.textContent = Math.round(data.progress) + '%';
+            statusText.textContent = data.message;
+            variantsCreated.textContent = data.variants_created;
+            totalSize.textContent = data.total_size_mb.toFixed(1);
+            processingTime.textContent = Math.round(data.processing_time || 0);
+        }
+
+        function downloadVariants() {
+            if (currentTaskId) {
+                window.location.href = `/download/${currentTaskId}`;
+            }
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+
+        function resetUI() {
+            document.getElementById('compressBtn').disabled = false;
+            document.getElementById('progressContainer').style.display = 'none';
+            if (progressInterval) {
+                clearInterval(progressInterval);
+            }
+        }
+    </script>
+</body>
+</html>

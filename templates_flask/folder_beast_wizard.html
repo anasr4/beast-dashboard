@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Folder Beast Mode - 3-Step Wizard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a, #1a1a1a, #2d2d2d);
+            color: white;
+            min-height: 100vh;
+        }
+
+        .wizard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: rgba(45, 45, 45, 0.9);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            color: #00ff88;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #333;
+            border-radius: 4px;
+            margin: 30px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff88, #00cc6a);
+            width: 33.33%;
+            transition: width 0.5s ease;
+            border-radius: 4px;
+        }
+
+        .step-indicators {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 40px;
+            padding: 0 20px;
+        }
+
+        .step-indicator {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            position: relative;
+        }
+
+        .step-number {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #333;
+            color: #666;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .step-indicator.active .step-number {
+            background: #00ff88;
+            color: #1a1a1a;
+        }
+
+        .step-indicator.completed .step-number {
+            background: #00cc6a;
+            color: white;
+        }
+
+        .step-title {
+            font-size: 1em;
+            color: #666;
+            text-align: center;
+            transition: color 0.3s ease;
+        }
+
+        .step-indicator.active .step-title {
+            color: #00ff88;
+        }
+
+        .step-indicator.completed .step-title {
+            color: #00cc6a;
+        }
+
+        .step-content {
+            background: rgba(45, 45, 45, 0.9);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+        }
+
+        .form-section h3 {
+            color: #00ff88;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #cccccc;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #444;
+            border-radius: 8px;
+            background: #1a1a1a;
+            color: white;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            border-color: #00ff88;
+            outline: none;
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+        }
+
+        .file-input-group {
+            position: relative;
+        }
+
+        .file-input-display {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .file-input-display input {
+            flex: 1;
+        }
+
+        .browse-btn {
+            background: #00ff88;
+            color: #1a1a1a;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .browse-btn:hover {
+            background: #00cc6a;
+            transform: translateY(-2px);
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 40px;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #00ff88, #00cc6a);
+            color: #1a1a1a;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 255, 136, 0.3);
+        }
+
+        .btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #666;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #777;
+        }
+
+        .summary-section {
+            background: rgba(26, 26, 26, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #00ff88;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #333;
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .progress-section {
+            background: rgba(26, 26, 26, 0.8);
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+
+        .progress-bar-detailed {
+            width: 100%;
+            height: 20px;
+            background: #333;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill-detailed {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff88, #00cc6a);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .logs {
+            background: #1a1a1a;
+            border-radius: 10px;
+            padding: 20px;
+            height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            border: 2px solid #333;
+            margin-top: 20px;
+        }
+
+        .log-entry {
+            margin-bottom: 5px;
+            color: #ccc;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .wizard-container {
+                padding: 10px;
+            }
+
+            .step-content {
+                padding: 20px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .navigation {
+                flex-direction: column;
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="wizard-container">
+        <div class="header">
+            <h1>📁 Folder Beast Mode</h1>
+            <p>3-Step Wizard: Campaign → Ad Sets → Ads Creation</p>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="mainProgress"></div>
+            </div>
+
+            <div class="step-indicators">
+                <div class="step-indicator active" id="step1Indicator">
+                    <div class="step-number">1</div>
+                    <div class="step-title">Campaign Details</div>
+                </div>
+                <div class="step-indicator" id="step2Indicator">
+                    <div class="step-number">2</div>
+                    <div class="step-title">Ad Sets Configuration</div>
+                </div>
+                <div class="step-indicator" id="step3Indicator">
+                    <div class="step-number">3</div>
+                    <div class="step-title">Ads & Launch</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 1: Campaign Details -->
+        <div id="step1" class="step-content">
+            <h2 style="color: #00ff88; margin-bottom: 30px;">Step 1: Campaign Configuration</h2>
+
+            <div class="form-section">
+                <h3>📁 File Selection</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Video Folder (200 videos):</label>
+                        <div class="file-input-display">
+                            <input type="text" id="videoFolder" value="C:\Users\PC\Desktop\200 vdieos" placeholder="Select video folder path">
+                            <button class="browse-btn" onclick="browseFolder()">Browse</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Headlines CSV File:</label>
+                        <div class="file-input-display">
+                            <input type="text" id="csvFile" value="D:\snapchat_headlines_khaleeji_200 (1) - snapchat_headlines_khaleeji_200 (1).csv.csv" placeholder="Select CSV file path">
+                            <button class="browse-btn" onclick="browseFile()">Browse</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>⚙️ Campaign Settings</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Campaign Name:</label>
+                        <input type="text" id="campaignName" value="vatoline" placeholder="Enter campaign name">
+                    </div>
+                    <div class="form-group">
+                        <label>Brand Name:</label>
+                        <input type="text" id="brandName" value="vatoline" placeholder="Enter brand name">
+                    </div>
+                    <div class="form-group">
+                        <label>Website URL:</label>
+                        <input type="text" id="websiteUrl" value="https://sallagcc.com" placeholder="Enter website URL">
+                    </div>
+                    <div class="form-group">
+                        <label>Daily Budget (USD):</label>
+                        <input type="number" id="dailyBudget" value="100" placeholder="100">
+                    </div>
+                </div>
+            </div>
+
+            <div class="navigation">
+                <button class="btn btn-secondary" onclick="goBack()">← Back to Dashboard</button>
+                <button class="btn" onclick="nextStep()">Next: Ad Sets →</button>
+            </div>
+        </div>
+
+        <!-- Step 2: Ad Sets Details -->
+        <div id="step2" class="step-content hidden">
+            <h2 style="color: #00ff88; margin-bottom: 30px;">Step 2: Ad Sets Configuration</h2>
+
+            <div class="form-section">
+                <h3>📊 Ad Sets Structure</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Number of Ad Sets:</label>
+                        <select id="numAdSets">
+                            <option value="5" selected>5 Ad Sets (Recommended)</option>
+                            <option value="3">3 Ad Sets</option>
+                            <option value="10">10 Ad Sets</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Budget per Ad Set (USD/day):</label>
+                        <input type="number" id="adSetBudget" value="20" placeholder="20">
+                    </div>
+                    <div class="form-group">
+                        <label>Target Demographics:</label>
+                        <select id="targetDemo">
+                            <option value="18-55">Age 18-55 (Default)</option>
+                            <option value="18-35">Age 18-35 (Young Adults)</option>
+                            <option value="25-45">Age 25-45 (Professionals)</option>
+                            <option value="35-55">Age 35-55 (Mature)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Geographic Targeting:</label>
+                        <select id="geoTarget">
+                            <option value="us">United States</option>
+                            <option value="ca">Canada</option>
+                            <option value="uk">United Kingdom</option>
+                            <option value="au">Australia</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>🎯 Optimization Settings</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Optimization Goal:</label>
+                        <select id="optimizationGoal">
+                            <option value="IMPRESSIONS">Impressions</option>
+                            <option value="CLICKS">Clicks</option>
+                            <option value="CONVERSIONS">Conversions</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Bid Strategy:</label>
+                        <select id="bidStrategy">
+                            <option value="auto" selected>Auto Bid (Recommended)</option>
+                            <option value="manual">Manual Bid</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="navigation">
+                <button class="btn btn-secondary" onclick="prevStep()">← Back: Campaign</button>
+                <button class="btn" onclick="nextStep()">Next: Ads Creation →</button>
+            </div>
+        </div>
+
+        <!-- Step 3: Ads & Launch -->
+        <div id="step3" class="step-content hidden">
+            <h2 style="color: #00ff88; margin-bottom: 30px;">Step 3: Ads Configuration & Launch</h2>
+
+            <div class="form-section">
+                <h3>🎭 Ads Configuration</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Total Ads to Create:</label>
+                        <input type="number" id="totalAds" value="200" readonly style="background: #333;">
+                    </div>
+                    <div class="form-group">
+                        <label>Ads per Ad Set:</label>
+                        <input type="number" id="adsPerSet" value="40" readonly style="background: #333;">
+                    </div>
+                    <div class="form-group">
+                        <label>Call to Action:</label>
+                        <select id="callToAction">
+                            <option value="SHOP_NOW">Shop Now</option>
+                            <option value="LEARN_MORE">Learn More</option>
+                            <option value="SIGN_UP">Sign Up</option>
+                            <option value="DOWNLOAD">Download</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Creative Type:</label>
+                        <select id="creativeType">
+                            <option value="WEB_VIEW">Web View (Recommended)</option>
+                            <option value="VIDEO">Video Only</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="summary-section">
+                <h3 style="color: #00ff88; margin-bottom: 20px;">📋 Campaign Summary</h3>
+                <div id="campaignSummary">
+                    <!-- Summary will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <div class="navigation">
+                <button class="btn btn-secondary" onclick="prevStep()">← Back: Ad Sets</button>
+                <button class="btn" id="launchBtn" onclick="launchCampaign()">🚀 Launch Beast Mode</button>
+            </div>
+
+            <div id="progressSection" class="progress-section hidden">
+                <h3 style="color: #00ff88; margin-bottom: 20px;">📈 Campaign Creation Progress</h3>
+                <div class="progress-bar-detailed">
+                    <div class="progress-fill-detailed" id="detailedProgress"></div>
+                </div>
+                <p id="currentStepText">Initializing...</p>
+                <div class="logs" id="logs">
+                    <div class="log-entry">Beast Mode Folder Creation Started...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        const sessionId = '{{ session_id }}';
+
+        function updateStepIndicators() {
+            for (let i = 1; i <= 3; i++) {
+                const indicator = document.getElementById(`step${i}Indicator`);
+                const progressFill = document.getElementById('mainProgress');
+
+                if (i < currentStep) {
+                    indicator.classList.add('completed');
+                    indicator.classList.remove('active');
+                } else if (i === currentStep) {
+                    indicator.classList.add('active');
+                    indicator.classList.remove('completed');
+                } else {
+                    indicator.classList.remove('active', 'completed');
+                }
+            }
+
+            document.getElementById('mainProgress').style.width = `${(currentStep / 3) * 100}%`;
+        }
+
+        function showStep(step) {
+            for (let i = 1; i <= 3; i++) {
+                document.getElementById(`step${i}`).classList.add('hidden');
+            }
+            document.getElementById(`step${step}`).classList.remove('hidden');
+            currentStep = step;
+            updateStepIndicators();
+
+            if (step === 3) {
+                updateSummary();
+            }
+        }
+
+        function nextStep() {
+            if (currentStep < 3) {
+                if (validateCurrentStep()) {
+                    saveCurrentStep();
+                    showStep(currentStep + 1);
+                }
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 1) {
+                showStep(currentStep - 1);
+            }
+        }
+
+        function validateCurrentStep() {
+            if (currentStep === 1) {
+                const campaignName = document.getElementById('campaignName').value;
+                const videoFolder = document.getElementById('videoFolder').value;
+                const csvFile = document.getElementById('csvFile').value;
+
+                if (!campaignName || !videoFolder || !csvFile) {
+                    alert('Please fill in all required fields.');
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function saveCurrentStep() {
+            let data = {};
+
+            if (currentStep === 1) {
+                data = {
+                    campaignName: document.getElementById('campaignName').value,
+                    brandName: document.getElementById('brandName').value,
+                    websiteUrl: document.getElementById('websiteUrl').value,
+                    dailyBudget: document.getElementById('dailyBudget').value,
+                    videoFolder: document.getElementById('videoFolder').value,
+                    csvFile: document.getElementById('csvFile').value
+                };
+            } else if (currentStep === 2) {
+                data = {
+                    numAdSets: document.getElementById('numAdSets').value,
+                    adSetBudget: document.getElementById('adSetBudget').value,
+                    targetDemo: document.getElementById('targetDemo').value,
+                    geoTarget: document.getElementById('geoTarget').value,
+                    optimizationGoal: document.getElementById('optimizationGoal').value,
+                    bidStrategy: document.getElementById('bidStrategy').value
+                };
+            }
+
+            fetch(`/api/folder_beast/step/${currentStep}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            });
+        }
+
+        function updateSummary() {
+            const summary = document.getElementById('campaignSummary');
+            summary.innerHTML = `
+                <div class="summary-item">
+                    <span>Campaign Name:</span>
+                    <span>${document.getElementById('campaignName').value}</span>
+                </div>
+                <div class="summary-item">
+                    <span>Brand Name:</span>
+                    <span>${document.getElementById('brandName').value}</span>
+                </div>
+                <div class="summary-item">
+                    <span>Number of Ad Sets:</span>
+                    <span>${document.getElementById('numAdSets').value}</span>
+                </div>
+                <div class="summary-item">
+                    <span>Total Ads:</span>
+                    <span>200</span>
+                </div>
+                <div class="summary-item">
+                    <span>Daily Budget:</span>
+                    <span>$${document.getElementById('dailyBudget').value}</span>
+                </div>
+                <div class="summary-item">
+                    <span>Target Audience:</span>
+                    <span>${document.getElementById('targetDemo').value}, ${document.getElementById('geoTarget').value.toUpperCase()}</span>
+                </div>
+            `;
+        }
+
+        function launchCampaign() {
+            saveCurrentStep();
+
+            const data = {
+                totalAds: document.getElementById('totalAds').value,
+                adsPerSet: document.getElementById('adsPerSet').value,
+                callToAction: document.getElementById('callToAction').value,
+                creativeType: document.getElementById('creativeType').value
+            };
+
+            fetch(`/api/folder_beast/step/3`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('launchBtn').disabled = true;
+                    document.getElementById('launchBtn').textContent = '🔄 Creating Campaign...';
+                    document.getElementById('progressSection').classList.remove('hidden');
+                    startProgressMonitoring();
+                }
+            });
+        }
+
+        function startProgressMonitoring() {
+            const interval = setInterval(() => {
+                fetch(`/api/folder_beast/progress/${sessionId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('detailedProgress').style.width = data.progress + '%';
+                        document.getElementById('currentStepText').textContent = data.current_step || 'Processing...';
+
+                        if (data.status === 'completed') {
+                            clearInterval(interval);
+                            document.getElementById('launchBtn').textContent = '✅ Campaign Created!';
+                            document.getElementById('currentStepText').textContent = 'Campaign creation completed successfully!';
+
+                            // Add success log
+                            const logs = document.getElementById('logs');
+                            logs.innerHTML += '<div class="log-entry" style="color: #00ff88;">✅ Campaign created successfully!</div>';
+                            logs.innerHTML += `<div class="log-entry" style="color: #00ff88;">Campaign ID: ${data.campaign_id}</div>`;
+                            logs.scrollTop = logs.scrollHeight;
+                        }
+                    });
+            }, 1000);
+        }
+
+        function browseFolder() {
+            alert('File browser integration would be implemented here');
+        }
+
+        function browseFile() {
+            alert('File browser integration would be implemented here');
+        }
+
+        function goBack() {
+            window.location.href = '/';
+        }
+
+        // Initialize
+        updateStepIndicators();
+    </script>
+</body>
+</html>

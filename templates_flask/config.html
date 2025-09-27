@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚙️ Configuration - Snapchat Beast</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .config-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #FFD700;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #FFD700;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .help-text {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-top: 5px;
+            line-height: 1.4;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 15px;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #666, #888);
+        }
+
+        .status-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-left: 4px solid #4ECDC4;
+        }
+
+        .status-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #4ECDC4;
+        }
+
+        .instructions-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .instructions-title {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: #FFD700;
+        }
+
+        .instruction-step {
+            margin-bottom: 15px;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .instruction-step::before {
+            content: "📋";
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        .warning-box {
+            background: rgba(255, 193, 7, 0.2);
+            border: 2px solid #FFC107;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .warning-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #FFC107;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚙️ API Configuration</h1>
+            <p>Setup your Snapchat Marketing API credentials</p>
+        </div>
+
+        <div class="status-card">
+            <div class="status-title">🔑 API Connection Status</div>
+            {% if config.client_id %}
+                <div style="color: #4ECDC4;">✅ API credentials configured</div>
+            {% else %}
+                <div style="color: #FFC107;">⚠️ API credentials required</div>
+            {% endif %}
+        </div>
+
+        <div class="instructions-section">
+            <div class="instructions-title">📖 How to Get Your API Credentials</div>
+
+            <div class="instruction-step">
+                Go to <strong>Snapchat Business Manager</strong> and create a new app
+            </div>
+            <div class="instruction-step">
+                Navigate to <strong>App Settings</strong> → <strong>API Keys</strong>
+            </div>
+            <div class="instruction-step">
+                Copy your <strong>Client ID</strong> and <strong>Client Secret</strong>
+            </div>
+            <div class="instruction-step">
+                Set redirect URI to: <code>http://localhost:8080/callback</code>
+            </div>
+            <div class="instruction-step">
+                Find your Ad Account ID in Snapchat Ads Manager → Account Settings
+            </div>
+        </div>
+
+        <div class="warning-box">
+            <div class="warning-title">🔒 Security Notice</div>
+            Your credentials are stored locally and never shared. Keep your Client Secret secure!
+        </div>
+
+        <div class="config-container">
+            <form action="/save_config" method="POST">
+                <div class="form-group">
+                    <label for="client_id">Client ID</label>
+                    <input type="text" id="client_id" name="client_id"
+                           value="{{ config.client_id or '' }}"
+                           placeholder="Your Snapchat App Client ID" required>
+                    <div class="help-text">Found in your Snapchat Business app settings under API Keys</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="client_secret">Client Secret</label>
+                    <input type="password" id="client_secret" name="client_secret"
+                           value="{{ config.client_secret or '' }}"
+                           placeholder="Your Snapchat App Client Secret" required>
+                    <div class="help-text">Keep this secret! Never share it publicly</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="redirect_uri">Redirect URI</label>
+                    <input type="url" id="redirect_uri" name="redirect_uri"
+                           value="{{ config.redirect_uri or 'http://localhost:8080/callback' }}"
+                           placeholder="http://localhost:8080/callback" required>
+                    <div class="help-text">Must match exactly what you set in your Snapchat app</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="ad_account_id">Ad Account ID (Optional)</label>
+                    <input type="text" id="ad_account_id" name="ad_account_id"
+                           value="{{ config.ad_account_id or '' }}"
+                           placeholder="Your Snapchat Ad Account ID">
+                    <div class="help-text">If left empty, the bot will use your default ad account</div>
+                </div>
+
+                <button type="submit" class="btn">💾 Save Configuration</button>
+                <a href="/" class="btn btn-secondary">← Back to Dashboard</a>
+            </form>
+        </div>
+
+        <div class="instructions-section">
+            <div class="instructions-title">🚀 Ready to Launch?</div>
+
+            <div class="instruction-step">
+                After saving your credentials, test the connection by creating a campaign
+            </div>
+            <div class="instruction-step">
+                Your first authentication will open a browser window for Snapchat login
+            </div>
+            <div class="instruction-step">
+                Once authenticated, you can create unlimited campaigns automatically!
+            </div>
+        </div>
+    </div>
+</body>
+</html>

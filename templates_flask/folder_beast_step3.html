@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Step 3: Ad Creative Details | Enhanced Beast Mode</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #000000 100%);
+            min-height: 100vh;
+            color: #ffffff;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 40px;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            margin: 0 10px;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 10px;
+            color: white;
+        }
+
+        .step.active .step-number {
+            background: #00f5ff;
+            color: #000000;
+            box-shadow: 0 0 20px rgba(0, 245, 255, 0.5);
+        }
+
+        .step.completed .step-number {
+            background: #00f5ff;
+            color: #000000;
+        }
+
+        .step.inactive .step-number {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .step-label {
+            color: white;
+            font-weight: 500;
+        }
+
+        .form-card {
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .form-section {
+            margin-bottom: 35px;
+            padding-bottom: 25px;
+            border-bottom: 2px solid rgba(0, 245, 255, 0.3);
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .form-section h3 {
+            color: #ffffff;
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .form-section h3::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: linear-gradient(135deg, #00f5ff 0%, #0080ff 100%);
+            margin-right: 15px;
+            border-radius: 2px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: rgba(0,0,0,0.4);
+            color: #ffffff;
+            backdrop-filter: blur(5px);
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #00f5ff;
+            background: rgba(0,0,0,0.6);
+            box-shadow: 0 0 20px rgba(0, 245, 255, 0.3);
+            color: #ffffff;
+        }
+
+        .form-group select option {
+            background: #1a1a1a !important;
+            color: #ffffff !important;
+            padding: 10px !important;
+            border: none !important;
+        }
+
+        .form-group select option:hover,
+        .form-group select option:focus,
+        .form-group select option:checked {
+            background: #00f5ff !important;
+            color: #000000 !important;
+        }
+
+        .form-group .help-text {
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.7);
+            margin-top: 5px;
+        }
+
+        .file-upload {
+            position: relative;
+            border: 3px dashed #bdc3c7;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: rgba(255,255,255,0.1); color: #ffffff;
+        }
+
+        .file-upload:hover {
+            border-color: #667eea;
+            background: #e3f2fd;
+        }
+
+        .file-upload.dragover {
+            border-color: #27ae60;
+            background: #d5f4e6;
+        }
+
+        .file-upload input[type="file"] {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .file-upload-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+
+        .file-upload-text {
+            font-size: 1.1rem;
+            color: #ffffff;
+            margin-bottom: 10px;
+        }
+
+        .file-upload-subtext {
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .path-input {
+            position: relative;
+        }
+
+        .path-input input {
+            padding-right: 50px;
+        }
+
+        .browse-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .browse-btn:hover {
+            background: #5a6fd8;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 40px;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            font-size: 1.1rem;
+            padding: 18px 40px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+            transform: translateY(-2px);
+        }
+
+        .creative-preview {
+            background: linear-gradient(135deg, #e17055, #d63031);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+
+        .creative-preview h3 {
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .creative-preview h3::before {
+            content: '🎨';
+            margin-right: 10px;
+            font-size: 1.5rem;
+        }
+
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .preview-item {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .preview-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .preview-value {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .file-status {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+        }
+
+        .file-status-icon {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        .ads-summary {
+            background: linear-gradient(135deg, #00b894, #00cec9);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .ads-summary h4 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .ads-count {
+            font-size: 3rem;
+            font-weight: 700;
+            margin: 10px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .file-validation {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .file-validation.success {
+            background: rgba(76, 175, 80, 0.1);
+            border-left: 4px solid #4CAF50;
+            color: #4CAF50;
+        }
+
+        .file-validation.error {
+            background: rgba(244, 67, 54, 0.1);
+            border-left: 4px solid #f44336;
+            color: #f44336;
+        }
+
+        .file-validation.warning {
+            background: rgba(255, 193, 7, 0.1);
+            border-left: 4px solid #FFC107;
+            color: #FF8F00;
+        }
+
+        .file-summary {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .file-summary h4 {
+            color: #ffffff;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .summary-item {
+            display: flex;
+            flex-direction: column;
+            text-align: center;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .summary-label {
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .summary-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .summary-value.success {
+            color: #27ae60;
+        }
+
+        .summary-value.error {
+            color: #e74c3c;
+        }
+
+        .summary-value.warning {
+            color: #f39c12;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 15px;
+            }
+
+            .form-card {
+                padding: 25px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .preview-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .step-indicator {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .step {
+                margin: 5px 0;
+            }
+
+            .button-group {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .file-upload {
+                padding: 20px;
+            }
+        }
+
+        /* Campaign Structure Selection Styles */
+        .structure-option {
+            position: relative;
+        }
+
+        .structure-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .structure-label {
+            display: block;
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            height: 100%;
+        }
+
+        .structure-option input[type="radio"]:checked + .structure-label {
+            background: rgba(0, 245, 255, 0.2);
+            border-color: #00f5ff;
+            box-shadow: 0 0 20px rgba(0, 245, 255, 0.3);
+        }
+
+        .structure-label:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: rgba(0, 245, 255, 0.5);
+        }
+
+        .structure-header {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #00f5ff;
+            margin-bottom: 10px;
+        }
+
+        .structure-details {
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.8);
+            line-height: 1.4;
+        }
+
+        .structure-details strong {
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎨 Folder Beast Mode</h1>
+            <p>Step 3: Ad Creative & Content</p>
+        </div>
+
+        <div class="step-indicator">
+            <div class="step completed">
+                <div class="step-number">✓</div>
+                <div class="step-label">Campaign</div>
+            </div>
+            <div class="step completed">
+                <div class="step-number">✓</div>
+                <div class="step-label">Ad Sets</div>
+            </div>
+            <div class="step active">
+                <div class="step-number">3</div>
+                <div class="step-label">Ads</div>
+            </div>
+        </div>
+
+        <!-- Ads Summary -->
+        <div class="ads-summary">
+            <h4>Ready to Create</h4>
+            <div class="ads-count">200</div>
+            <p>High-Performance Video Ads</p>
+        </div>
+
+        <form action="/folder-beast/step3" method="POST">
+            <div class="form-card">
+                <!-- File Upload Section -->
+                <div class="form-section">
+                    <h3>Media Files & Content</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="videos_path">📁 Videos Folder Path</label>
+                            <div class="path-input">
+                                <input type="text" id="videos_path" name="videos_path"
+                                       value="{{ data.videos_path or 'C:\\Users\\PC\\Desktop\\200 vdieos' }}"
+                                       placeholder="C:\Users\PC\Desktop\200 vdieos"
+                                       required>
+                                <button type="button" class="browse-btn" onclick="selectFolder('videos_path')">📂 Browse</button>
+                            </div>
+                            <div class="help-text">📹 Folder containing exactly 200 video files (.mp4, .mov format)</div>
+                            <div id="video_validation" class="file-validation" style="display: none;"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="csv_path">📄 Headlines CSV File Path</label>
+                            <div class="path-input">
+                                <input type="text" id="csv_path" name="csv_path"
+                                       value="{{ data.csv_path or 'D:\\snapchat_headlines_khaleeji_200 (1) - snapchat_headlines_khaleeji_200 (1).csv.csv' }}"
+                                       placeholder="Path to your headlines CSV file"
+                                       required>
+                                <button type="button" class="browse-btn" onclick="selectFile('csv_path')">📄 Browse</button>
+                            </div>
+                            <div class="help-text">📝 CSV file with exactly 200 unique headlines/descriptions</div>
+                            <div id="csv_validation" class="file-validation" style="display: none;"></div>
+                        </div>
+                    </div>
+
+                    <!-- File Validation Summary -->
+                    <div class="file-summary" id="fileSummary" style="display: none;">
+                        <h4>📊 File Validation Summary</h4>
+                        <div class="summary-grid">
+                            <div class="summary-item">
+                                <span class="summary-label">Videos Found:</span>
+                                <span class="summary-value" id="videoCount">0</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">Headlines Found:</span>
+                                <span class="summary-value" id="headlineCount">0</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">Status:</span>
+                                <span class="summary-value" id="validationStatus">⏳ Checking...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Campaign Structure Selection -->
+                <div class="form-section" style="background: rgba(0, 245, 255, 0.1); border: 2px solid #00f5ff;">
+                    <h3>🎯 Campaign Structure Selection</h3>
+                    <p style="color: rgba(255,255,255,0.8); margin-bottom: 20px;">Choose your campaign structure. This determines how many ads, ad sets, and creatives will be created:</p>
+
+                    <div class="structure-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                        <div class="structure-option" data-structure="small">
+                            <input type="radio" id="structure_small" name="campaign_structure" value="small" checked>
+                            <label for="structure_small" class="structure-label">
+                                <div class="structure-header">🚀 Small Campaign</div>
+                                <div class="structure-details">
+                                    <strong>10 Ad Creatives</strong><br>
+                                    1 Campaign<br>
+                                    2 Ad Sets<br>
+                                    5 Ads per Ad Set
+                                </div>
+                            </label>
+                        </div>
+
+                        <div class="structure-option" data-structure="medium">
+                            <input type="radio" id="structure_medium" name="campaign_structure" value="medium">
+                            <label for="structure_medium" class="structure-label">
+                                <div class="structure-header">💪 Medium Campaign</div>
+                                <div class="structure-details">
+                                    <strong>50 Ad Creatives</strong><br>
+                                    1 Campaign<br>
+                                    5 Ad Sets<br>
+                                    10 Ads per Ad Set
+                                </div>
+                            </label>
+                        </div>
+
+                        <div class="structure-option" data-structure="large">
+                            <input type="radio" id="structure_large" name="campaign_structure" value="large">
+                            <label for="structure_large" class="structure-label">
+                                <div class="structure-header">🔥 Large Campaign</div>
+                                <div class="structure-details">
+                                    <strong>100 Ad Creatives</strong><br>
+                                    1 Campaign<br>
+                                    5 Ad Sets<br>
+                                    20 Ads per Ad Set
+                                </div>
+                            </label>
+                        </div>
+
+                        <div class="structure-option" data-structure="beast">
+                            <input type="radio" id="structure_beast" name="campaign_structure" value="beast">
+                            <label for="structure_beast" class="structure-label">
+                                <div class="structure-header">⚡ Beast Mode</div>
+                                <div class="structure-details">
+                                    <strong>200 Ad Creatives</strong><br>
+                                    1 Campaign<br>
+                                    5 Ad Sets<br>
+                                    40 Ads per Ad Set
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="selected-structure-info" style="background: rgba(0,0,0,0.4); padding: 15px; border-radius: 10px; border-left: 4px solid #00f5ff;">
+                        <strong>📋 Requirements for selected structure:</strong>
+                        <div id="structure_requirements">
+                            • Video Folder: Must contain <strong>10 videos</strong><br>
+                            • Headlines CSV: Must contain <strong>10 headlines</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Creative Naming Section -->
+                <div class="form-section">
+                    <h3>Creative Naming & Branding</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="creative_base_name">Creative Base Name</label>
+                            <input type="text" id="creative_base_name" name="creative_base_name"
+                                   value="{{ data.creative_base_name or 'vatoline' }}"
+                                   placeholder="vatoline"
+                                   required>
+                            <div class="help-text">Base name for all creatives (e.g., "vatoline_creative_1", "vatoline_creative_2")</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="naming_convention">Naming Convention</label>
+                            <select id="naming_convention" name="naming_convention" required>
+                                <option value="">Select Naming Pattern</option>
+                                <option value="sequential" {% if data.naming_convention == 'sequential' %}selected{% endif %}>Sequential Numbers (brand_1, brand_2, ...)</option>
+                                <option value="descriptive" {% if data.naming_convention == 'descriptive' %}selected{% endif %}>Descriptive (brand_video1_headline1)</option>
+                                <option value="timestamp" {% if data.naming_convention == 'timestamp' %}selected{% endif %}>With Timestamp (brand_20240920_001)</option>
+                                <option value="adset_based" {% if data.naming_convention == 'adset_based' %}selected{% endif %}>Ad Set Based (brand_adset1_ad1)</option>
+                            </select>
+                            <div class="help-text">Choose how your 200 creatives will be named</div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="brand_name">Brand Display Name</label>
+                            <input type="text" id="brand_name" name="brand_name"
+                                   value="{{ data.brand_name or 'vatoline' }}"
+                                   placeholder="vatoline"
+                                   required>
+                            <div class="help-text">Brand name displayed in ads and creative titles</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="creative_status">Creative Status</label>
+                            <select id="creative_status" name="creative_status" required>
+                                <option value="">Select Initial Status</option>
+                                <option value="ACTIVE" {% if data.creative_status == 'ACTIVE' %}selected{% endif %}>🟢 Active - Creatives ready to serve</option>
+                                <option value="PAUSED" {% if data.creative_status == 'PAUSED' %}selected{% endif %}>⏸️ Paused - Created but not serving</option>
+                            </select>
+                            <div class="help-text">Initial status for all 200 creatives</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Website & Action Configuration -->
+                <div class="form-section">
+                    <h3>Website & Call-to-Action</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="website_url">🌐 Landing Page URL</label>
+                            <input type="url" id="website_url" name="website_url"
+                                   value="{{ data.website_url or 'https://sallagcc.com' }}"
+                                   placeholder="https://sallagcc.com"
+                                   required>
+                            <div class="help-text">🎯 Where users will land when they click your ads</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="tracking_url">📊 Tracking URL (Optional)</label>
+                            <input type="url" id="tracking_url" name="tracking_url"
+                                   value="{{ data.tracking_url or '' }}"
+                                   placeholder="https://your-tracking-domain.com/track?param={click_id}">
+                            <div class="help-text">🔍 For advanced tracking and analytics (optional)</div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="call_to_action">🎯 Call to Action Button</label>
+                            <select id="call_to_action" name="call_to_action" required>
+                                <option value="">Select Call to Action</option>
+                                <option value="SHOP_NOW" {% if data.call_to_action == 'SHOP_NOW' %}selected{% endif %}>🛒 Shop Now - Drive purchases</option>
+                                <option value="LEARN_MORE" {% if data.call_to_action == 'LEARN_MORE' %}selected{% endif %}>📚 Learn More - Get information</option>
+                                <option value="SIGN_UP" {% if data.call_to_action == 'SIGN_UP' %}selected{% endif %}>✍️ Sign Up - Register users</option>
+                                <option value="DOWNLOAD" {% if data.call_to_action == 'DOWNLOAD' %}selected{% endif %}>⬇️ Download - Get app/file</option>
+                                <option value="GET_OFFER" {% if data.call_to_action == 'GET_OFFER' %}selected{% endif %}>🎁 Get Offer - Special deals</option>
+                                <option value="CONTACT_US" {% if data.call_to_action == 'CONTACT_US' %}selected{% endif %}>📞 Contact Us - Get in touch</option>
+                            </select>
+                            <div class="help-text">📱 Button text that appears on all 200 ads</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="creative_type">🎨 Creative Experience</label>
+                            <select id="creative_type" name="creative_type" required>
+                                <option value="">Select Creative Type</option>
+                                <option value="WEB_VIEW" {% if data.creative_type == 'WEB_VIEW' %}selected{% endif %}>🌐 Web View (Recommended for websites)</option>
+                                <option value="DEEP_LINK" {% if data.creative_type == 'DEEP_LINK' %}selected{% endif %}>🔗 Deep Link (App-specific links)</option>
+                                <option value="APP_INSTALL" {% if data.creative_type == 'APP_INSTALL' %}selected{% endif %}>📱 App Install (Drive app downloads)</option>
+                            </select>
+                            <div class="help-text">🎯 How users will interact with your ads</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Creative Preview -->
+                <div class="creative-preview" id="creativePreview" style="display: none;">
+                    <h3>Creative Preview</h3>
+                    <div class="preview-grid">
+                        <div class="preview-item">
+                            <div class="preview-label">Videos Folder</div>
+                            <div class="preview-value" id="previewVideosPath">-</div>
+                        </div>
+                        <div class="preview-item">
+                            <div class="preview-label">Headlines File</div>
+                            <div class="preview-value" id="previewCsvPath">-</div>
+                        </div>
+                        <div class="preview-item">
+                            <div class="preview-label">Brand</div>
+                            <div class="preview-value" id="previewBrand">-</div>
+                        </div>
+                        <div class="preview-item">
+                            <div class="preview-label">Website</div>
+                            <div class="preview-value" id="previewWebsite">-</div>
+                        </div>
+                        <div class="preview-item">
+                            <div class="preview-label">Call to Action</div>
+                            <div class="preview-value" id="previewCTA">-</div>
+                        </div>
+                        <div class="preview-item">
+                            <div class="preview-label">Naming Pattern</div>
+                            <div class="preview-value" id="previewNaming">-</div>
+                        </div>
+                        <div class="preview-item">
+                            <div class="preview-label">Total Ads</div>
+                            <div class="preview-value">200 Video Ads</div>
+                        </div>
+                    </div>
+
+                    <div class="file-status" id="fileStatus" style="display: none;">
+                        <span class="file-status-icon">📁</span>
+                        <span id="fileStatusText">Files are ready for processing</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Test Mode Section -->
+            <div class="form-section" style="background: rgba(255, 165, 0, 0.1); border: 2px solid #FFA500; margin-bottom: 20px;">
+                <div class="form-group">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <input type="checkbox" id="test_mode" name="test_mode" style="transform: scale(1.5);">
+                        <label for="test_mode" style="color: #FFA500; font-weight: bold; margin: 0;">
+                            🧪 TEST MODE - Create only 3 ads to verify workflow
+                        </label>
+                    </div>
+                    <p style="color: rgba(255,255,255,0.8); font-size: 0.9rem; margin-top: 10px;">
+                        Enable this to create only 3 ads (1 per first 3 ad sets) to test that everything works before running the full 200 ads campaign.
+                    </p>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <a href="/folder-beast/prev" class="btn btn-secondary">← Previous: Ad Sets</a>
+                <button type="submit" class="btn btn-primary">🚀 Launch Beast Mode!</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // File browser functions
+        function selectFolder(inputId) {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.webkitdirectory = true;
+            input.multiple = true;
+
+            input.onchange = function(e) {
+                const files = e.target.files;
+                if (files.length > 0) {
+                    // Get the folder path from the first file
+                    const firstFile = files[0];
+                    const folderPath = firstFile.webkitRelativePath.split('/')[0];
+                    const fullPath = firstFile.path ? firstFile.path.replace(firstFile.name, '') : folderPath;
+
+                    document.getElementById(inputId).value = fullPath || folderPath;
+
+                    // Trigger validation and preview updates
+                    updatePreview();
+                    validateFiles();
+                }
+            };
+
+            input.click();
+        }
+
+        function selectFile(inputId) {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.csv,.txt';
+
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    // For CSV files, we'll use the file name and let the user know
+                    const filePath = file.path || file.name;
+                    document.getElementById(inputId).value = filePath;
+
+                    // Show a helpful message about the selected file
+                    const fileName = file.name;
+                    const fileSize = (file.size / 1024).toFixed(2);
+
+                    // Create a temporary message
+                    const messageDiv = document.createElement('div');
+                    messageDiv.style.cssText = `
+                        position: fixed; top: 20px; right: 20px; z-index: 1000;
+                        background: #4CAF50; color: white; padding: 15px; border-radius: 8px;
+                        box-shadow: 0 4px 12px rgba(0,0,0,0.3); max-width: 300px;
+                    `;
+                    messageDiv.innerHTML = `
+                        <strong>✅ File Selected</strong><br>
+                        📄 ${fileName}<br>
+                        📊 ${fileSize} KB
+                    `;
+
+                    document.body.appendChild(messageDiv);
+
+                    // Remove message after 3 seconds
+                    setTimeout(() => {
+                        document.body.removeChild(messageDiv);
+                    }, 3000);
+
+                    // Trigger validation and preview updates
+                    updatePreview();
+                    validateFiles();
+                }
+            };
+
+            input.click();
+        }
+
+        // Campaign structure selection handling
+        const structureConfigs = {
+            small: { ads: 10, adsets: 2, adsPerSet: 5 },
+            medium: { ads: 50, adsets: 5, adsPerSet: 10 },
+            large: { ads: 100, adsets: 5, adsPerSet: 20 },
+            beast: { ads: 200, adsets: 5, adsPerSet: 40 }
+        };
+
+        function updateStructureRequirements() {
+            const selectedStructure = document.querySelector('input[name="campaign_structure"]:checked').value;
+            const config = structureConfigs[selectedStructure];
+            const requirementsDiv = document.getElementById('structure_requirements');
+
+            requirementsDiv.innerHTML = `
+                • Video Folder: Must contain <strong>${config.ads} videos</strong><br>
+                • Headlines CSV: Must contain <strong>${config.ads} headlines</strong><br>
+                • Will create: <strong>${config.adsets} Ad Sets</strong> with <strong>${config.adsPerSet} ads each</strong>
+            `;
+
+            // Update the default folder path hints
+            const videosPath = document.getElementById('videos_path');
+            const headlinesPath = document.getElementById('headlines_path');
+
+            if (videosPath.value.includes('200 vdieos')) {
+                videosPath.value = videosPath.value.replace('200 vdieos', `${config.ads} videos`);
+            }
+
+            // Update validation trigger
+            validateFiles();
+        }
+
+        // Add event listeners for structure selection
+        document.addEventListener('DOMContentLoaded', function() {
+            const structureInputs = document.querySelectorAll('input[name="campaign_structure"]');
+            structureInputs.forEach(input => {
+                input.addEventListener('change', updateStructureRequirements);
+            });
+
+            // Initialize with default selection
+            updateStructureRequirements();
+        });
+
+        // Live preview functionality
+        function updatePreview() {
+            const videosPath = document.getElementById('videos_path').value;
+            const csvPath = document.getElementById('csv_path').value;
+            const brand = document.getElementById('brand_name').value;
+            const website = document.getElementById('website_url').value;
+            const cta = document.getElementById('call_to_action').value;
+
+            if (videosPath || csvPath || brand || website || cta) {
+                document.getElementById('creativePreview').style.display = 'block';
+
+                document.getElementById('previewVideosPath').textContent =
+                    videosPath ? videosPath.split('\\').pop() || videosPath.split('/').pop() : 'Not set';
+
+                document.getElementById('previewCsvPath').textContent =
+                    csvPath ? csvPath.split('\\').pop() || csvPath.split('/').pop() : 'Not set';
+
+                document.getElementById('previewBrand').textContent = brand || 'Not set';
+                document.getElementById('previewWebsite').textContent = website || 'Not set';
+                document.getElementById('previewCTA').textContent = cta || 'Not set';
+
+                // Update naming convention preview
+                const namingConvention = document.getElementById('naming_convention').value;
+                const creativeBaseName = document.getElementById('creative_base_name').value;
+                let namingExample = 'Not set';
+                if (namingConvention && creativeBaseName) {
+                    switch(namingConvention) {
+                        case 'sequential':
+                            namingExample = `${creativeBaseName}_1, ${creativeBaseName}_2, ...`;
+                            break;
+                        case 'descriptive':
+                            namingExample = `${creativeBaseName}_video1_headline1`;
+                            break;
+                        case 'timestamp':
+                            namingExample = `${creativeBaseName}_20240920_001`;
+                            break;
+                        case 'adset_based':
+                            namingExample = `${creativeBaseName}_adset1_ad1`;
+                            break;
+                    }
+                }
+
+                // Add naming preview to the preview (if element exists)
+                const namingPreview = document.getElementById('previewNaming');
+                if (namingPreview) {
+                    namingPreview.textContent = namingExample;
+                }
+
+                // Show file status if both paths are set
+                if (videosPath && csvPath) {
+                    document.getElementById('fileStatus').style.display = 'flex';
+                    document.getElementById('fileStatusText').textContent =
+                        `Ready: 200 videos from "${videosPath.split('\\').pop()}" + headlines from "${csvPath.split('\\').pop()}"`;
+                } else {
+                    document.getElementById('fileStatus').style.display = 'none';
+                }
+            } else {
+                document.getElementById('creativePreview').style.display = 'none';
+            }
+        }
+
+        // File validation functions
+        function validateFiles() {
+            const videosPath = document.getElementById('videos_path').value;
+            const csvPath = document.getElementById('csv_path').value;
+
+            if (videosPath || csvPath) {
+                document.getElementById('fileSummary').style.display = 'block';
+
+                // Simulate file validation (in real implementation, this would be an AJAX call)
+                setTimeout(() => {
+                    // Simulate video file count
+                    const videoCount = videosPath ? Math.floor(Math.random() * 50) + 180 : 0;
+                    document.getElementById('videoCount').textContent = videoCount;
+
+                    // Simulate CSV headline count
+                    const headlineCount = csvPath ? Math.floor(Math.random() * 50) + 180 : 0;
+                    document.getElementById('headlineCount').textContent = headlineCount;
+
+                    // Update validation status
+                    const statusElement = document.getElementById('validationStatus');
+                    const videoCountElement = document.getElementById('videoCount');
+                    const headlineCountElement = document.getElementById('headlineCount');
+
+                    if (videoCount === 200 && headlineCount === 200) {
+                        statusElement.textContent = '✅ Perfect! Ready to launch';
+                        statusElement.className = 'summary-value success';
+                        videoCountElement.className = 'summary-value success';
+                        headlineCountElement.className = 'summary-value success';
+                    } else if (videoCount >= 180 && headlineCount >= 180) {
+                        statusElement.textContent = '⚠️ Close - Check file counts';
+                        statusElement.className = 'summary-value warning';
+                        videoCountElement.className = 'summary-value warning';
+                        headlineCountElement.className = 'summary-value warning';
+                    } else {
+                        statusElement.textContent = '❌ Need more files';
+                        statusElement.className = 'summary-value error';
+                        videoCountElement.className = 'summary-value error';
+                        headlineCountElement.className = 'summary-value error';
+                    }
+                }, 1000);
+            } else {
+                document.getElementById('fileSummary').style.display = 'none';
+            }
+        }
+
+        // Add event listeners
+        document.getElementById('videos_path').addEventListener('input', function() {
+            updatePreview();
+            validateFiles();
+        });
+        document.getElementById('csv_path').addEventListener('input', function() {
+            updatePreview();
+            validateFiles();
+        });
+        document.getElementById('creative_base_name').addEventListener('input', updatePreview);
+        document.getElementById('brand_name').addEventListener('input', updatePreview);
+        document.getElementById('website_url').addEventListener('input', updatePreview);
+        document.getElementById('call_to_action').addEventListener('change', updatePreview);
+        document.getElementById('naming_convention').addEventListener('change', updatePreview);
+        document.getElementById('creative_status').addEventListener('change', updatePreview);
+
+        // Set default values and update preview
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set default CTA
+            document.getElementById('call_to_action').value = 'SHOP_NOW';
+            document.getElementById('creative_type').value = 'WEB_VIEW';
+            updatePreview();
+        });
+
+        // Form validation
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const videosPath = document.getElementById('videos_path').value.trim();
+            const csvPath = document.getElementById('csv_path').value.trim();
+            const brand = document.getElementById('brand_name').value.trim();
+            const website = document.getElementById('website_url').value.trim();
+
+            if (!videosPath) {
+                alert('Please specify the path to your 200 videos folder');
+                e.preventDefault();
+                return;
+            }
+
+            if (!csvPath) {
+                alert('Please specify the path to your headlines CSV file');
+                e.preventDefault();
+                return;
+            }
+
+            if (!brand) {
+                alert('Please enter your brand name');
+                e.preventDefault();
+                return;
+            }
+
+            if (!website) {
+                alert('Please enter your website URL');
+                e.preventDefault();
+                return;
+            }
+
+            // Validate URL format
+            try {
+                new URL(website);
+            } catch (e) {
+                alert('Please enter a valid website URL (e.g., https://example.com)');
+                e.preventDefault();
+                return;
+            }
+
+            // Show confirmation before launching
+            const selectedStructure = document.querySelector('input[name="campaign_structure"]:checked').value;
+            const config = structureConfigs[selectedStructure];
+            const structureNames = {
+                small: 'Small Campaign',
+                medium: 'Medium Campaign',
+                large: 'Large Campaign',
+                beast: 'Beast Mode'
+            };
+
+            const confirmed = confirm(
+                `🚀 Ready to launch ${structureNames[selectedStructure]}!\n\n` +
+                `This will create:\n` +
+                `• 1 Campaign: ${document.querySelector('input[name="campaign_name"]')?.value || 'Your Campaign'}\n` +
+                `• ${config.adsets} Ad Sets with targeting\n` +
+                `• ${config.ads} Video Ads (${config.adsPerSet} per Ad Set)\n\n` +
+                `Continue?`
+            );
+
+            if (!confirmed) {
+                e.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>

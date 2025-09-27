@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 Results - Snapchat Beast</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #FFFC00 0%, #FF6B35 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.2rem;
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .results-container {
+            padding: 40px;
+        }
+
+        .result-card {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+
+        .result-card:hover {
+            border-color: #FFFC00;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .result-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .result-content {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #28a745;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            font-weight: bold;
+            color: #666;
+        }
+
+        .result-value {
+            color: #333;
+            font-family: 'Courier New', monospace;
+            background: #f8f9fa;
+            padding: 5px 10px;
+            border-radius: 5px;
+            word-break: break-all;
+        }
+
+        .campaign-id {
+            font-size: 1.2rem;
+            color: #007bff;
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin: 20px 0;
+            border: 2px dashed #007bff;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s;
+            flex: 1;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .next-steps {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+        }
+
+        .next-steps h3 {
+            color: #856404;
+            margin-bottom: 15px;
+        }
+
+        .next-steps ul {
+            color: #856404;
+            padding-left: 20px;
+        }
+
+        .next-steps li {
+            margin-bottom: 8px;
+        }
+
+        .copy-btn {
+            background: #17a2b8;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin-left: 10px;
+        }
+
+        .copy-btn:hover {
+            background: #138496;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="success-icon">🎉</div>
+            <h1>Campaign Created!</h1>
+            <p>Your Snapchat campaign is now live in Ads Manager</p>
+        </div>
+
+        <div class="results-container">
+
+            <!-- Campaign Summary -->
+            <div class="result-card">
+                <div class="result-title">
+                    📊 Campaign Summary
+                </div>
+                <div class="result-content">
+                    {% if results.campaign %}
+                    <div class="result-item">
+                        <span class="result-label">Status:</span>
+                        <span class="status-badge status-success">Created Successfully</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Campaign Name:</span>
+                        <span class="result-value">{{ results.campaign.campaign.name }}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Campaign ID:</span>
+                        <span class="result-value">
+                            {{ results.campaign.campaign.id }}
+                            <button class="copy-btn" onclick="copyToClipboard('{{ results.campaign.campaign.id }}')">Copy</button>
+                        </span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Daily Budget:</span>
+                        <span class="result-value">${{ (results.campaign.campaign.daily_budget_micro / 1000000) | int }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Media Upload -->
+            {% if results.media %}
+            <div class="result-card">
+                <div class="result-title">
+                    🎨 Media Upload
+                </div>
+                <div class="result-content">
+                    <div class="result-item">
+                        <span class="result-label">Media ID:</span>
+                        <span class="result-value">
+                            {{ results.media.media.id }}
+                            <button class="copy-btn" onclick="copyToClipboard('{{ results.media.media.id }}')">Copy</button>
+                        </span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Media Type:</span>
+                        <span class="result-value">{{ results.media.media.type }}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Status:</span>
+                        <span class="status-badge status-success">Uploaded Successfully</span>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Ad Account Info -->
+            <div class="result-card">
+                <div class="result-title">
+                    🏢 Account Information
+                </div>
+                <div class="result-content">
+                    <div class="result-item">
+                        <span class="result-label">Ad Account ID:</span>
+                        <span class="result-value">{{ results.ad_account_id }}</span>
+                    </div>
+                    {% if results.profile %}
+                    <div class="result-item">
+                        <span class="result-label">Profile ID:</span>
+                        <span class="result-value">{{ results.profile.profile.id }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Quick Access Links -->
+            <div class="campaign-id">
+                <strong>🎯 View in Snapchat Ads Manager:</strong><br>
+                <a href="https://ads.snapchat.com" target="_blank" style="color: #007bff; text-decoration: none;">
+                    https://ads.snapchat.com
+                </a>
+            </div>
+
+            <!-- Current Status Info -->
+            <div class="result-card" style="background: linear-gradient(135deg, #FFA500 0%, #FF8C00 100%); margin-bottom: 30px;">
+                <div class="result-title" style="color: #000;">
+                    ⚠️ Current Bot Status
+                </div>
+                <div class="result-content" style="color: #000;">
+                    <div style="margin-bottom: 15px;">
+                        <strong>✅ Working Features:</strong>
+                        <ul style="margin: 10px 0; padding-left: 20px;">
+                            <li>Campaign creation (fully functional)</li>
+                            <li>Media upload (images & videos)</li>
+                            <li>Campaign monitoring dashboard</li>
+                        </ul>
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <strong>🔒 API Limitation:</strong>
+                        <p style="margin: 10px 0;">Ad Squad creation requires special Snapchat API permissions (GEO_FILTER or SCT_ID types) that this account doesn't currently have. This is a platform restriction, not a code issue.</p>
+                    </div>
+                    <div>
+                        <strong>📈 What This Means:</strong>
+                        <p style="margin: 10px 0;">Your campaigns and media appear in Snapchat Ads Manager. You can manually create ad squads, creatives, and ads to complete the campaign structure.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Next Steps -->
+            <div class="next-steps">
+                <h3>📋 Next Steps</h3>
+                <ul>
+                    <li>Your campaign has been created and is currently <strong>PAUSED</strong></li>
+                    <li>Log into <a href="https://ads.snapchat.com" target="_blank">Snapchat Ads Manager</a> to review and activate</li>
+                    <li><strong>Manually create ad squads, creatives, and ads</strong> to complete the campaign setup</li>
+                    <li>Set your campaign to <strong>ACTIVE</strong> when ready to start spending</li>
+                    <li>Contact Snapchat Business Support for elevated API permissions if you need full automation</li>
+                </ul>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <a href="https://ads.snapchat.com" target="_blank" class="btn btn-primary">
+                    🚀 Open Ads Manager
+                </a>
+                <a href="/campaigns" class="btn btn-secondary">
+                    📊 View My Campaigns
+                </a>
+                <a href="/" class="btn btn-secondary">
+                    ➕ Create Another Campaign
+                </a>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(function() {
+                // Show temporary success message
+                const button = event.target;
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                button.style.background = '#28a745';
+
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = '#17a2b8';
+                }, 2000);
+            });
+        }
+
+        // Auto-refresh page status every 30 seconds
+        // setTimeout(() => {
+        //     location.reload();
+        // }, 30000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔥🚀 ULTIMATE BEAST MODE - Snapchat Domination</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #000 0%, #FF1744 25%, #FF6B35 50%, #FFD700 75%, #000 100%);
+            background-size: 400% 400%;
+            animation: beastGradient 8s ease infinite;
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        @keyframes beastGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .beast-header {
+            text-align: center;
+            margin-bottom: 40px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 3px solid #FF1744;
+            box-shadow: 0 0 50px rgba(255, 23, 68, 0.5);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 50px rgba(255, 23, 68, 0.5); }
+            50% { box-shadow: 0 0 80px rgba(255, 215, 0, 0.8); }
+            100% { box-shadow: 0 0 50px rgba(255, 23, 68, 0.5); }
+        }
+
+        .beast-title {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #FF1744, #FF6B35, #FFD700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+            animation: titleGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes titleGlow {
+            from { filter: brightness(1) drop-shadow(0 0 20px #FF1744); }
+            to { filter: brightness(1.2) drop-shadow(0 0 40px #FFD700); }
+        }
+
+        .beast-subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+            animation: fadeInUp 2s ease-out;
+        }
+
+        .beast-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .beast-stat {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .beast-stat:hover {
+            border-color: #FFD700;
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #FFD700;
+            display: block;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            opacity: 0.8;
+            margin-top: 10px;
+        }
+
+        .progress-section {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 40px;
+            border-radius: 20px;
+            margin: 40px 0;
+            border: 2px solid rgba(255, 107, 53, 0.5);
+        }
+
+        .progress-title {
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 30px;
+            color: #FF6B35;
+        }
+
+        .main-progress-bar {
+            width: 100%;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .main-progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #FF1744, #FF6B35, #FFD700);
+            width: 0%;
+            border-radius: 15px;
+            transition: width 0.5s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .main-progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            animation: shine 2s infinite;
+        }
+
+        @keyframes shine {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .progress-text {
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #FFD700;
+        }
+
+        .current-step {
+            text-align: center;
+            font-size: 1.1rem;
+            opacity: 0.9;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border-left: 4px solid #FF6B35;
+        }
+
+        .live-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .live-stat {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+        }
+
+        .live-stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #4ECDC4;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .live-stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .completion-section {
+            display: none;
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.3), rgba(76, 175, 80, 0.1));
+            border: 3px solid #4CAF50;
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            margin: 40px 0;
+            animation: successPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes successPulse {
+            0% { box-shadow: 0 0 30px rgba(76, 175, 80, 0.5); }
+            50% { box-shadow: 0 0 60px rgba(76, 175, 80, 0.8); }
+            100% { box-shadow: 0 0 30px rgba(76, 175, 80, 0.5); }
+        }
+
+        .success-title {
+            font-size: 3rem;
+            color: #4CAF50;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(76, 175, 80, 0.8);
+        }
+
+        .error-section {
+            display: none;
+            background: rgba(244, 67, 54, 0.2);
+            border: 2px solid #f44336;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .error-title {
+            font-size: 2rem;
+            color: #f44336;
+            margin-bottom: 15px;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+            min-width: 180px;
+        }
+
+        .btn-beast {
+            background: linear-gradient(45deg, #FF1744, #FF6B35, #FFD700);
+            color: white;
+            box-shadow: 0 10px 30px rgba(255, 23, 68, 0.4);
+            animation: btnGlow 2s infinite alternate;
+        }
+
+        @keyframes btnGlow {
+            from { box-shadow: 0 10px 30px rgba(255, 23, 68, 0.4); }
+            to { box-shadow: 0 15px 40px rgba(255, 215, 0, 0.6); }
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+        }
+
+        .floating-elements {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .floating-emoji {
+            position: absolute;
+            font-size: 2rem;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+        }
+
+        @media (max-width: 768px) {
+            .beast-title {
+                font-size: 2.5rem;
+            }
+
+            .beast-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .live-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating Elements -->
+    <div class="floating-elements" id="floatingElements"></div>
+
+    <div class="container">
+        <div class="beast-header">
+            <h1 class="beast-title">🔥🚀 ULTIMATE BEAST MODE 🚀🔥</h1>
+            <p class="beast-subtitle">SNAPCHAT CAMPAIGN DOMINATION IN PROGRESS</p>
+
+            <div class="beast-stats">
+                <div class="beast-stat">
+                    <span class="stat-number">1</span>
+                    <span class="stat-label">Master Campaign</span>
+                </div>
+                <div class="beast-stat">
+                    <span class="stat-number">5</span>
+                    <span class="stat-label">Advanced Ad Sets</span>
+                </div>
+                <div class="beast-stat">
+                    <span class="stat-number">200</span>
+                    <span class="stat-label">Video Variations</span>
+                </div>
+                <div class="beast-stat">
+                    <span class="stat-number">200</span>
+                    <span class="stat-label">Unique Headlines</span>
+                </div>
+                <div class="beast-stat">
+                    <span class="stat-number">200</span>
+                    <span class="stat-label">Total Ads</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="progress-section">
+            <div class="progress-title">🎯 BEAST MODE PROGRESS</div>
+
+            <div class="progress-text" id="progressText">Initializing BEAST MODE...</div>
+            <div class="main-progress-bar">
+                <div class="main-progress-fill" id="progressFill"></div>
+            </div>
+
+            <div class="current-step" id="currentStep">🚀 Preparing for ultimate automation domination...</div>
+
+            <div class="live-stats">
+                <div class="live-stat">
+                    <span class="live-stat-number" id="videosProcessed">0</span>
+                    <span class="live-stat-label">Videos Processed</span>
+                </div>
+                <div class="live-stat">
+                    <span class="live-stat-number" id="headlinesProcessed">0</span>
+                    <span class="live-stat-label">Headlines Processed</span>
+                </div>
+                <div class="live-stat">
+                    <span class="live-stat-number" id="adsCreated">0</span>
+                    <span class="live-stat-label">Ads Created</span>
+                </div>
+                <div class="live-stat">
+                    <span class="live-stat-number" id="timeElapsed">0:00</span>
+                    <span class="live-stat-label">Time Elapsed</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success Section -->
+        <div class="completion-section" id="completionSection">
+            <div class="success-title">🎉 ULTIMATE BEAST MODE COMPLETE! 🎉</div>
+            <p style="font-size: 1.3rem; margin-bottom: 20px;">
+                SNAPCHAT ADS MANAGER HAS BEEN DOMINATED!
+            </p>
+            <p style="opacity: 0.9;">
+                Your campaign structure is now live with 200 unique ads across 5 optimized ad sets.
+                Each ad features a unique video variation and headline combination.
+            </p>
+
+            <div class="action-buttons">
+                <a href="https://ads.snapchat.com" target="_blank" class="btn btn-beast">
+                    🚀 Open Ads Manager
+                </a>
+                <a href="/results" class="btn btn-beast">
+                    📊 View Results
+                </a>
+                <a href="/" class="btn btn-beast">
+                    🏠 Dashboard
+                </a>
+            </div>
+        </div>
+
+        <!-- Error Section -->
+        <div class="error-section" id="errorSection">
+            <div class="error-title">💥 BEAST MODE ERROR</div>
+            <p id="errorMessage">An error occurred during the automation process.</p>
+            <div class="action-buttons">
+                <button class="btn btn-beast" onclick="retryBeastMode()">🔄 Retry Beast Mode</button>
+                <a href="/" class="btn btn-beast">🏠 Back to Dashboard</a>
+            </div>
+        </div>
+
+        <!-- Initial Launch Section -->
+        <div id="launchSection">
+            <div class="action-buttons">
+                <button class="btn btn-beast" onclick="startBeastMode()" id="launchBtn">
+                    🔥🚀 LAUNCH ULTIMATE BEAST MODE 🚀🔥
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let startTime = null;
+        let statusCheckInterval = null;
+
+        // Create floating elements
+        function createFloatingElements() {
+            const emojis = ['🔥', '🚀', '💪', '⚡', '🎯', '💥', '🎉', '⭐'];
+            const container = document.getElementById('floatingElements');
+
+            setInterval(() => {
+                const emoji = document.createElement('div');
+                emoji.className = 'floating-emoji';
+                emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                emoji.style.left = Math.random() * 100 + '%';
+                emoji.style.animationDelay = '0s';
+                emoji.style.animationDuration = (Math.random() * 3 + 4) + 's';
+
+                container.appendChild(emoji);
+
+                setTimeout(() => {
+                    container.removeChild(emoji);
+                }, 7000);
+            }, 1000);
+        }
+
+        // Update progress display
+        function updateProgress(data) {
+            document.getElementById('progressFill').style.width = data.progress + '%';
+            document.getElementById('progressText').textContent = `BEAST PROGRESS: ${data.progress}%`;
+            document.getElementById('currentStep').textContent = data.current_step || 'Processing...';
+
+            // Update live stats
+            document.getElementById('videosProcessed').textContent = data.videos_processed || 0;
+            document.getElementById('headlinesProcessed').textContent = data.headlines_processed || 0;
+            document.getElementById('adsCreated').textContent = data.ads_created || 0;
+
+            // Update time elapsed
+            if (startTime) {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const minutes = Math.floor(elapsed / 60);
+                const seconds = elapsed % 60;
+                document.getElementById('timeElapsed').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            }
+        }
+
+        // Check automation status
+        function checkBeastStatus() {
+            fetch('/beast_status')
+                .then(response => response.json())
+                .then(data => {
+                    updateProgress(data);
+
+                    if (data.completed && data.progress >= 100) {
+                        clearInterval(statusCheckInterval);
+                        showSuccess();
+                    } else if (data.error) {
+                        clearInterval(statusCheckInterval);
+                        showError(data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Status check error:', error);
+                });
+        }
+
+        // Show success
+        function showSuccess() {
+            document.getElementById('completionSection').style.display = 'block';
+
+            // Create success celebration
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    createCelebrationEmoji();
+                }, i * 100);
+            }
+        }
+
+        // Show error
+        function showError(error) {
+            document.getElementById('errorSection').style.display = 'block';
+            document.getElementById('errorMessage').textContent = error;
+        }
+
+        // Create celebration emoji
+        function createCelebrationEmoji() {
+            const celebEmojis = ['🎉', '🎊', '🥳', '🎈', '✨', '🌟', '💫', '🎆'];
+            const emoji = document.createElement('div');
+            emoji.style.position = 'fixed';
+            emoji.style.fontSize = '2rem';
+            emoji.style.left = Math.random() * 100 + '%';
+            emoji.style.top = '-50px';
+            emoji.style.zIndex = '1000';
+            emoji.textContent = celebEmojis[Math.floor(Math.random() * celebEmojis.length)];
+
+            document.body.appendChild(emoji);
+
+            emoji.animate([
+                { transform: 'translateY(-50px) rotate(0deg)', opacity: 1 },
+                { transform: `translateY(${window.innerHeight + 50}px) rotate(360deg)`, opacity: 0 }
+            ], {
+                duration: 3000,
+                easing: 'ease-out'
+            }).onfinish = () => {
+                document.body.removeChild(emoji);
+            };
+        }
+
+        // Start BEAST MODE
+        function startBeastMode() {
+            // Check if we have the required data
+            const campaignData = JSON.parse(sessionStorage.getItem('campaignData') || '{}');
+            const adSetData = JSON.parse(sessionStorage.getItem('adSetData') || '{}');
+            const creativeData = JSON.parse(sessionStorage.getItem('creativeData') || '{}');
+
+            if (!campaignData.campaign_name) {
+                showError('Missing campaign data. Please start from Step 1.');
+                return;
+            }
+
+            // Hide launch button
+            document.getElementById('launchSection').style.display = 'none';
+
+            startTime = Date.now();
+
+            // Start status checking
+            statusCheckInterval = setInterval(checkBeastStatus, 2000);
+
+            // Show that we're starting
+            updateProgress({
+                progress: 5,
+                current_step: '🚀 Initializing BEAST MODE...',
+                videos_processed: 0,
+                headlines_processed: 0,
+                ads_created: 0
+            });
+
+            // ACTUALLY START THE BEAST MODE AUTOMATION
+            const formData = new FormData();
+            formData.append('campaign_name', campaignData.campaign_name);
+            formData.append('daily_budget', adSetData.daily_budget || '100');
+            formData.append('brand_name', campaignData.brand_name || '');
+            formData.append('landing_url', creativeData.landing_url || 'https://example.com');
+            formData.append('cta_type', creativeData.cta_type || 'SHOP_NOW');
+
+            // Add uploaded files if they exist
+            if (creativeData.videoFile) {
+                formData.append('master_video', creativeData.videoFile);
+            }
+            if (creativeData.headlinesFile) {
+                formData.append('headlines_csv', creativeData.headlinesFile);
+            }
+
+            // Actually trigger the backend automation
+            fetch('/start_beast_mode', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) {
+                    showError(data.error || 'Failed to start BEAST MODE');
+                    clearInterval(statusCheckInterval);
+                }
+            })
+            .catch(error => {
+                showError('Network error: ' + error.message);
+                clearInterval(statusCheckInterval);
+            });
+        }
+
+        // Retry BEAST MODE
+        function retryBeastMode() {
+            document.getElementById('errorSection').style.display = 'none';
+            document.getElementById('launchSection').style.display = 'block';
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            createFloatingElements();
+
+            // Auto-start if coming from step 3
+            if (window.location.search.includes('auto_start=true')) {
+                setTimeout(startBeastMode, 2000);
+            }
+        });
+    </script>
+</body>
+</html>

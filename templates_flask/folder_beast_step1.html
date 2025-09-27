@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Step 1: Campaign Details | Enhanced Beast Mode</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #000000 100%);
+            min-height: 100vh;
+            color: #ffffff;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 40px;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            margin: 0 10px;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 10px;
+            color: white;
+        }
+
+        .step.active .step-number {
+            background: #27ae60;
+            box-shadow: 0 0 20px rgba(39, 174, 96, 0.5);
+        }
+
+        .step.inactive .step-number {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .step-label {
+            color: white;
+            font-weight: 500;
+        }
+
+        .form-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: rgba(0,0,0,0.4);
+            color: #ffffff;
+            backdrop-filter: blur(5px);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #00f5ff;
+            background: rgba(0,0,0,0.6);
+            box-shadow: 0 0 20px rgba(0, 245, 255, 0.3);
+            color: #ffffff;
+        }
+
+        .form-group select option {
+            background: #1a1a1a !important;
+            color: #ffffff !important;
+            padding: 10px !important;
+            border: none !important;
+        }
+
+        .form-group select option:hover,
+        .form-group select option:focus,
+        .form-group select option:checked {
+            background: #00f5ff !important;
+            color: #000000 !important;
+        }
+
+        .form-group .help-text {
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.7);
+            margin-top: 5px;
+        }
+
+        .currency-input {
+            position: relative;
+        }
+
+        .currency-input::before {
+            content: '$';
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255,255,255,0.7);
+            font-weight: 600;
+            z-index: 1;
+        }
+
+        .currency-input input {
+            padding-left: 35px;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 40px;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00f5ff 0%, #0080ff 50%, #00f5ff 100%);
+            border: 2px solid rgba(0, 245, 255, 0.3);
+            color: #000000;
+            font-weight: 700;
+            box-shadow: 0 5px 20px rgba(0, 245, 255, 0.4);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 245, 255, 0.6);
+            background: linear-gradient(135deg, #ffffff 0%, #00f5ff 50%, #ffffff 100%);
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+            transform: translateY(-2px);
+        }
+
+        .campaign-preview {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+
+        .campaign-preview h3 {
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .preview-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .preview-item:last-child {
+            border-bottom: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 15px;
+            }
+
+            .form-card {
+                padding: 25px;
+            }
+
+            .step-indicator {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .step {
+                margin: 5px 0;
+            }
+
+            .button-group {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📁 Folder Beast Mode</h1>
+            <p>Step 1: Campaign Details</p>
+        </div>
+
+        <div class="step-indicator">
+            <div class="step active">
+                <div class="step-number">1</div>
+                <div class="step-label">Campaign</div>
+            </div>
+            <div class="step inactive">
+                <div class="step-number">2</div>
+                <div class="step-label">Ad Sets</div>
+            </div>
+            <div class="step inactive">
+                <div class="step-number">3</div>
+                <div class="step-label">Ads</div>
+            </div>
+        </div>
+
+        <form action="/folder-beast/step1" method="POST">
+            <div class="form-card">
+                <h2 style="margin-bottom: 30px; color: #2c3e50; font-size: 1.8rem;">Campaign Configuration</h2>
+
+                <div class="form-group">
+                    <label for="campaign_name">Campaign Name</label>
+                    <input type="text" id="campaign_name" name="campaign_name"
+                           value="{{ data.campaign_name or '' }}"
+                           placeholder="Enter your campaign name (e.g., vatoline, summer_sale_2024)"
+                           required>
+                    <div class="help-text">Choose a descriptive name for your campaign that you'll easily recognize</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="objective">Campaign Objective</label>
+                    <select id="objective" name="objective" required>
+                        <option value="">Select Campaign Objective</option>
+                        <option value="SALES" {% if data.objective == 'SALES' %}selected{% endif %}>Sales - Drive purchases on your website</option>
+                        <option value="TRAFFIC" {% if data.objective == 'TRAFFIC' %}selected{% endif %}>Traffic - Drive traffic to your website</option>
+                        <option value="CONVERSIONS" {% if data.objective == 'CONVERSIONS' %}selected{% endif %}>Conversions - Drive specific actions</option>
+                        <option value="BRAND_AWARENESS" {% if data.objective == 'BRAND_AWARENESS' %}selected{% endif %}>Brand Awareness - Increase brand visibility</option>
+                        <option value="REACH" {% if data.objective == 'REACH' %}selected{% endif %}>Reach - Reach maximum people</option>
+                    </select>
+                    <div class="help-text">Choose the main goal for your campaign to optimize ad delivery</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="daily_budget">Daily Budget (USD)</label>
+                    <div class="currency-input">
+                        <input type="number" id="daily_budget" name="daily_budget"
+                               value="{{ data.daily_budget or '100' }}"
+                               min="20" max="10000" step="1"
+                               placeholder="100"
+                               required>
+                    </div>
+                    <div class="help-text">Minimum $20/day. This will be split across all ad sets in your campaign</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="start_date">Campaign Start Date</label>
+                    <input type="datetime-local" id="start_date" name="start_date"
+                           value="{{ data.start_date or '' }}"
+                           min="{{ current_datetime }}"
+                           required>
+                    <div class="help-text">Campaign will start automatically at this date and time</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="campaign_status">Campaign Status</label>
+                    <select id="campaign_status" name="campaign_status" required>
+                        <option value="">Select Initial Status</option>
+                        <option value="ACTIVE" {% if data.campaign_status == 'ACTIVE' %}selected{% endif %}>🟢 Active - Campaign will run immediately</option>
+                        <option value="PAUSED" {% if data.campaign_status == 'PAUSED' %}selected{% endif %}>⏸️ Paused - Campaign will be created but paused</option>
+                    </select>
+                    <div class="help-text">You can change this status anytime after creation</div>
+                </div>
+
+                <!-- Live Preview -->
+                <div class="campaign-preview" id="campaignPreview" style="display: none;">
+                    <h3>📋 Campaign Preview</h3>
+                    <div class="preview-item">
+                        <span>Name:</span>
+                        <span id="previewName">-</span>
+                    </div>
+                    <div class="preview-item">
+                        <span>Objective:</span>
+                        <span id="previewObjective">-</span>
+                    </div>
+                    <div class="preview-item">
+                        <span>Daily Budget:</span>
+                        <span id="previewBudget">-</span>
+                    </div>
+                    <div class="preview-item">
+                        <span>Start Date:</span>
+                        <span id="previewStartDate">-</span>
+                    </div>
+                    <div class="preview-item">
+                        <span>Status:</span>
+                        <span id="previewStatus">-</span>
+                    </div>
+                    <div class="preview-item">
+                        <span>Expected Reach:</span>
+                        <span id="previewReach">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <a href="/" class="btn btn-secondary">← Back to Dashboard</a>
+                <button type="submit" class="btn btn-primary">Next: Ad Sets →</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Live preview functionality
+        function updatePreview() {
+            const name = document.getElementById('campaign_name').value;
+            const objective = document.getElementById('objective').value;
+            const budget = document.getElementById('daily_budget').value;
+            const startDate = document.getElementById('start_date').value;
+            const status = document.getElementById('campaign_status').value;
+
+            if (name || objective || budget || startDate || status) {
+                document.getElementById('campaignPreview').style.display = 'block';
+                document.getElementById('previewName').textContent = name || 'Not set';
+                document.getElementById('previewObjective').textContent = objective || 'Not set';
+                document.getElementById('previewBudget').textContent = budget ? `$${budget}/day` : 'Not set';
+
+                // Format start date
+                if (startDate) {
+                    const date = new Date(startDate);
+                    document.getElementById('previewStartDate').textContent = date.toLocaleString();
+                } else {
+                    document.getElementById('previewStartDate').textContent = 'Not set';
+                }
+
+                // Format status with emoji
+                let statusText = 'Not set';
+                if (status === 'ACTIVE') statusText = '🟢 Active';
+                if (status === 'PAUSED') statusText = '⏸️ Paused';
+                document.getElementById('previewStatus').textContent = statusText;
+
+                // Calculate estimated reach based on budget
+                const estimatedReach = budget ? Math.floor(budget * 100 * (Math.random() * 0.5 + 0.8)) : 0;
+                document.getElementById('previewReach').textContent = estimatedReach ? `${estimatedReach.toLocaleString()} people` : '-';
+            } else {
+                document.getElementById('campaignPreview').style.display = 'none';
+            }
+        }
+
+        // Add event listeners
+        document.getElementById('campaign_name').addEventListener('input', updatePreview);
+        document.getElementById('objective').addEventListener('change', updatePreview);
+        document.getElementById('daily_budget').addEventListener('input', updatePreview);
+        document.getElementById('start_date').addEventListener('change', updatePreview);
+        document.getElementById('campaign_status').addEventListener('change', updatePreview);
+
+        // Initial preview update
+        updatePreview();
+
+        // Form validation
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const name = document.getElementById('campaign_name').value.trim();
+            const objective = document.getElementById('objective').value;
+            const budget = parseInt(document.getElementById('daily_budget').value);
+            const startDate = document.getElementById('start_date').value;
+            const status = document.getElementById('campaign_status').value;
+
+            if (!name) {
+                alert('Please enter a campaign name');
+                e.preventDefault();
+                return;
+            }
+
+            if (!objective) {
+                alert('Please select a campaign objective');
+                e.preventDefault();
+                return;
+            }
+
+            if (!budget || budget < 20) {
+                alert('Daily budget must be at least $20');
+                e.preventDefault();
+                return;
+            }
+
+            if (!startDate) {
+                alert('Please select a start date and time');
+                e.preventDefault();
+                return;
+            }
+
+            // Check if start date is in the future
+            const selectedDate = new Date(startDate);
+            const now = new Date();
+            if (selectedDate < now) {
+                alert('Start date must be in the future');
+                e.preventDefault();
+                return;
+            }
+
+            if (!status) {
+                alert('Please select a campaign status');
+                e.preventDefault();
+                return;
+            }
+        });
+    </script>
+</body>
+</html>
