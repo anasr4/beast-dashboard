@@ -1837,6 +1837,13 @@ def compress_video_variants(input_path, num_variants, callback=None):
     """Compress 1 video into specified number of different variants under 5MB with original aspect ratio"""
     print(f"[DEBUG] Starting compression: {input_path}, variants: {num_variants}")
 
+    # Check if input file exists
+    if not os.path.exists(input_path):
+        print(f"[ERROR] Input file does not exist: {input_path}")
+        return {'successful': 0, 'total': num_variants, 'error': f'Input file not found: {input_path}'}
+
+    print(f"[DEBUG] Input file confirmed exists: {input_path}")
+
     # Find FFmpeg executable with fallback paths
     ffmpeg_paths = [
         "ffmpeg",  # Railway/Linux system path first
@@ -1919,14 +1926,7 @@ def compress_video_variants(input_path, num_variants, callback=None):
             shutil.rmtree("compressed_videos")
             print(f"[DEBUG] Completely removed compressed_videos directory")
 
-        # Clean up temp directories
-        temp_dirs = glob.glob("/tmp/video_compress_*")
-        for temp_dir in temp_dirs:
-            try:
-                shutil.rmtree(temp_dir)
-                print(f"[DEBUG] Cleaned up temp dir: {temp_dir}")
-            except:
-                pass
+        # Note: Don't clean temp directories here as they contain the current input file
 
     except Exception as e:
         print(f"[DEBUG] Cleanup error: {e}")
