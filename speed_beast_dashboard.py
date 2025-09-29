@@ -1923,8 +1923,8 @@ def compress_video_variants(input_path, num_variants, callback=None):
             # Different target sizes between 1MB and 5MB
             target_mb = 1.0 + (4.0 * ((i - 1) / max(1, num_variants - 1)))  # 1MB to 5MB range
             target_bits = target_mb * 8 * 1024 * 1024
-            video_bits = target_bits * 0.85  # Reserve for audio
-            bitrate = max(200, min(2000, int(video_bits / duration / 1000)))
+            video_bits = target_bits * 0.75  # Reserve more for audio and overhead
+            bitrate = max(100, min(800, int(video_bits / duration / 1000)))  # Much lower bitrate limits
 
             # Create different resolution variants while maintaining aspect ratio
             variant_percent = (i - 1) / max(1, num_variants - 1)
@@ -1961,20 +1961,24 @@ def compress_video_variants(input_path, num_variants, callback=None):
             output_file = f"{base_name}_variant_{i:03d}_{target_width}x{target_height}_{target_mb:.1f}MB.mp4"
             output_path = os.path.join(output_folder, output_file)
 
+            # Use higher CRF for smaller files based on target size
+            crf = 18 + int((5 - target_mb) * 4)  # CRF 18-34 range, higher CRF = smaller file
+            crf = max(18, min(34, crf))
+
             cmd = [
                 ffmpeg_path, '-i', input_path, '-y',
                 '-vf', f'scale={scale}:flags=lanczos',
                 '-c:v', 'libx264',
-                '-preset', 'fast',  # Faster encoding
-                '-profile:v', 'baseline',  # More compatible
-                '-crf', '23',
+                '-preset', 'medium',
+                '-crf', str(crf),
                 '-maxrate', f'{bitrate}k',
+                '-bufsize', f'{bitrate * 2}k',
                 '-c:a', 'aac',
-                '-b:a', '96k',
+                '-b:a', '64k',  # Lower audio bitrate
                 output_path
             ]
 
-            print(f"[DEBUG] Processing variant {i}/{num_variants} - Resolution: {target_width}x{target_height}, Target: {target_mb:.1f}MB, Bitrate: {bitrate}k")
+            print(f"[DEBUG] Processing variant {i}/{num_variants} - Resolution: {target_width}x{target_height}, Target: {target_mb:.1f}MB, Bitrate: {bitrate}k, CRF: {crf}")
 
             result = subprocess.run(cmd, capture_output=True, text=True, timeout=45)
 
