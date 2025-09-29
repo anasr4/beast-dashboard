@@ -551,7 +551,7 @@ def folder_beast_execute_real():
                 'bid_amount': str(request.form.get('bid_amount', '50')),
                 'adset_budget': str(request.form.get('adset_budget', '20')),
                 'countries': [request.form.get('target_country', 'SA')],
-                'min_age': str(request.form.get('min_age', '22')),
+                'min_age': str(request.form.get('min_age', '20')),
                 'max_age': str(request.form.get('max_age', '55+'))
             },
             'ads': {
@@ -587,7 +587,7 @@ def folder_beast_execute_real():
             'bid_amount': str(session_data.get('bid_amount', '50')),
             'adset_budget': str(session_data.get('adset_budget', '20')),
             'countries': session_data.get('countries', ['SA', 'AE']),
-            'min_age': str(session_data.get('min_age', '22')),
+            'min_age': str(session_data.get('min_age', '20')),
             'max_age': str(session_data.get('max_age', '55+'))
         },
         'ads': {
@@ -1915,34 +1915,75 @@ def bulk_uploader():
 
 # Video Compressor routes
 def compress_video_variants(input_path, num_variants, callback=None):
-    """Compress 1 video into specified number of different variants under 8MB with original aspect ratio"""
+    """Compress 1 video into specified number of different variants under 5MB with original aspect ratio"""
     print(f"[DEBUG] Starting compression: {input_path}, variants: {num_variants}")
+
+    # Find FFmpeg executable with fallback paths
+    ffmpeg_paths = [
+        r"C:\Users\PC\ffmpeg-master-latest-win64-gpl\bin\ffmpeg.exe",
+        r"C:\ffmpeg\bin\ffmpeg.exe",
+        "ffmpeg.exe",  # System PATH
+        "ffmpeg"       # Unix systems
+    ]
+
+    ffmpeg_path = None
+    for path in ffmpeg_paths:
+        try:
+            result = subprocess.run([path, "-version"], capture_output=True, timeout=5)
+            if result.returncode == 0:
+                ffmpeg_path = path
+                print(f"[DEBUG] Found FFmpeg at: {path}")
+                break
+        except:
+            continue
+
+    if not ffmpeg_path:
+        print("[ERROR] FFmpeg not found in any of the expected locations")
+        return {'successful': 0, 'total': num_variants, 'error': 'FFmpeg not found'}
+
+    # Find FFprobe executable
+    ffprobe_paths = [
+        r"C:\Users\PC\ffmpeg-master-latest-win64-gpl\bin\ffprobe.exe",
+        r"C:\ffmpeg\bin\ffprobe.exe",
+        "ffprobe.exe",
+        "ffprobe"
+    ]
+
+    ffprobe_path = None
+    for path in ffprobe_paths:
+        try:
+            result = subprocess.run([path, "-version"], capture_output=True, timeout=5)
+            if result.returncode == 0:
+                ffprobe_path = path
+                break
+        except:
+            continue
 
     # Get video info (duration, width, height)
     duration = 10.0
     original_width = 1080
     original_height = 1920
 
-    try:
-        ffprobe_path = r"C:\Users\PC\ffmpeg-master-latest-win64-gpl\bin\ffprobe.exe"
-        cmd = [ffprobe_path, '-v', 'quiet', '-print_format', 'json', '-show_format', '-show_streams', input_path]
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
-        if result.returncode == 0:
-            video_info = json.loads(result.stdout)
-            duration = float(video_info['format']['duration'])
+    if ffprobe_path:
+        try:
+            cmd = [ffprobe_path, '-v', 'quiet', '-print_format', 'json', '-show_format', '-show_streams', input_path]
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+            if result.returncode == 0:
+                video_info = json.loads(result.stdout)
+                duration = float(video_info['format']['duration'])
 
-            # Get video stream info
-            for stream in video_info.get('streams', []):
-                if stream.get('codec_type') == 'video':
-                    original_width = int(stream.get('width', 1080))
-                    original_height = int(stream.get('height', 1920))
-                    break
+                # Get video stream info
+                for stream in video_info.get('streams', []):
+                    if stream.get('codec_type') == 'video':
+                        original_width = int(stream.get('width', 1080))
+                        original_height = int(stream.get('height', 1920))
+                        break
 
-            print(f"[DEBUG] Video info: {duration}s, {original_width}x{original_height}")
-        else:
-            print(f"[DEBUG] FFprobe failed, using defaults: {duration}s, {original_width}x{original_height}")
-    except Exception as e:
-        print(f"[DEBUG] Error getting video info: {e}, using defaults")
+                print(f"[DEBUG] Video info: {duration}s, {original_width}x{original_height}")
+            else:
+                print(f"[DEBUG] FFprobe failed, using defaults: {duration}s, {original_width}x{original_height}")
+        except Exception as e:
+            print(f"[DEBUG] Error getting video info: {e}, using defaults")
 
     # Create output folder
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -1952,7 +1993,6 @@ def compress_video_variants(input_path, num_variants, callback=None):
 
     successful = 0
     total_size = 0
-    ffmpeg_path = r"C:\Users\PC\ffmpeg-master-latest-win64-gpl\bin\ffmpeg.exe"
 
     # Calculate aspect ratio to maintain original proportions
     aspect_ratio = original_width / original_height
@@ -1961,40 +2001,21 @@ def compress_video_variants(input_path, num_variants, callback=None):
     # Create variants with different sizes while maintaining aspect ratio
     for i in range(1, num_variants + 1):
         try:
-            # Different target sizes between 2MB and 7.5MB
-            target_mb = 2.0 + (5.5 * ((i - 1) / max(1, num_variants - 1)))  # 2MB to 7.5MB range
+            # Different target sizes between 1MB and 5MB
+            target_mb = 1.0 + (4.0 * ((i - 1) / max(1, num_variants - 1)))  # 1MB to 5MB range
             target_bits = target_mb * 8 * 1024 * 1024
             video_bits = target_bits * 0.85  # Reserve for audio
-            bitrate = max(200, min(2000, int(video_bits / duration / 1000)))
+            bitrate = max(200, min(1500, int(video_bits / duration / 1000)))
 
-            # Create different resolution variants while maintaining aspect ratio
-            variant_percent = (i - 1) / max(1, num_variants - 1)
+            # Linear resolution scaling for exact variant count
+            scale_factor = 0.6 + (0.4 * ((i - 1) / max(1, num_variants - 1)))  # 0.6 to 1.0 scale
 
-            # Scale options that maintain aspect ratio
-            if aspect_ratio > 1:  # Landscape video (wider than tall)
-                if variant_percent <= 0.25:
-                    target_width = 854
-                elif variant_percent <= 0.5:
-                    target_width = 720
-                elif variant_percent <= 0.75:
-                    target_width = 960
-                else:
-                    target_width = min(1080, original_width)
-                target_height = int(target_width / aspect_ratio)
-                # Ensure even numbers for H.264 compatibility
-                target_height = target_height - (target_height % 2)
-            else:  # Portrait or square video (taller than wide or equal)
-                if variant_percent <= 0.25:
-                    target_height = 1280
-                elif variant_percent <= 0.5:
-                    target_height = 1080
-                elif variant_percent <= 0.75:
-                    target_height = 1440
-                else:
-                    target_height = min(1920, original_height)
-                target_width = int(target_height * aspect_ratio)
-                # Ensure even numbers for H.264 compatibility
-                target_width = target_width - (target_width % 2)
+            target_width = int(original_width * scale_factor)
+            target_height = int(original_height * scale_factor)
+
+            # Ensure even numbers for H.264 compatibility
+            target_width = target_width - (target_width % 2)
+            target_height = target_height - (target_height % 2)
 
             scale = f"{target_width}:{target_height}"
 
@@ -2002,33 +2023,34 @@ def compress_video_variants(input_path, num_variants, callback=None):
             output_file = f"{base_name}_variant_{i:03d}_{target_width}x{target_height}_{target_mb:.1f}MB.mp4"
             output_path = os.path.join(output_folder, output_file)
 
+            # Optimized FFmpeg command for speed and compatibility
             cmd = [
                 ffmpeg_path, '-i', input_path, '-y',
-                '-vf', f'scale={scale}',
+                '-vf', f'scale={scale}:flags=lanczos',
                 '-c:v', 'libx264',
-                '-profile:v', 'main',  # H.264 Main profile for compatibility
-                '-level:v', '4.0',     # H.264 Level 4.0 for good compatibility
-                '-b:v', f'{bitrate}k',
-                '-maxrate', f'{int(bitrate * 1.2)}k',  # Max bitrate for consistency
-                '-bufsize', f'{int(bitrate * 2)}k',    # Buffer size
-                '-preset', 'medium',   # Better quality than 'fast'
-                '-pix_fmt', 'yuv420p', # Standard pixel format for H.264
-                '-c:a', 'aac',
-                '-b:a', '128k',
-                '-ar', '44100',
-                '-movflags', '+faststart',  # Optimize for streaming
+                '-preset', 'veryfast',  # Much faster encoding
+                '-profile:v', 'baseline',  # More compatible profile
+                '-crf', '23',
+                '-maxrate', f'{bitrate}k',
+                '-c:a', 'aac', '-b:a', '96k',
                 output_path
             ]
 
             print(f"[DEBUG] Processing variant {i}/{num_variants} - Resolution: {target_width}x{target_height}, Target: {target_mb:.1f}MB, Bitrate: {bitrate}k")
 
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=45)
 
             if result.returncode == 0 and os.path.exists(output_path):
                 file_size = os.path.getsize(output_path) / (1024 * 1024)
-                successful += 1
-                total_size += file_size
-                print(f"[SUCCESS] Variant {i}: {file_size:.2f} MB")
+
+                # Validate file size is within acceptable range (under 5MB)
+                if file_size <= 5.0:
+                    successful += 1
+                    total_size += file_size
+                    print(f"[SUCCESS] Variant {i}: {file_size:.2f} MB")
+                else:
+                    print(f"[WARNING] Variant {i} too large: {file_size:.2f} MB, removing")
+                    os.remove(output_path)
             else:
                 print(f"[ERROR] Failed variant {i}: {result.stderr}")
 
@@ -2041,7 +2063,7 @@ def compress_video_variants(input_path, num_variants, callback=None):
                     'current_variant': i
                 })
 
-            time.sleep(0.02)  # Small delay
+            time.sleep(0.01)  # Minimal delay for speed
 
         except Exception as e:
             print(f"[ERROR] Variant {i} failed: {e}")
@@ -2259,7 +2281,7 @@ def start_single_ad():
                 'base_name': f"{campaign_name} AdSet",
                 'status': 'PAUSED',
                 'countries': [target_country],
-                'min_age': 22,
+                'min_age': 20,
                 'max_age': '55+',
                 'budget_per_adset': daily_budget
             },
@@ -2365,7 +2387,7 @@ def start_test_bot():
                 'base_name': f"{campaign_name} Test AdSet",
                 'status': 'PAUSED',
                 'countries': [target_country],
-                'min_age': 22,
+                'min_age': 20,
                 'max_age': '55+',
                 'budget_per_adset': daily_budget
             },
@@ -2495,7 +2517,7 @@ def start_folder_beast():
                 'base_name': f"{campaign_name} AdSet",
                 'status': 'PAUSED',
                 'countries': [target_country],
-                'min_age': 22,
+                'min_age': 20,
                 'max_age': '55+',
                 'budget_per_adset': str(int(float(daily_budget)) // config['adsets']),
                 'count': config['adsets']
