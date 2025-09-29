@@ -1837,31 +1837,72 @@ def compress_video_variants(input_path, num_variants, callback=None):
     """Compress 1 video into specified number of different variants under 8MB with original aspect ratio"""
     print(f"[DEBUG] Starting compression: {input_path}, variants: {num_variants}")
 
+    # Find FFmpeg executable with fallback paths
+    ffmpeg_paths = [
+        r"C:\Users\PC\ffmpeg-master-latest-win64-gpl\bin\ffmpeg.exe",
+        r"C:\ffmpeg\bin\ffmpeg.exe",
+        "ffmpeg.exe",
+        "ffmpeg"
+    ]
+
+    ffmpeg_path = None
+    for path in ffmpeg_paths:
+        try:
+            result = subprocess.run([path, "-version"], capture_output=True, timeout=5)
+            if result.returncode == 0:
+                ffmpeg_path = path
+                print(f"[DEBUG] Found FFmpeg at: {path}")
+                break
+        except:
+            continue
+
+    if not ffmpeg_path:
+        print("[ERROR] FFmpeg not found")
+        return {'successful': 0, 'total': num_variants, 'error': 'FFmpeg not found'}
+
+    # Find FFprobe executable with fallback paths
+    ffprobe_paths = [
+        r"C:\Users\PC\ffmpeg-master-latest-win64-gpl\bin\ffprobe.exe",
+        r"C:\ffmpeg\bin\ffprobe.exe",
+        "ffprobe.exe",
+        "ffprobe"
+    ]
+
+    ffprobe_path = None
+    for path in ffprobe_paths:
+        try:
+            result = subprocess.run([path, "-version"], capture_output=True, timeout=5)
+            if result.returncode == 0:
+                ffprobe_path = path
+                break
+        except:
+            continue
+
     # Get video info (duration, width, height)
     duration = 10.0
     original_width = 1080
     original_height = 1920
 
-    try:
-        ffprobe_path = r"C:\Users\PC\ffmpeg-master-latest-win64-gpl\bin\ffprobe.exe"
-        cmd = [ffprobe_path, '-v', 'quiet', '-print_format', 'json', '-show_format', '-show_streams', input_path]
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
-        if result.returncode == 0:
-            video_info = json.loads(result.stdout)
-            duration = float(video_info['format']['duration'])
+    if ffprobe_path:
+        try:
+            cmd = [ffprobe_path, '-v', 'quiet', '-print_format', 'json', '-show_format', '-show_streams', input_path]
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+            if result.returncode == 0:
+                video_info = json.loads(result.stdout)
+                duration = float(video_info['format']['duration'])
 
-            # Get video stream info
-            for stream in video_info.get('streams', []):
-                if stream.get('codec_type') == 'video':
-                    original_width = int(stream.get('width', 1080))
-                    original_height = int(stream.get('height', 1920))
-                    break
+                # Get video stream info
+                for stream in video_info.get('streams', []):
+                    if stream.get('codec_type') == 'video':
+                        original_width = int(stream.get('width', 1080))
+                        original_height = int(stream.get('height', 1920))
+                        break
 
-            print(f"[DEBUG] Video info: {duration}s, {original_width}x{original_height}")
-        else:
-            print(f"[DEBUG] FFprobe failed, using defaults: {duration}s, {original_width}x{original_height}")
-    except Exception as e:
-        print(f"[DEBUG] Error getting video info: {e}, using defaults")
+                print(f"[DEBUG] Video info: {duration}s, {original_width}x{original_height}")
+            else:
+                print(f"[DEBUG] FFprobe failed, using defaults: {duration}s, {original_width}x{original_height}")
+        except Exception as e:
+            print(f"[DEBUG] Error getting video info: {e}, using defaults")
 
     # Create output folder
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -1871,7 +1912,6 @@ def compress_video_variants(input_path, num_variants, callback=None):
 
     successful = 0
     total_size = 0
-    ffmpeg_path = r"C:\Users\PC\ffmpeg-master-latest-win64-gpl\bin\ffmpeg.exe"
 
     # Calculate aspect ratio to maintain original proportions
     aspect_ratio = original_width / original_height
@@ -1923,25 +1963,20 @@ def compress_video_variants(input_path, num_variants, callback=None):
 
             cmd = [
                 ffmpeg_path, '-i', input_path, '-y',
-                '-vf', f'scale={scale}',
+                '-vf', f'scale={scale}:flags=lanczos',
                 '-c:v', 'libx264',
-                '-profile:v', 'main',  # H.264 Main profile for compatibility
-                '-level:v', '4.0',     # H.264 Level 4.0 for good compatibility
-                '-b:v', f'{bitrate}k',
-                '-maxrate', f'{int(bitrate * 1.2)}k',  # Max bitrate for consistency
-                '-bufsize', f'{int(bitrate * 2)}k',    # Buffer size
-                '-preset', 'medium',   # Better quality than 'fast'
-                '-pix_fmt', 'yuv420p', # Standard pixel format for H.264
+                '-preset', 'fast',  # Faster encoding
+                '-profile:v', 'baseline',  # More compatible
+                '-crf', '23',
+                '-maxrate', f'{bitrate}k',
                 '-c:a', 'aac',
-                '-b:a', '128k',
-                '-ar', '44100',
-                '-movflags', '+faststart',  # Optimize for streaming
+                '-b:a', '96k',
                 output_path
             ]
 
             print(f"[DEBUG] Processing variant {i}/{num_variants} - Resolution: {target_width}x{target_height}, Target: {target_mb:.1f}MB, Bitrate: {bitrate}k")
 
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=45)
 
             if result.returncode == 0 and os.path.exists(output_path):
                 file_size = os.path.getsize(output_path) / (1024 * 1024)
