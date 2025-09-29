@@ -1909,19 +1909,27 @@ def compress_video_variants(input_path, num_variants, callback=None):
     unique_id = str(uuid.uuid4())[:8]
     output_folder = os.path.join("compressed_videos", f"variants_{timestamp}_{unique_id}")
 
-    # Clean up old compressed_videos folders to prevent cache buildup
+    # Aggressive cleanup of old files and folders to prevent cache buildup
     try:
+        import shutil
+        import glob
+
+        # Remove entire compressed_videos directory
         if os.path.exists("compressed_videos"):
-            import shutil
-            import glob
-            old_folders = glob.glob("compressed_videos/variants_*")
-            for folder in old_folders:
-                try:
-                    shutil.rmtree(folder)
-                    print(f"[DEBUG] Cleaned up old folder: {folder}")
-                except:
-                    pass
-    except:
+            shutil.rmtree("compressed_videos")
+            print(f"[DEBUG] Completely removed compressed_videos directory")
+
+        # Clean up temp directories
+        temp_dirs = glob.glob("/tmp/video_compress_*")
+        for temp_dir in temp_dirs:
+            try:
+                shutil.rmtree(temp_dir)
+                print(f"[DEBUG] Cleaned up temp dir: {temp_dir}")
+            except:
+                pass
+
+    except Exception as e:
+        print(f"[DEBUG] Cleanup error: {e}")
         pass
 
     os.makedirs(output_folder, exist_ok=True)
@@ -2060,12 +2068,11 @@ def start_compression():
         if num_variants < 1 or num_variants > 1000:
             return jsonify({'success': False, 'error': 'Number of variants must be between 1 and 1000'})
 
-        # Clear old compression tasks to prevent memory buildup
+        # Aggressive clearing of compression tasks to prevent cache
         try:
-            old_tasks = list(compression_tasks.keys())
-            for old_task_id in old_tasks:
-                if len(compression_tasks) > 5:  # Keep only 5 most recent tasks
-                    del compression_tasks[old_task_id]
+            # Clear ALL old compression tasks for fresh start
+            compression_tasks.clear()
+            print(f"[DEBUG] Cleared all compression tasks for fresh start")
         except:
             pass
 
@@ -2198,12 +2205,21 @@ def download_variants(task_id):
     try:
         zip_path = task.get('zip_path')
         if zip_path and os.path.exists(zip_path):
-            return send_file(
+            # Create response with cache-busting headers
+            from flask import make_response
+            unique_timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
+            response = make_response(send_file(
                 zip_path,
                 as_attachment=True,
-                download_name=f'compressed_variants_{task["variants_created"]}_{datetime.now().strftime("%Y%m%d_%H%M%S")}.zip',
+                download_name=f'compressed_variants_{task["variants_created"]}_{unique_timestamp}.zip',
                 mimetype='application/zip'
-            )
+            ))
+            # Add aggressive cache-busting headers
+            response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
+            response.headers['Pragma'] = 'no-cache'
+            response.headers['Expires'] = '0'
+            response.headers['ETag'] = f'"{unique_timestamp}"'
+            return response
         else:
             return "Download file not found", 404
     except Exception as e:
