@@ -1839,10 +1839,10 @@ def compress_video_variants(input_path, num_variants, callback=None):
 
     # Find FFmpeg executable with fallback paths
     ffmpeg_paths = [
+        "ffmpeg",  # Railway/Linux system path first
         r"C:\Users\PC\ffmpeg-master-latest-win64-gpl\bin\ffmpeg.exe",
         r"C:\ffmpeg\bin\ffmpeg.exe",
-        "ffmpeg.exe",
-        "ffmpeg"
+        "ffmpeg.exe"
     ]
 
     ffmpeg_path = None
@@ -1862,10 +1862,10 @@ def compress_video_variants(input_path, num_variants, callback=None):
 
     # Find FFprobe executable with fallback paths
     ffprobe_paths = [
+        "ffprobe",  # Railway/Linux system path first
         r"C:\Users\PC\ffmpeg-master-latest-win64-gpl\bin\ffprobe.exe",
         r"C:\ffmpeg\bin\ffprobe.exe",
-        "ffprobe.exe",
-        "ffprobe"
+        "ffprobe.exe"
     ]
 
     ffprobe_path = None
