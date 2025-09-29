@@ -1834,7 +1834,7 @@ def bulk_uploader():
 
 # Video Compressor routes
 def compress_video_variants(input_path, num_variants, callback=None):
-    """Compress 1 video into specified number of different variants under 8MB with original aspect ratio"""
+    """Compress 1 video into specified number of different variants under 5MB with original aspect ratio"""
     print(f"[DEBUG] Starting compression: {input_path}, variants: {num_variants}")
 
     # Find FFmpeg executable with fallback paths
@@ -1920,8 +1920,8 @@ def compress_video_variants(input_path, num_variants, callback=None):
     # Create variants with different sizes while maintaining aspect ratio
     for i in range(1, num_variants + 1):
         try:
-            # Different target sizes between 2MB and 7.5MB
-            target_mb = 2.0 + (5.5 * ((i - 1) / max(1, num_variants - 1)))  # 2MB to 7.5MB range
+            # Different target sizes between 1MB and 5MB
+            target_mb = 1.0 + (4.0 * ((i - 1) / max(1, num_variants - 1)))  # 1MB to 5MB range
             target_bits = target_mb * 8 * 1024 * 1024
             video_bits = target_bits * 0.85  # Reserve for audio
             bitrate = max(200, min(2000, int(video_bits / duration / 1000)))
@@ -1980,9 +1980,15 @@ def compress_video_variants(input_path, num_variants, callback=None):
 
             if result.returncode == 0 and os.path.exists(output_path):
                 file_size = os.path.getsize(output_path) / (1024 * 1024)
-                successful += 1
-                total_size += file_size
-                print(f"[SUCCESS] Variant {i}: {file_size:.2f} MB")
+
+                # Validate file size is under 5MB
+                if file_size <= 5.0:
+                    successful += 1
+                    total_size += file_size
+                    print(f"[SUCCESS] Variant {i}: {file_size:.2f} MB")
+                else:
+                    print(f"[WARNING] Variant {i} too large: {file_size:.2f} MB, removing")
+                    os.remove(output_path)
             else:
                 print(f"[ERROR] Failed variant {i}: {result.stderr}")
 
