@@ -1904,9 +1904,26 @@ def compress_video_variants(input_path, num_variants, callback=None):
         except Exception as e:
             print(f"[DEBUG] Error getting video info: {e}, using defaults")
 
-    # Create output folder
+    # Create unique output folder with UUID to prevent cache issues
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    output_folder = os.path.join("compressed_videos", f"variants_{timestamp}")
+    unique_id = str(uuid.uuid4())[:8]
+    output_folder = os.path.join("compressed_videos", f"variants_{timestamp}_{unique_id}")
+
+    # Clean up old compressed_videos folders to prevent cache buildup
+    try:
+        if os.path.exists("compressed_videos"):
+            import shutil
+            import glob
+            old_folders = glob.glob("compressed_videos/variants_*")
+            for folder in old_folders:
+                try:
+                    shutil.rmtree(folder)
+                    print(f"[DEBUG] Cleaned up old folder: {folder}")
+                except:
+                    pass
+    except:
+        pass
+
     os.makedirs(output_folder, exist_ok=True)
     print(f"[DEBUG] Output folder: {output_folder}")
 
@@ -1958,7 +1975,7 @@ def compress_video_variants(input_path, num_variants, callback=None):
             scale = f"{target_width}:{target_height}"
 
             base_name = os.path.splitext(os.path.basename(input_path))[0]
-            output_file = f"{base_name}_variant_{i:03d}_{target_width}x{target_height}_{target_mb:.1f}MB.mp4"
+            output_file = f"{base_name}_{unique_id}_variant_{i:03d}_{target_width}x{target_height}_{target_mb:.1f}MB.mp4"
             output_path = os.path.join(output_folder, output_file)
 
             # Use higher CRF for smaller files based on target size
@@ -2042,6 +2059,15 @@ def start_compression():
         num_variants = int(request.form.get('num_variants', 200))
         if num_variants < 1 or num_variants > 1000:
             return jsonify({'success': False, 'error': 'Number of variants must be between 1 and 1000'})
+
+        # Clear old compression tasks to prevent memory buildup
+        try:
+            old_tasks = list(compression_tasks.keys())
+            for old_task_id in old_tasks:
+                if len(compression_tasks) > 5:  # Keep only 5 most recent tasks
+                    del compression_tasks[old_task_id]
+        except:
+            pass
 
         # Generate task ID
         task_id = str(uuid.uuid4())
