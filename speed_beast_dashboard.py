@@ -1126,7 +1126,7 @@ def execute_optimized_beast_mode(execution_id, data):
                 call_to_action = ads_data.get('call_to_action') or 'SHOP_NOW'
                 website_url = ads_data.get('website_url') or 'https://sallagcc.com'
             else:
-                # Direct form data structure
+                # Direct form data structure (from Modern Beast Mode form)
                 campaign_name = str(data.get('campaign_name', 'Beast Mode Campaign'))
                 daily_budget = data.get('daily_budget', '100')
                 objective = data.get('objective', 'WEBSITE_VISITS')
@@ -1146,10 +1146,14 @@ def execute_optimized_beast_mode(execution_id, data):
                 countries = data.get('countries', ['SA'])
                 adset_budget = data.get('adset_budget', 25)
 
-                # Ads data
-                videos_path = data.get('videos_folder') or r'C:\Users\PC\Desktop\200 vdieos'
-                csv_path = data.get('headlines_csv') or r'D:\snapchat_headlines_khaleeji_200 (1) - snapchat_headlines_khaleeji_200 (1).csv.csv'
-                brand_name = data.get('brand_name') or 'sallagcc'
+                # Ads data - FIXED: Get from nested 'ads' structure
+                ads_data = data.get('ads', {})
+                videos_path = ads_data.get('videos_path', '')
+                csv_path = ads_data.get('csv_path', '')
+                brand_name = ads_data.get('brand_name', '')
+
+                print(f"[DEBUG] Direct form structure - videos_path from ads_data: '{videos_path}'")
+                print(f"[DEBUG] Direct form structure - csv_path from ads_data: '{csv_path}'")
                 call_to_action = data.get('cta_type') or 'SHOP_NOW'
                 website_url = data.get('landing_url') or 'https://sallagcc.com'
         else:
@@ -1375,14 +1379,20 @@ def execute_optimized_beast_mode(execution_id, data):
 
             csv_file = csv_path
 
-            # Debug output
-            print(f"[DEBUG] videos_path = '{videos_path}'")
-            print(f"[DEBUG] csv_path = '{csv_path}'")
-            print(f"[DEBUG] video_folder (resolved) = '{video_folder}'")
-            print(f"[DEBUG] csv_file = '{csv_file}'")
-            print(f"[DEBUG] brand_name = '{brand_name}'")
-            print(f"[DEBUG] website_url = '{website_url}'")
-            print(f"[DEBUG] call_to_action = '{call_to_action}'")
+            # Debug output - DETAILED
+            print(f"\n{'='*60}")
+            print(f"[DEBUG] VIDEO FOLDER RESOLUTION:")
+            print(f"[DEBUG] Original videos_path from form: '{videos_path}'")
+            print(f"[DEBUG] Checking paths:")
+            for idx, path in enumerate(possible_paths):
+                exists = os.path.exists(path) and os.path.isdir(path)
+                print(f"[DEBUG]   {idx+1}. '{path}' -> {'✅ EXISTS' if exists else '❌ NOT FOUND'}")
+            print(f"[DEBUG] Final video_folder: '{video_folder}'")
+            print(f"[DEBUG] csv_file: '{csv_file}'")
+            print(f"[DEBUG] brand_name: '{brand_name}'")
+            print(f"[DEBUG] website_url: '{website_url}'")
+            print(f"[DEBUG] call_to_action: '{call_to_action}'")
+            print(f"{'='*60}\n")
 
             # Handle missing folder - throw error instead of using dummy files
             if not os.path.exists(video_folder):
