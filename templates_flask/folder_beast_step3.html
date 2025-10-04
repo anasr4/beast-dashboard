@@ -596,15 +596,36 @@
                     <h3>Media Files & Content</h3>
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="videos_path">📁 Videos Folder Path</label>
-                            <div class="path-input">
-                                <input type="text" id="videos_path" name="videos_path"
-                                       value="{{ data.videos_path or 'C:\\Users\\PC\\Desktop\\200 vdieos' }}"
-                                       placeholder="C:\Users\PC\Desktop\200 vdieos"
-                                       required>
-                                <button type="button" class="browse-btn" onclick="selectFolder('videos_path')">📂 Browse</button>
+                            <label for="videos_path">📁 Videos Folder - Upload to Server</label>
+
+                            <!-- Drag & Drop Upload Area -->
+                            <div id="drop_zone" style="border: 3px dashed #667eea; border-radius: 12px; padding: 40px; text-align: center; background: rgba(102, 126, 234, 0.1); cursor: pointer; transition: all 0.3s;">
+                                <div style="font-size: 3rem;">📁</div>
+                                <div style="font-size: 1.2rem; font-weight: bold; color: #ffffff; margin: 10px 0;">Drag & Drop Video Folder Here</div>
+                                <div style="color: rgba(255,255,255,0.7); margin-bottom: 15px;">or</div>
+                                <button type="button" class="browse-btn" onclick="document.getElementById('videos_upload').click()" style="position: relative; transform: none; padding: 12px 24px; font-size: 1rem;">📂 Browse Videos</button>
+                                <input type="file" id="videos_upload" webkitdirectory directory multiple style="display: none;">
                             </div>
-                            <div class="help-text">📹 Folder containing exactly 200 video files (.mp4, .mov format)</div>
+
+                            <!-- Hidden input for server path (auto-filled after upload) -->
+                            <input type="hidden" id="videos_path" name="videos_path" required>
+
+                            <!-- Upload Progress -->
+                            <div id="upload_progress" style="display: none; margin-top: 15px;">
+                                <div style="background: rgba(0,0,0,0.4); border-radius: 10px; overflow: hidden; height: 30px; margin-bottom: 10px;">
+                                    <div id="upload_bar" style="background: linear-gradient(90deg, #00f5ff, #0080ff); height: 100%; width: 0%; transition: width 0.3s; display: flex; align-items: center; justify-content: center; color: #000; font-weight: bold;"></div>
+                                </div>
+                                <div id="upload_status" style="text-align: center; color: #00f5ff; font-weight: 600;"></div>
+                            </div>
+
+                            <!-- Success Confirmation -->
+                            <div id="folder_confirmation" style="display: none; margin-top: 15px; background: rgba(0, 245, 255, 0.2); border: 2px solid #00f5ff; border-radius: 10px; padding: 20px; text-align: center;">
+                                <div style="font-size: 2rem; margin-bottom: 10px;">✅</div>
+                                <div style="font-size: 1.2rem; font-weight: bold; color: #00f5ff; margin-bottom: 8px;">VIDEOS UPLOADED TO SERVER</div>
+                                <div id="folder_info" style="color: rgba(255,255,255,0.9); font-size: 0.95rem;"></div>
+                            </div>
+
+                            <div class="help-text">📹 Upload folder with video files (.mp4, .mov format) - Videos will be uploaded to Railway server</div>
                             <div id="video_validation" class="file-validation" style="display: none;"></div>
                         </div>
                         <div class="form-group">
@@ -865,30 +886,137 @@
     </div>
 
     <script>
-        // File browser functions
-        function selectFolder(inputId) {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.webkitdirectory = true;
-            input.multiple = true;
+        // Video upload handling
+        let selectedVideos = [];
+        const dropZone = document.getElementById('drop_zone');
+        const uploadProgress = document.getElementById('upload_progress');
+        const uploadBar = document.getElementById('upload_bar');
+        const uploadStatus = document.getElementById('upload_status');
+        const folderConfirmation = document.getElementById('folder_confirmation');
+        const folderInfo = document.getElementById('folder_info');
+        const folderPathInput = document.getElementById('videos_path');
+        const videosUploadInput = document.getElementById('videos_upload');
 
-            input.onchange = function(e) {
-                const files = e.target.files;
-                if (files.length > 0) {
-                    // Get the folder path from the first file
-                    const firstFile = files[0];
-                    const folderPath = firstFile.webkitRelativePath.split('/')[0];
-                    const fullPath = firstFile.path ? firstFile.path.replace(firstFile.name, '') : folderPath;
+        // File input change handler
+        videosUploadInput.addEventListener('change', function(e) {
+            const files = Array.from(e.target.files);
+            if (files.length > 0) {
+                uploadVideosToServer(files);
+            }
+        });
 
-                    document.getElementById(inputId).value = fullPath || folderPath;
+        // Drag and drop handlers
+        dropZone.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            dropZone.style.borderColor = '#00f5ff';
+            dropZone.style.background = 'rgba(0, 245, 255, 0.2)';
+        });
 
-                    // Trigger validation and preview updates
-                    updatePreview();
-                    validateFiles();
+        dropZone.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            dropZone.style.borderColor = '#667eea';
+            dropZone.style.background = 'rgba(102, 126, 234, 0.1)';
+        });
+
+        dropZone.addEventListener('drop', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            dropZone.style.borderColor = '#667eea';
+            dropZone.style.background = 'rgba(102, 126, 234, 0.1)';
+
+            const files = Array.from(e.dataTransfer.files);
+            if (files.length > 0) {
+                uploadVideosToServer(files);
+            }
+        });
+
+        // Upload videos to server
+        async function uploadVideosToServer(files) {
+            // Filter for video files only
+            selectedVideos = files.filter(f =>
+                f.type.startsWith('video/') ||
+                f.name.toLowerCase().endsWith('.mp4') ||
+                f.name.toLowerCase().endsWith('.mov') ||
+                f.name.toLowerCase().endsWith('.avi') ||
+                f.name.toLowerCase().endsWith('.mkv') ||
+                f.name.toLowerCase().endsWith('.wmv') ||
+                f.name.toLowerCase().endsWith('.flv')
+            );
+
+            if (selectedVideos.length === 0) {
+                alert('No video files found. Please select a folder containing video files.');
+                return;
+            }
+
+            console.log(`[UPLOAD] Starting upload of ${selectedVideos.length} videos`);
+
+            // Show progress
+            uploadProgress.style.display = 'block';
+            folderConfirmation.style.display = 'none';
+
+            // Create FormData
+            const formData = new FormData();
+            selectedVideos.forEach(file => {
+                formData.append('videos', file);
+            });
+
+            // Create XMLHttpRequest for progress tracking
+            const xhr = new XMLHttpRequest();
+
+            // Progress event
+            xhr.upload.addEventListener('progress', (e) => {
+                if (e.lengthComputable) {
+                    const percent = (e.loaded / e.total) * 100;
+                    uploadBar.style.width = percent + '%';
+                    uploadBar.textContent = Math.round(percent) + '%';
+                    uploadStatus.textContent = `Uploading ${selectedVideos.length} videos... ${(e.loaded / 1024 / 1024).toFixed(1)} MB / ${(e.total / 1024 / 1024).toFixed(1)} MB`;
                 }
-            };
+            });
 
-            input.click();
+            // Load event (upload complete)
+            xhr.addEventListener('load', () => {
+                if (xhr.status === 200) {
+                    try {
+                        const result = JSON.parse(xhr.responseText);
+                        console.log('[UPLOAD] Success:', result);
+
+                        // Hide progress
+                        uploadProgress.style.display = 'none';
+
+                        // Show confirmation
+                        folderConfirmation.style.display = 'block';
+                        folderInfo.textContent = `${result.count} videos uploaded to: ${result.folder_path}`;
+
+                        // AUTO-FILL THE PATH - THIS IS THE KEY!
+                        folderPathInput.value = result.folder_path;
+                        console.log('[UPLOAD] Auto-filled path:', result.folder_path);
+
+                        // Update preview
+                        updatePreview();
+                    } catch (error) {
+                        console.error('[UPLOAD] Parse error:', error);
+                        alert('Upload completed but response parsing failed');
+                        uploadProgress.style.display = 'none';
+                    }
+                } else {
+                    console.error('[UPLOAD] HTTP error:', xhr.status, xhr.responseText);
+                    alert('Upload failed: ' + xhr.statusText);
+                    uploadProgress.style.display = 'none';
+                }
+            });
+
+            // Error event
+            xhr.addEventListener('error', () => {
+                console.error('[UPLOAD] Network error');
+                alert('Upload failed: Network error');
+                uploadProgress.style.display = 'none';
+            });
+
+            // Send request
+            xhr.open('POST', '/api/upload-videos');
+            xhr.send(formData);
         }
 
         function selectFile(inputId) {
