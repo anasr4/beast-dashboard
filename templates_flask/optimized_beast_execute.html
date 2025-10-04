@@ -13,7 +13,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #000000 100%);
             min-height: 100vh;
             color: white;
         }
@@ -41,12 +41,13 @@
         }
 
         .execution-panel {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(10px);
             border-radius: 20px;
             padding: 30px;
             margin-bottom: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(0, 245, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 245, 255, 0.1);
         }
 
         .campaign-summary {
@@ -57,16 +58,24 @@
         }
 
         .summary-card {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.4);
             border-radius: 15px;
             padding: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(0, 245, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .summary-card:hover {
+            border-color: rgba(0, 245, 255, 0.5);
+            box-shadow: 0 4px 20px rgba(0, 245, 255, 0.2);
+            transform: translateY(-2px);
         }
 
         .summary-card h3 {
             font-size: 1.2em;
             margin-bottom: 10px;
-            color: #00ff88;
+            color: #00f5ff;
+            font-weight: 600;
         }
 
         .summary-card p {
@@ -75,11 +84,12 @@
         }
 
         .progress-container {
-            background: rgba(0, 0, 0, 0.3);
+            background: rgba(0, 0, 0, 0.6);
             border-radius: 15px;
             padding: 30px;
             margin: 30px 0;
-            border: 2px solid rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(0, 245, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 245, 255, 0.1);
         }
 
         .progress-header {
@@ -95,21 +105,21 @@
         .progress-strip {
             width: 100%;
             height: 40px;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.5);
             border-radius: 20px;
             overflow: hidden;
             margin: 20px 0;
-            border: 2px solid rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(0, 245, 255, 0.3);
             position: relative;
         }
 
         .progress-bar {
             height: 100%;
-            background: linear-gradient(90deg, #00ff88, #00ccff);
+            background: linear-gradient(90deg, #00f5ff, #0080ff);
             border-radius: 18px;
             transition: width 0.5s ease;
             position: relative;
-            box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+            box-shadow: 0 0 20px rgba(0, 245, 255, 0.6);
         }
 
         .progress-bar::after {
@@ -147,17 +157,24 @@
         }
 
         .stat-box {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.4);
             border-radius: 10px;
             padding: 15px;
             text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(0, 245, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .stat-box:hover {
+            border-color: rgba(0, 245, 255, 0.5);
+            transform: scale(1.05);
         }
 
         .stat-number {
             font-size: 2em;
             font-weight: bold;
-            color: #00ff88;
+            color: #00f5ff;
+            text-shadow: 0 0 10px rgba(0, 245, 255, 0.5);
         }
 
         .stat-label {
@@ -171,28 +188,30 @@
             font-size: 1.3em;
             margin: 15px 0;
             padding: 15px;
-            background: rgba(0, 255, 136, 0.1);
+            background: rgba(0, 245, 255, 0.1);
             border-radius: 10px;
-            border: 1px solid rgba(0, 255, 136, 0.3);
+            border: 1px solid rgba(0, 245, 255, 0.3);
+            color: #00f5ff;
+            font-weight: 600;
         }
 
         .log-container {
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.7);
             border-radius: 15px;
             padding: 20px;
             margin: 20px 0;
             max-height: 300px;
             overflow-y: auto;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(0, 245, 255, 0.3);
         }
 
         .log-entry {
             font-family: 'Courier New', monospace;
             font-size: 0.9em;
             margin: 5px 0;
-            opacity: 0.9;
+            color: #00f5ff;
             padding: 5px;
-            border-left: 3px solid #00ff88;
+            border-left: 3px solid #00f5ff;
             padding-left: 10px;
         }
 
@@ -202,9 +221,9 @@
         }
 
         .execute-btn {
-            background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+            background: linear-gradient(135deg, #ff1a1a, #ff4444);
             color: white;
-            border: none;
+            border: 2px solid rgba(255, 26, 26, 0.5);
             padding: 20px 40px;
             font-size: 1.3em;
             border-radius: 50px;
@@ -213,12 +232,13 @@
             text-transform: uppercase;
             font-weight: bold;
             letter-spacing: 1px;
-            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.3);
+            box-shadow: 0 10px 40px rgba(255, 26, 26, 0.4);
         }
 
         .execute-btn:hover {
             transform: translateY(-3px);
-            box-shadow: 0 15px 40px rgba(255, 107, 107, 0.4);
+            box-shadow: 0 15px 50px rgba(255, 26, 26, 0.6);
+            border-color: rgba(255, 26, 26, 0.8);
         }
 
         .execute-btn:disabled {
@@ -229,26 +249,28 @@
         }
 
         .success-message {
-            background: rgba(0, 255, 136, 0.2);
-            border: 2px solid #00ff88;
+            background: rgba(0, 245, 255, 0.15);
+            border: 2px solid #00f5ff;
             border-radius: 15px;
             padding: 20px;
             text-align: center;
             margin: 20px 0;
+            box-shadow: 0 4px 20px rgba(0, 245, 255, 0.3);
         }
 
         .error-message {
-            background: rgba(255, 107, 107, 0.2);
-            border: 2px solid #ff6b6b;
+            background: rgba(255, 26, 26, 0.15);
+            border: 2px solid #ff1a1a;
             border-radius: 15px;
             padding: 20px;
             text-align: center;
             margin: 20px 0;
+            box-shadow: 0 4px 20px rgba(255, 26, 26, 0.3);
         }
 
         .loading-spinner {
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-top: 4px solid #00ff88;
+            border: 4px solid rgba(0, 0, 0, 0.3);
+            border-top: 4px solid #00f5ff;
             border-radius: 50%;
             width: 40px;
             height: 40px;
@@ -266,8 +288,11 @@
             text-align: center;
             margin: 15px 0;
             padding: 10px;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.4);
             border-radius: 10px;
+            color: #00f5ff;
+            font-weight: 600;
+            border: 1px solid rgba(0, 245, 255, 0.2);
         }
     </style>
 </head>
@@ -475,7 +500,8 @@
                     ${data.ads_created < 100 ? '<p><em>Some ads may still be processing as media files become ready...</em></p>' : ''}
                 `;
                 executeBtn.textContent = '✅ COMPLETED - CHECK ADS MANAGER';
-                executeBtn.style.background = 'linear-gradient(45deg, #00ff88, #00ccff)';
+                executeBtn.style.background = 'linear-gradient(135deg, #00f5ff, #0080ff)';
+                executeBtn.style.borderColor = 'rgba(0, 245, 255, 0.5)';
             } else {
                 resultDiv.className = 'error-message';
                 resultDiv.innerHTML = `
@@ -484,7 +510,8 @@
                     <p>Please check the logs above for details.</p>
                 `;
                 executeBtn.textContent = '🔄 RETRY EXECUTION';
-                executeBtn.style.background = 'linear-gradient(45deg, #ff6b6b, #ff8e53)';
+                executeBtn.style.background = 'linear-gradient(135deg, #ff1a1a, #ff4444)';
+                executeBtn.style.borderColor = 'rgba(255, 26, 26, 0.5)';
             }
 
             resultDiv.style.display = 'block';
