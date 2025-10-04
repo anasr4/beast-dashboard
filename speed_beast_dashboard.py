@@ -1801,10 +1801,14 @@ def api_oauth_callback():
         state = request.args.get('state')
         error = request.args.get('error')
 
+        print(f"[OAUTH] Callback received - Code: {auth_code[:20] if auth_code else 'None'}..., Error: {error}")
+
         if error:
+            print(f"[OAUTH ERROR] Authorization failed: {error}")
             return f"Authorization failed: {error}", 400
 
         if not auth_code:
+            print("[OAUTH ERROR] No authorization code received")
             return "No authorization code received", 400
 
         # Load saved credentials
@@ -1812,11 +1816,14 @@ def api_oauth_callback():
         config = tm.load_config()
 
         if not config or 'client_id' not in config or 'client_secret' not in config:
+            print("[OAUTH ERROR] Configuration not found")
             return "Configuration not found. Please set up credentials first.", 400
 
         client_id = config['client_id']
         client_secret = config['client_secret']
         ad_account_id = config.get('ad_account_id')
+
+        print(f"[OAUTH] Using client_id: {client_id[:20]}...")
 
         token_url = "https://accounts.snapchat.com/login/oauth2/access_token"
         token_data = {
@@ -1827,10 +1834,13 @@ def api_oauth_callback():
             "redirect_uri": "https://web-production-95efb.up.railway.app/api/oauth/callback"
         }
 
+        print(f"[OAUTH] Exchanging code for token...")
         response = requests.post(token_url, data=token_data)
+        print(f"[OAUTH] Token exchange response: {response.status_code}")
 
         if response.status_code == 200:
             token_info = response.json()
+            print(f"[OAUTH] Token exchange successful!")
 
             # Save tokens and keep credentials
             new_config = {
@@ -1845,13 +1855,19 @@ def api_oauth_callback():
                 new_config['ad_account_id'] = ad_account_id
 
             if tm.save_config(new_config):
+                print(f"[OAUTH] Tokens saved successfully! Redirecting to token manager...")
                 return redirect(url_for('token_manager') + '?success=1')
             else:
+                print("[OAUTH ERROR] Failed to save tokens")
                 return "Failed to save tokens", 500
         else:
+            print(f"[OAUTH ERROR] Token exchange failed: {response.status_code} - {response.text}")
             return f"Token exchange failed: {response.text}", 400
 
     except Exception as e:
+        print(f"[OAUTH ERROR] Exception: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return f"OAuth callback error: {str(e)}", 500
 
 @app.route('/auth/callback')
