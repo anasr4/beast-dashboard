@@ -540,54 +540,11 @@ def folder_beast_execute_real():
     # If form data is present, use it instead of session data
     form_campaign_name = request.form.get('campaign_name')
     if form_campaign_name:
-        # Save uploaded videos first
-        video_folder_path = ''
+        # Get video folder path from form (user types the server path)
+        final_videos_path = request.form.get('videos_folder', '').strip()
 
-        print(f"[DEBUG] ===== VIDEO UPLOAD DEBUG =====")
-        print(f"[DEBUG] 'videos' in request.files: {'videos' in request.files}")
-        print(f"[DEBUG] request.form.get('videos_folder'): '{request.form.get('videos_folder', '')}'")
-
-        if 'videos' in request.files:
-            videos = request.files.getlist('videos')
-            print(f"[DEBUG] Videos count in request: {len(videos)}")
-            print(f"[DEBUG] First video filename: {videos[0].filename if videos else 'None'}")
-
-            if len(videos) > 0 and videos[0].filename:
-                # Create upload folder
-                upload_folder = f'/tmp/beast_uploads/videos_{int(time.time())}'
-                os.makedirs(upload_folder, exist_ok=True)
-
-                # Save all videos
-                saved_count = 0
-                for video in videos:
-                    if video.filename:
-                        filename = secure_filename(video.filename)
-                        filepath = os.path.join(upload_folder, filename)
-                        video.save(filepath)
-                        saved_count += 1
-
-                video_folder_path = upload_folder
-                print(f"[INFO] ✅ Saved {saved_count} videos to {upload_folder}")
-                print(f"[DEBUG] video_folder_path set to: '{video_folder_path}'")
-            else:
-                # No files uploaded - user only typed path
-                print(f"[ERROR] ❌ No video files uploaded! User must click Browse button and select folder.")
-                return jsonify({
-                    'error': 'No video files uploaded! Please click the Browse button and select your video folder (typing the path is not enough).'
-                }), 400
-        else:
-            # No files in request at all
-            print(f"[ERROR] ❌ No video files in request! User must click Browse button.")
-            return jsonify({
-                'error': 'No video files uploaded! Please click the Browse button (📁 Browse) and select your video folder containing all videos.'
-            }), 400
-
-        # Direct form submission - use form data
-        final_videos_path = video_folder_path if video_folder_path else request.form.get('videos_folder', '')
-        print(f"[DEBUG] final_videos_path calculation:")
-        print(f"[DEBUG]   video_folder_path (uploaded): '{video_folder_path}'")
-        print(f"[DEBUG]   request.form.get('videos_folder'): '{request.form.get('videos_folder', '')}'")
-        print(f"[DEBUG]   final_videos_path: '{final_videos_path}'")
+        print(f"[DEBUG] ===== VIDEO PATH DEBUG =====")
+        print(f"[DEBUG] User entered videos_folder: '{final_videos_path}'")
 
         execution_data = {
             'campaign': {

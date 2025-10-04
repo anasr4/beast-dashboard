@@ -500,26 +500,25 @@
                     <div class="section-content" id="ads-content">
                         <div class="form-grid">
                             <div class="form-group">
-                                <label for="videos_folder_path">Video Folder Path:</label>
+                                <label for="videos_folder_path">Video Folder Path (Server Path):</label>
 
-                                <!-- Folder Browse Button -->
-                                <div style="display: flex; gap: 10px; align-items: center;">
-                                    <input type="text" id="videos_folder_path" name="videos_folder"
-                                           class="modern-input"
-                                           placeholder="C:\path\to\videos or click Browse..."
-                                           style="flex: 1;" required>
+                                <input type="text" id="videos_folder_path" name="videos_folder"
+                                       class="modern-input"
+                                       placeholder="Enter folder path on server: /tmp/beast_uploads/videos_XXXXX"
+                                       style="width: 100%;" required>
 
-                                    <button type="button" id="browse_button" onclick="handleBrowseClick()"
-                                            style="padding: 12px 24px; background: linear-gradient(135deg, #ff1a1a, #cc0000); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; white-space: nowrap;">
-                                        📁 Browse
-                                    </button>
-
-                                    <input type="file" id="folder_browser" webkitdirectory directory multiple style="display: none;" onclick="showLoadingMessage()">
+                                <div style="margin-top: 10px; padding: 15px; background: rgba(0,170,255,0.1); border-left: 4px solid #00aaff; border-radius: 5px; font-size: 13px;">
+                                    <strong>📌 How to use:</strong><br>
+                                    1. Use Video Compressor to create videos<br>
+                                    2. Copy the output folder path from Video Compressor<br>
+                                    3. Paste it here<br>
+                                    <br>
+                                    <strong>Example:</strong> <code style="background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 3px;">/tmp/beast_uploads/videos_1234567890</code>
                                 </div>
 
-                                <!-- GREEN CONFIRMATION -->
+                                <!--GREEN CONFIRMATION -->
                                 <div id="folder-confirmation" style="display: none; margin-top: 15px; padding: 20px; background: linear-gradient(135deg, #00ff88, #00cc66); color: #000; border-radius: 10px; text-align: center; font-weight: bold; font-size: 18px; box-shadow: 0 4px 15px rgba(0, 255, 136, 0.5);">
-                                    ✅ FOLDER SELECTED
+                                    ✅ PATH ENTERED
                                     <div id="folder-info" style="font-size: 14px; margin-top: 10px; opacity: 0.8;"></div>
                                 </div>
                             </div>
@@ -601,42 +600,20 @@
             }
         });
 
-        // SIMPLE folder path handler
+        // SIMPLE folder path handler - JUST TYPE PATH
         let selectedVideos = [];
         const folderPathInput = document.getElementById('videos_folder_path');
-        const folderBrowser = document.getElementById('folder_browser');
         const folderConfirmation = document.getElementById('folder-confirmation');
         const folderInfo = document.getElementById('folder-info');
-        const browseButton = document.getElementById('browse_button');
 
-        // Show loading immediately when Browse is clicked
-        function handleBrowseClick() {
-            // Show BLUE "loading" message immediately
-            folderConfirmation.style.display = 'block';
-            folderConfirmation.style.background = 'linear-gradient(135deg, #00aaff, #0088cc)';
-            folderInfo.textContent = '⏳ Opening folder browser... Please select your video folder';
-            browseButton.innerHTML = '⏳ Opening...';
-            browseButton.disabled = true;
-
-            // Trigger file input
-            document.getElementById('folder_browser').click();
-        }
-
-        function showLoadingMessage() {
-            // When file dialog opens, update message
-            folderConfirmation.style.display = 'block';
-            folderConfirmation.style.background = 'linear-gradient(135deg, #00aaff, #0088cc)';
-            folderInfo.textContent = '📂 Select your folder, then wait while browser loads all files...';
-        }
-
-        // When user TYPES a path - SHOW WARNING
+        // When user TYPES a path - SHOW GREEN
         folderPathInput.addEventListener('input', function() {
             const path = this.value.trim();
-            if (path.length > 0) {
-                // Show YELLOW WARNING (not green)
+            if (path.length > 5) {
+                // Show GREEN confirmation
                 folderConfirmation.style.display = 'block';
-                folderConfirmation.style.background = 'linear-gradient(135deg, #ffaa00, #ff8800)';
-                folderInfo.textContent = `⚠️ Please click the BROWSE button to select your folder! Typing the path won't work.`;
+                folderConfirmation.style.background = 'linear-gradient(135deg, #00ff88, #00cc66)';
+                folderInfo.textContent = `✅ Path entered: "${path}"`;
             } else {
                 folderConfirmation.style.display = 'none';
             }
@@ -753,24 +730,10 @@
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            // CRITICAL CHECK: Must have videos selected via Browse button
-            if (selectedVideos.length === 0) {
-                alert('❌ NO VIDEOS SELECTED!\n\nYou MUST click the "📁 Browse" button and select your video folder.\n\nTyping the folder path does NOT work - you must browse and select the actual files!');
-                return;
-            }
-
             const formData = new FormData(form);
 
-            // Add all selected video files
-            console.log(`✅ Adding ${selectedVideos.length} videos to upload...`);
-            selectedVideos.forEach((file, index) => {
-                formData.append('videos', file);
-                if (index < 5) console.log(`  - ${file.name}`);
-            });
-            if (selectedVideos.length > 5) console.log(`  ... and ${selectedVideos.length - 5} more videos`);
-
             startBtn.disabled = true;
-            startBtn.innerHTML = `🔄 Uploading ${selectedVideos.length} videos & creating campaign...`;
+            startBtn.innerHTML = '🔄 Creating campaign...';
 
             try {
                 const response = await fetch('/folder-beast/execute-real', {
