@@ -267,7 +267,7 @@ dashboard_bots = {
     },
     'video_compressor': {
         'name': 'Video Compressor',
-        'description': '1 Video → Custom Variants (1-1000) H.264 + Original Aspect Ratio',
+        'description': '1 Video → 1-1000 Variants (1MB-4MB) H.264 + Original Aspect Ratio',
         'status': 'ready',
         'icon': '🎬',
         'color': '#ff6600'
@@ -1834,7 +1834,7 @@ def bulk_uploader():
 
 # Video Compressor routes
 def compress_video_variants(input_path, num_variants, callback=None):
-    """Compress 1 video into specified number of different variants under 5MB with original aspect ratio"""
+    """Compress 1 video into specified number of different variants (1MB-4MB) with original aspect ratio"""
     print(f"[DEBUG] Starting compression: {input_path}, variants: {num_variants}")
 
     # Check if input file exists
@@ -1945,11 +1945,11 @@ def compress_video_variants(input_path, num_variants, callback=None):
     # Create variants with different sizes while maintaining aspect ratio
     for i in range(1, num_variants + 1):
         try:
-            # Different target sizes between 1MB and 5MB
-            target_mb = 1.0 + (4.0 * ((i - 1) / max(1, num_variants - 1)))  # 1MB to 5MB range
+            # Different target sizes between 1MB and 4MB
+            target_mb = 1.0 + (3.0 * ((i - 1) / max(1, num_variants - 1)))  # 1MB to 4MB range
             target_bits = target_mb * 8 * 1024 * 1024
             video_bits = target_bits * 0.75  # Reserve more for audio and overhead
-            bitrate = max(100, min(800, int(video_bits / duration / 1000)))  # Much lower bitrate limits
+            bitrate = max(100, min(700, int(video_bits / duration / 1000)))  # Lower bitrate for 4MB max
 
             # Create different resolution variants while maintaining aspect ratio
             variant_percent = (i - 1) / max(1, num_variants - 1)
