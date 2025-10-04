@@ -1137,17 +1137,17 @@ def execute_optimized_beast_mode(execution_id, data):
             print(f"[DEBUG] Starting campaign creation. Campaign name: {campaign_name}, Budget: ${daily_budget}")
             now = datetime.now(timezone.utc)
             start_time = now.isoformat()
-            end_time = (now + timedelta(days=30)).isoformat()
 
             campaign_data_api = {
                 'campaigns': [{
                     'name': campaign_name,
                     'status': campaign_status,
                     'start_time': start_time,
-                    'end_time': end_time,
+                    # NO end_time - campaign runs indefinitely
                     'buy_model': 'AUCTION',
                     'objective': objective,
                     'daily_budget_micro': int(float(daily_budget)) * 1000000
+                    # NO lifetime_budget_micro - no budget limit
                 }]
             }
 
@@ -1219,8 +1219,8 @@ def execute_optimized_beast_mode(execution_id, data):
                         'auto_bid': True,
                         'optimization_goal': 'PIXEL_PURCHASE',  # Changed from CONVERSIONS to PIXEL_PURCHASE
                         'daily_budget_micro': int(float(adset_budget)) * 1000000,
-                        'start_time': start_time,
-                        'end_time': end_time
+                        'start_time': start_time
+                        # NO end_time - ad squad runs indefinitely
                     }]
                 }
 
@@ -1409,42 +1409,58 @@ def execute_optimized_beast_mode(execution_id, data):
 
                 # Removed unnecessary 0.5s delay per upload (saves 100+ seconds total)
 
-            update_progress(75, 'checking_media', 'Checking media processing...', f'Uploaded {len(uploaded_media)} media files', media_uploaded=len(uploaded_media))
+            # ALL VIDEOS UPLOADED - Show green confirmation
+            update_progress(75, 'media_uploaded', '✅ All Videos Uploaded Successfully!', f'Successfully uploaded {len(uploaded_media)}/{len(video_files)} videos', media_uploaded=len(uploaded_media))
+            print(f"[SUCCESS] ✅ ALL {len(uploaded_media)} VIDEOS UPLOADED TO SNAPCHAT!")
 
         except Exception as e:
             update_progress(0, 'error', 'Upload Error', f'Error uploading media: {str(e)}', error=str(e))
             return
 
-        # Check media processing
+        # Check media processing - EXTENDED WAIT TIME
         try:
-            update_progress(77, 'checking_media', 'Checking media status...', 'Checking if media files are ready...')
+            update_progress(77, 'checking_media', 'Waiting for Snapchat to process videos...', 'This can take 2-5 minutes. Please wait...')
 
             headers = tm.get_headers()
+
+            # Initial check
             ready_count, checked = check_media_status_batch(uploaded_media, headers, 20)
-            update_progress(80, 'checking_media', f'Media check: {ready_count}/{checked} ready', f'{ready_count}/{checked} sample media files ready', media_ready=ready_count)
+            update_progress(78, 'checking_media', f'Initial check: {ready_count}/{checked} ready', f'{ready_count}/{checked} sample media files ready', media_ready=ready_count)
 
-            # Smart wait with early exit (saves 60-90 seconds on average)
-            if ready_count == 0:
-                update_progress(82, 'waiting_media', 'Smart waiting for media processing...', 'Checking every 10 seconds for ready media...')
-                max_wait_time = 60  # Reduced from 120 seconds
-                check_interval = 10
-                wait_start = time.time()
+            # EXTENDED wait with detailed status - up to 5 minutes
+            max_wait_time = 300  # Increased from 60 to 300 seconds (5 minutes)
+            check_interval = 15  # Check every 15 seconds
+            wait_start = time.time()
 
-                while time.time() - wait_start < max_wait_time:
-                    time.sleep(check_interval)
-                    ready_count, checked = check_media_status_batch(uploaded_media, headers, 20)
-                    elapsed = int(time.time() - wait_start)
-                    ready_percentage = (ready_count / checked * 100) if checked > 0 else 0
+            while time.time() - wait_start < max_wait_time:
+                time.sleep(check_interval)
+                ready_count, checked = check_media_status_batch(uploaded_media, headers, 20)
+                elapsed = int(time.time() - wait_start)
+                ready_percentage = (ready_count / checked * 100) if checked > 0 else 0
 
-                    # Early exit if 50% or more media is ready
-                    if ready_percentage >= 50:
-                        update_progress(85, 'creating_ads', f'Media ready! Starting ads...', f'Early exit: {ready_count}/{checked} media ready ({ready_percentage:.1f}%)', media_ready=ready_count)
-                        break
+                # Progress bar calculation
+                progress_percent = 78 + (elapsed / max_wait_time * 7)  # 78-85%
 
-                    update_progress(82, 'waiting_media', f'Checking media... {ready_percentage:.1f}% ready', f'Waited {elapsed}s: {ready_count}/{checked} ready', media_ready=ready_count)
+                # Early exit if 80% or more media is ready
+                if ready_percentage >= 80:
+                    update_progress(85, 'media_ready', f'✅ Videos Ready! Starting ad creation...', f'Success: {ready_count}/{checked} media ready ({ready_percentage:.1f}%)', media_ready=ready_count)
+                    print(f"[SUCCESS] ✅ {ready_percentage:.1f}% OF VIDEOS ARE READY!")
+                    break
 
-                if ready_count == 0:
-                    update_progress(85, 'creating_ads', 'Proceeding with ad creation...', f'Final check: {ready_count}/{checked} sample media files ready', media_ready=ready_count)
+                # Show detailed waiting status
+                update_progress(
+                    progress_percent,
+                    'waiting_media',
+                    f'⏳ Processing videos... {ready_percentage:.1f}% ready',
+                    f'Waited {elapsed}s / {max_wait_time}s: {ready_count}/{checked} sample videos ready',
+                    media_ready=ready_count
+                )
+
+            # Final status after wait
+            if ready_count > 0:
+                update_progress(85, 'media_ready', f'✅ Proceeding with ad creation...', f'Final check: {ready_count}/{checked} videos ready ({ready_percentage:.1f}%)', media_ready=ready_count)
+            else:
+                update_progress(85, 'creating_ads', '⚠️ Proceeding anyway...', f'Videos may still be processing. Creating ads...', media_ready=ready_count)
 
         except Exception as e:
             update_progress(85, 'creating_ads', 'Creating ads anyway...', f'Media check failed: {str(e)}')
