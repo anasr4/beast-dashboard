@@ -719,20 +719,24 @@
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            const formData = new FormData(form);
-
-            // If user BROWSED and selected files, add them
-            if (selectedVideos.length > 0) {
-                selectedVideos.forEach(file => {
-                    formData.append('videos', file);
-                });
-                startBtn.innerHTML = '🔄 Uploading videos & creating campaign...';
-            } else {
-                // User typed a path - bot will load from that path
-                startBtn.innerHTML = '🔄 Creating campaign...';
+            // CRITICAL CHECK: Must have videos selected via Browse button
+            if (selectedVideos.length === 0) {
+                alert('❌ NO VIDEOS SELECTED!\n\nYou MUST click the "📁 Browse" button and select your video folder.\n\nTyping the folder path does NOT work - you must browse and select the actual files!');
+                return;
             }
 
+            const formData = new FormData(form);
+
+            // Add all selected video files
+            console.log(`✅ Adding ${selectedVideos.length} videos to upload...`);
+            selectedVideos.forEach((file, index) => {
+                formData.append('videos', file);
+                if (index < 5) console.log(`  - ${file.name}`);
+            });
+            if (selectedVideos.length > 5) console.log(`  ... and ${selectedVideos.length - 5} more videos`);
+
             startBtn.disabled = true;
+            startBtn.innerHTML = `🔄 Uploading ${selectedVideos.length} videos & creating campaign...`;
 
             try {
                 const response = await fetch('/folder-beast/execute-real', {
