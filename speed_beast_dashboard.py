@@ -665,22 +665,31 @@ def execute_single_ad_mode(execution_id, data):
         update_single_ad_progress(30, "Creating ad set...", "Creating ad set", campaign_name=data['campaign']['name'])
 
         # 2. Create Ad Set
+        # Build ad squad data with pixel and purchase optimization
+        adsquad_config = {
+            'name': data['adsets']['base_name'],
+            'status': data['adsets']['status'],
+            'auto_bid': True,
+            'optimization_goal': 'PIXEL_PURCHASE',
+            'daily_budget_micro': int(float(data['adsets']['budget_per_adset'])) * 1000000,
+            'start_time': data['campaign']['start_date'],
+            'targeting': {
+                'geos': [{'country_code': country} for country in data['adsets']['countries']],
+                'demographics': [{
+                    'min_age': data['adsets']['min_age'],
+                    'max_age': data['adsets']['max_age']
+                }]
+            }
+        }
+
+        # Add pixel ID if provided
+        pixel_id = data.get('adsets', {}).get('pixel_id') or data.get('pixel_id')
+        if pixel_id:
+            adsquad_config['pixel_id'] = pixel_id
+            print(f"[DEBUG] Adding pixel ID to ad squad: {pixel_id}")
+
         adset_data = {
-            'adsquads': [{
-                'name': data['adsets']['base_name'],
-                'status': data['adsets']['status'],
-                'auto_bid': True,
-                'optimization_goal': 'CONVERSIONS',
-                'daily_budget_micro': int(float(data['adsets']['budget_per_adset'])) * 1000000,
-                'start_time': data['campaign']['start_date'],
-                'targeting': {
-                    'geos': [{'country_code': country} for country in data['adsets']['countries']],
-                    'demographics': [{
-                        'min_age': data['adsets']['min_age'],
-                        'max_age': data['adsets']['max_age']
-                    }]
-                }
-            }]
+            'adsquads': [adsquad_config]
         }
 
         print(f"[DEBUG] Creating ad set for campaign {campaign_id}")
@@ -830,22 +839,31 @@ def execute_test_bot_mode(execution_id, data):
         update_test_progress(30, "Creating ad set...")
 
         # 2. Create Ad Set (NO AGE TARGETING FOR CONVERSIONS)
-        adset_data = {
-            'adsquads': [{
-                'name': data['adsets']['base_name'],
-                'status': data['adsets']['status'],
-                'auto_bid': True,
-                'optimization_goal': 'CONVERSIONS',
-                'daily_budget_micro': int(float(data['adsets']['budget_per_adset'])) * 1000000,
-                'start_time': data['campaign']['start_date'],
-                'targeting': {
-                    'geos': [{'country_code': country} for country in data['adsets']['countries']]
-                    # NO DEMOGRAPHICS/AGE for CONVERSIONS optimization
-                }
-            }]
+        # Build ad squad data with pixel and purchase optimization
+        adsquad_config = {
+            'name': data['adsets']['base_name'],
+            'status': data['adsets']['status'],
+            'auto_bid': True,
+            'optimization_goal': 'PIXEL_PURCHASE',
+            'daily_budget_micro': int(float(data['adsets']['budget_per_adset'])) * 1000000,
+            'start_time': data['campaign']['start_date'],
+            'targeting': {
+                'geos': [{'country_code': country} for country in data['adsets']['countries']]
+                # NO DEMOGRAPHICS/AGE for PIXEL optimization goals
+            }
         }
 
-        print(f"[DEBUG] [TEST BOT] Skipping age targeting for CONVERSIONS optimization")
+        # Add pixel ID if provided
+        pixel_id = data.get('adsets', {}).get('pixel_id') or data.get('pixel_id')
+        if pixel_id:
+            adsquad_config['pixel_id'] = pixel_id
+            print(f"[DEBUG] [TEST BOT] Adding pixel ID to ad squad: {pixel_id}")
+
+        adset_data = {
+            'adsquads': [adsquad_config]
+        }
+
+        print(f"[DEBUG] [TEST BOT] Using PIXEL_PURCHASE optimization with pixel tracking")
 
         print(f"[DEBUG] [TEST BOT] Creating ad set using SnapchatAPIClient")
 
@@ -1184,6 +1202,11 @@ def execute_optimized_beast_mode(execution_id, data):
                 else:
                     print(f"[DEBUG] Skipping age targeting for CONVERSIONS optimization")
 
+                # Get pixel configuration
+                adsets_data = data.get('adsets', {})
+                pixel_enabled = adsets_data.get('enable_pixel', 'true') == 'true'
+                pixel_id = adsets_data.get('pixel_id', '').strip()
+
                 ad_set_data_api = {
                     'adsquads': [{
                         'name': f'{campaign_name} - Ad Set {str(ad_set_num)}',
@@ -1194,7 +1217,7 @@ def execute_optimized_beast_mode(execution_id, data):
                         'placement_v2': {'config': 'AUTOMATIC'},
                         'billing_event': 'IMPRESSION',
                         'auto_bid': True,
-                        'optimization_goal': 'CONVERSIONS',
+                        'optimization_goal': 'PIXEL_PURCHASE',  # Changed from CONVERSIONS to PIXEL_PURCHASE
                         'daily_budget_micro': int(float(adset_budget)) * 1000000,
                         'start_time': start_time,
                         'end_time': end_time
@@ -1202,14 +1225,11 @@ def execute_optimized_beast_mode(execution_id, data):
                 }
 
                 # Add pixel_id if pixel is enabled and pixel_id is provided
-                adsets_data = data.get('adsets', {})
-                pixel_enabled = adsets_data.get('enable_pixel', 'true') == 'true'
-                pixel_id = adsets_data.get('pixel_id', '').strip()
                 if pixel_enabled and pixel_id:
                     ad_set_data_api['adsquads'][0]['pixel_id'] = pixel_id
-                    print(f"[DEBUG] Pixel enabled for ad set {ad_set_num} with pixel_id: {pixel_id}")
+                    print(f"[DEBUG] Pixel enabled for ad set {ad_set_num} with pixel_id: {pixel_id} (PIXEL_PURCHASE optimization)")
                 else:
-                    print(f"[DEBUG] Pixel not added for ad set {ad_set_num}. Enabled: {pixel_enabled}, ID: '{pixel_id}'")
+                    print(f"[DEBUG] WARNING: Pixel not added for ad set {ad_set_num}. Enabled: {pixel_enabled}, ID: '{pixel_id}'")
 
                 print(f"[DEBUG] Ad set {ad_set_num} JSON payload: {json.dumps(ad_set_data_api, indent=2)}")
 
