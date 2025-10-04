@@ -223,47 +223,12 @@ dashboard_bots = {
         'icon': '🚀',
         'color': '#00ff88'
     },
-    'single_ad': {
-        'name': 'Single Ad Bot',
-        'description': '1 Video → 1 Campaign, 1 Ad Set, 1 Ad',
-        'status': 'ready',
-        'icon': '🎯',
-        'color': '#4CAF50'
-    },
-    'test_bot': {
-        'name': 'Test Bot',
-        'description': '3 Videos → Quick Testing (2-3 min)',
-        'status': 'ready',
-        'icon': '🧪',
-        'color': '#667eea'
-    },
-    'campaign_manager': {
-        'name': 'Campaign Manager',
-        'description': 'Manage existing campaigns',
-        'status': 'ready',
-        'icon': '📊',
-        'color': '#4444ff'
-    },
     'token_manager': {
         'name': 'Token Manager',
         'description': 'Refresh and manage API tokens',
         'status': 'ready',
         'icon': '🔑',
         'color': '#ffaa00'
-    },
-    'analytics_bot': {
-        'name': 'Analytics Bot',
-        'description': 'Campaign performance analytics',
-        'status': 'ready',
-        'icon': '📈',
-        'color': '#00aaff'
-    },
-    'bulk_uploader': {
-        'name': 'Bulk Uploader',
-        'description': 'Mass upload media files',
-        'status': 'ready',
-        'icon': '📤',
-        'color': '#aa00ff'
     },
     'video_compressor': {
         'name': 'Video Compressor',
