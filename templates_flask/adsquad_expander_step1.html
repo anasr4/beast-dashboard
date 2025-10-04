@@ -244,6 +244,17 @@
 
             <div id="campaignsSection" style="display: none;">
                 <h2 style="margin-bottom: 20px; color: #00f5ff;">Select a Campaign to Expand:</h2>
+
+                <!-- Search Bar -->
+                <div style="margin-bottom: 20px;">
+                    <input type="text"
+                           id="searchInput"
+                           placeholder="🔍 Search campaigns by name, ID, or objective..."
+                           style="width: 100%; padding: 15px; border: 2px solid rgba(0, 245, 255, 0.3); border-radius: 12px; background: rgba(0, 0, 0, 0.4); color: #ffffff; font-size: 1rem;"
+                           oninput="filterCampaigns()">
+                    <div id="searchResults" style="margin-top: 10px; text-align: center; color: rgba(255, 255, 255, 0.7); font-size: 0.95rem;"></div>
+                </div>
+
                 <div id="campaignsList" class="campaigns-list"></div>
 
                 <form method="POST" action="/adsquad-expander/step2" id="campaignForm">
@@ -328,6 +339,9 @@
 
                 campaignsList.appendChild(campaignDiv);
             });
+
+            // Show initial count
+            document.getElementById('searchResults').textContent = `${campaigns.length} campaigns total`;
         }
 
         function selectCampaign(id, name, element) {
@@ -353,6 +367,36 @@
             document.getElementById('campaignsSection').style.display = 'none';
             document.getElementById('errorSection').style.display = 'block';
             document.getElementById('errorText').textContent = message;
+        }
+
+        function filterCampaigns() {
+            const searchInput = document.getElementById('searchInput').value.toLowerCase();
+            const campaignItems = document.querySelectorAll('.campaign-item');
+            let visibleCount = 0;
+            let totalCount = campaignItems.length;
+
+            campaignItems.forEach(item => {
+                const campaignName = item.querySelector('.campaign-name').textContent.toLowerCase();
+                const campaignDetails = item.querySelector('.campaign-details').textContent.toLowerCase();
+
+                // Search in name, ID, status, budget, and objective
+                if (campaignName.includes(searchInput) || campaignDetails.includes(searchInput)) {
+                    item.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            // Update search results counter
+            const searchResults = document.getElementById('searchResults');
+            if (searchInput) {
+                searchResults.textContent = `Showing ${visibleCount} of ${totalCount} campaigns`;
+                searchResults.style.color = visibleCount > 0 ? '#00f5ff' : '#ff1a1a';
+            } else {
+                searchResults.textContent = `${totalCount} campaigns total`;
+                searchResults.style.color = 'rgba(255, 255, 255, 0.7)';
+            }
         }
     </script>
 </body>
