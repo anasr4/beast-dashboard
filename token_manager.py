@@ -48,11 +48,15 @@ class TokenManager:
             print("[ERROR] No refresh token available")
             return False
 
+        # Get credentials from saved config
+        if 'client_id' not in self.config or 'client_secret' not in self.config:
+            print("[ERROR] No client credentials found in config")
+            return False
+
         print("[INFO] Refreshing access token...")
 
-        # Your credentials
-        client_id = "26267fa4-831c-47fb-97b4-afca39be5877"
-        client_secret = "84ec597b44ef3968088c"
+        client_id = self.config['client_id']
+        client_secret = self.config['client_secret']
 
         token_url = "https://accounts.snapchat.com/login/oauth2/access_token"
         token_data = {
