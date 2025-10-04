@@ -314,6 +314,48 @@ def test_bot():
     """Test Bot"""
     return render_template('test_bot.html')
 
+@app.route('/api/upload-videos', methods=['POST'])
+@require_auth
+def upload_videos():
+    """Upload video files to server"""
+    try:
+        if 'videos' not in request.files:
+            return jsonify({'success': False, 'error': 'No videos in request'})
+
+        videos = request.files.getlist('videos')
+
+        if len(videos) == 0:
+            return jsonify({'success': False, 'error': 'No videos selected'})
+
+        # Create upload folder with timestamp
+        upload_folder = f'/tmp/beast_uploads/videos_{int(time.time())}'
+        os.makedirs(upload_folder, exist_ok=True)
+
+        # Save videos
+        saved_count = 0
+        for video in videos:
+            if video.filename and video.filename.endswith(('.mp4', '.mov', '.avi', '.mkv', '.wmv', '.flv')):
+                filename = secure_filename(video.filename)
+                filepath = os.path.join(upload_folder, filename)
+                video.save(filepath)
+                saved_count += 1
+
+        if saved_count == 0:
+            return jsonify({'success': False, 'error': 'No valid video files uploaded'})
+
+        # Return folder name (not full path) so it can be used in campaign
+        folder_name = os.path.basename(upload_folder)
+
+        return jsonify({
+            'success': True,
+            'folder_name': folder_name,
+            'count': saved_count,
+            'message': f'{saved_count} videos uploaded successfully'
+        })
+
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
 @app.route('/folder-beast')
 @require_auth
 def folder_beast():

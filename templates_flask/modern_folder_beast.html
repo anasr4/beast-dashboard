@@ -500,19 +500,23 @@
                     <div class="section-content" id="ads-content">
                         <div class="form-grid">
                             <div class="form-group">
-                                <label for="videos_folder">Videos Folder (200 videos):</label>
-                                <div class="file-upload-area" onclick="document.getElementById('videos_folder').click()">
+                                <label for="videos_upload">Upload Videos (200 videos):</label>
+                                <div class="file-upload-area" onclick="document.getElementById('videos_upload').click()">
                                     <div style="font-size: 3rem; margin-bottom: 15px;">📁</div>
-                                    <div>Click to select folder with 200 videos</div>
+                                    <div id="upload-text">Click to select 200 video files from your PC</div>
                                     <div style="font-size: 0.9rem; opacity: 0.7; margin-top: 10px;">
                                         Supports: .mp4, .mov, .avi, .mkv, .wmv, .flv
                                     </div>
                                 </div>
-                                <input type="text" id="videos_folder" name="videos_folder"
-                                       class="modern-input" style="margin-top: 15px;"
-                                       placeholder="C:\path\to\your\200videos" required>
+                                <input type="file" id="videos_upload" name="videos"
+                                       multiple webkitdirectory directory accept="video/*"
+                                       style="display: none;">
+                                <input type="hidden" id="videos_folder" name="videos_folder" value="">
                                 <div class="file-path-display" id="videos-path-display" style="display: none;"></div>
                                 <div class="validation-message" id="videos-validation"></div>
+                                <button type="button" id="uploadVideosBtn" style="display: none; margin-top: 15px; padding: 12px 24px; background: linear-gradient(135deg, #00ff88, #00cc66); color: #000; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">
+                                    ⬆️ Upload Videos to Server
+                                </button>
                             </div>
                             <div class="form-group">
                                 <label for="headlines_csv">Headlines CSV (200 headlines):</label>
@@ -592,16 +596,106 @@
             }
         });
 
-        // File path display
-        document.getElementById('videos_folder').addEventListener('input', function() {
-            const display = document.getElementById('videos-path-display');
-            if (this.value) {
-                display.textContent = 'Folder: ' + this.value;
-                display.style.display = 'block';
-            } else {
-                display.style.display = 'none';
+        // Video file upload handler
+        let selectedVideos = [];
+        const videosUploadInput = document.getElementById('videos_upload');
+        const uploadBtn = document.getElementById('uploadVideosBtn');
+        const uploadText = document.getElementById('upload-text');
+        const videosDisplay = document.getElementById('videos-path-display');
+
+        videosUploadInput.addEventListener('change', async function(e) {
+            selectedVideos = Array.from(e.target.files).filter(f => f.type.startsWith('video/'));
+
+            if (selectedVideos.length === 0) {
+                alert('No video files selected!');
+                return;
+            }
+
+            uploadText.textContent = `${selectedVideos.length} videos selected`;
+            uploadBtn.style.display = 'block';
+            videosDisplay.textContent = `Ready to upload: ${selectedVideos.length} videos (${(selectedVideos.reduce((sum, f) => sum + f.size, 0) / 1024 / 1024).toFixed(1)} MB total)`;
+            videosDisplay.style.display = 'block';
+            videosDisplay.className = 'file-path-display';
+        });
+
+        uploadBtn.addEventListener('click', async function() {
+            if (selectedVideos.length === 0) {
+                alert('Please select videos first!');
+                return;
+            }
+
+            uploadBtn.disabled = true;
+            uploadBtn.innerHTML = '⬆️ Uploading...';
+
+            const formData = new FormData();
+            selectedVideos.forEach(file => {
+                formData.append('videos', file);
+            });
+
+            try {
+                const response = await fetch('/api/upload-videos', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // ✅ GREEN CONFIRMATION!
+                    uploadBtn.style.background = 'linear-gradient(135deg, #00ff88, #00cc66)';
+                    uploadBtn.innerHTML = '✅ Videos Uploaded!';
+                    uploadText.textContent = `✅ ${selectedVideos.length} videos uploaded to server!`;
+                    videosDisplay.textContent = `Server folder: ${result.folder_name}`;
+                    videosDisplay.className = 'success-message';
+
+                    // Set hidden field with server folder name
+                    document.getElementById('videos_folder').value = result.folder_name;
+
+                    // Show big green popup
+                    showGreenPopup(`${selectedVideos.length} VIDEOS UPLOADED!`, `Ready to create campaign`);
+                } else {
+                    alert('Upload failed: ' + result.error);
+                    uploadBtn.disabled = false;
+                    uploadBtn.innerHTML = '⬆️ Upload Videos to Server';
+                }
+            } catch (error) {
+                alert('Upload error: ' + error.message);
+                uploadBtn.disabled = false;
+                uploadBtn.innerHTML = '⬆️ Upload Videos to Server';
             }
         });
+
+        function showGreenPopup(title, subtitle) {
+            const banner = document.createElement('div');
+            banner.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: linear-gradient(135deg, #00ff88 0%, #00cc66 100%);
+                color: #000;
+                padding: 40px 60px;
+                border-radius: 20px;
+                font-size: 28px;
+                font-weight: bold;
+                z-index: 10000;
+                box-shadow: 0 20px 60px rgba(0, 255, 136, 0.5);
+                text-align: center;
+                animation: popIn 0.5s ease;
+            `;
+            banner.innerHTML = `
+                <div style="font-size: 60px; margin-bottom: 10px;">✅</div>
+                <div>${title}</div>
+                <div style="font-size: 18px; margin-top: 10px; opacity: 0.8;">${subtitle}</div>
+            `;
+            document.body.appendChild(banner);
+
+            setTimeout(() => {
+                banner.style.transition = 'all 0.5s ease';
+                banner.style.opacity = '0';
+                setTimeout(() => banner.remove(), 500);
+            }, 3000);
+        }
 
         document.getElementById('headlines_csv').addEventListener('input', function() {
             const display = document.getElementById('csv-path-display');
