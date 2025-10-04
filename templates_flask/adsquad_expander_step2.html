@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Step 2: Ad Set Details | Enhanced Beast Mode</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 20%, #16213e 40%, #0f0f23 60%, #000000 100%);
+            min-height: 100vh;
+            color: #ffffff;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(circle at 20% 50%, rgba(0, 245, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 0, 150, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(0, 255, 100, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 40px;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            margin: 0 10px;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 10px;
+            color: white;
+        }
+
+        .step.active .step-number {
+            background: #27ae60;
+            box-shadow: 0 0 20px rgba(39, 174, 96, 0.5);
+        }
+
+        .step.completed .step-number {
+            background: #2ecc71;
+        }
+
+        .step.inactive .step-number {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .step-label {
+            color: white;
+            font-weight: 500;
+        }
+
+        .form-card {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(0, 245, 255, 0.2);
+            border-radius: 25px;
+            padding: 40px;
+            box-shadow:
+                0 25px 50px rgba(0,0,0,0.5),
+                0 0 30px rgba(0, 245, 255, 0.1),
+                inset 0 1px 0 rgba(255,255,255,0.1);
+            margin-bottom: 30px;
+            backdrop-filter: blur(20px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .form-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(0, 245, 255, 0.5), transparent);
+        }
+
+        .form-section {
+            margin-bottom: 35px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .form-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .form-section h3 {
+            color: #ffffff;
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .form-section h3::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: linear-gradient(135deg, #000000 0%, #333333 50%, #000000 100%); border: 1px solid rgba(255,255,255,0.2);
+            margin-right: 15px;
+            border-radius: 2px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: rgba(0,0,0,0.4);
+            color: #ffffff;
+            backdrop-filter: blur(5px);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #00f5ff;
+            background: rgba(0,0,0,0.6);
+            box-shadow: 0 0 20px rgba(0, 245, 255, 0.3);
+            color: #ffffff;
+        }
+
+        .form-group select option {
+            background: #1a1a1a;
+            color: #ffffff;
+            padding: 10px;
+            border: none;
+        }
+
+        .form-group select option:hover,
+        .form-group select option:focus,
+        .form-group select option:checked {
+            background: #00f5ff;
+            color: #000000;
+        }
+
+        .form-group .help-text {
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.7);
+            margin-top: 5px;
+        }
+
+        .country-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .country-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            border: 2px solid rgba(0, 245, 255, 0.2);
+            transition: all 0.4s ease;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .country-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 245, 255, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .country-item:hover {
+            background: rgba(0, 245, 255, 0.1);
+            border-color: #00f5ff;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 245, 255, 0.3);
+        }
+
+        .country-item:hover::before {
+            left: 100%;
+        }
+
+        .country-item input[type="checkbox"] {
+            width: auto;
+            margin-right: 10px;
+            transform: scale(1.2);
+        }
+
+        .control-btn {
+            background: rgba(0,0,0,0.4);
+            color: #ffffff;
+            border: 2px solid rgba(0, 245, 255, 0.3);
+            padding: 12px 20px;
+            margin: 0 8px 8px 0;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.4s ease;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .control-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 245, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .control-btn:hover {
+            background: rgba(0, 245, 255, 0.2);
+            border-color: #00f5ff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 245, 255, 0.4);
+        }
+
+        .control-btn:hover::before {
+            left: 100%;
+        }
+
+        .country-item.hidden {
+            display: none;
+        }
+
+        .country-flag {
+            font-size: 1.5rem;
+            margin-right: 8px;
+        }
+
+        .age-range {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .age-input {
+            flex: 1;
+        }
+
+        .age-separator {
+            color: rgba(255,255,255,0.7);
+            font-weight: 600;
+        }
+
+        .currency-input {
+            position: relative;
+        }
+
+        .currency-input::before {
+            content: '$';
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255,255,255,0.7);
+            font-weight: 600;
+            z-index: 1;
+        }
+
+        .currency-input input {
+            padding-left: 35px;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 40px;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00f5ff 0%, #0080ff 50%, #00f5ff 100%);
+            border: 2px solid rgba(0, 245, 255, 0.3);
+            color: #000000;
+            font-weight: 700;
+            box-shadow: 0 5px 20px rgba(0, 245, 255, 0.4);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 245, 255, 0.6);
+            background: linear-gradient(135deg, #ffffff 0%, #00f5ff 50%, #ffffff 100%);
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+            transform: translateY(-2px);
+        }
+
+        .targeting-preview {
+            background: linear-gradient(135deg, #00b894, #00cec9);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+
+        .targeting-preview h3 {
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .preview-item {
+            background: rgba(255,255,255,0.1);
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .preview-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .preview-value {
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 15px;
+            }
+
+            .form-card {
+                padding: 25px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .country-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .age-range {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .step-indicator {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .step {
+                margin: 5px 0;
+            }
+
+            .button-group {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Beast AdSquad Expander</h1>
+            <p>Step 2: Ad Set Configuration</p>
+        </div>
+
+        <div class="step-indicator">
+            <div class="step completed">
+                <div class="step-number">✓</div>
+                <div class="step-label">Campaign</div>
+            </div>
+            <div class="step active">
+                <div class="step-number">2</div>
+                <div class="step-label">Ad Sets</div>
+            </div>
+            <div class="step inactive">
+                <div class="step-number">3</div>
+                <div class="step-label">Ads</div>
+            </div>
+        </div>
+
+        <form action="/adsquad-expander/step2" method="POST">
+            <div class="form-card">
+                <!-- Ad Set Basic Configuration -->
+                <div class="form-section">
+                    <h3>📝 Ad Set Configuration</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="adset_base_name">Ad Set Base Name</label>
+                            <input type="text" id="adset_base_name" name="adset_base_name"
+                                   value="{{ data.adset_base_name or 'Beast AdSet' }}"
+                                   placeholder="e.g., vatoline, Summer Sale"
+                                   required>
+                            <div class="help-text">Base name for ad sets (will be numbered: Name 1, Name 2, etc.)</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="adset_status">Ad Set Status</label>
+                            <select id="adset_status" name="adset_status" required>
+                                <option value="ACTIVE" {% if data.adset_status == 'ACTIVE' %}selected{% endif %}>🟢 Active - Ad sets will run immediately</option>
+                                <option value="PAUSED" {% if data.adset_status == 'PAUSED' %}selected{% endif %}>⏸️ Paused - Ad sets will be created but paused</option>
+                            </select>
+                            <div class="help-text">Initial status for all ad sets</div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="enable_pixel">Enable Pixel Tracking</label>
+                            <select id="enable_pixel" name="enable_pixel" required>
+                                <option value="true" {% if data.enable_pixel == 'true' %}selected{% endif %}>✅ Enable - Track conversions and optimize</option>
+                                <option value="false" {% if data.enable_pixel == 'false' %}selected{% endif %}>❌ Disable - Basic tracking only</option>
+                            </select>
+                            <div class="help-text">Pixel tracking helps optimize ad performance</div>
+                        </div>
+                        <div class="form-group" id="pixel_id_group" style="display: none;">
+                            <label for="pixel_id">🎯 Snapchat Pixel ID</label>
+                            <input type="text" id="pixel_id" name="pixel_id"
+                                   value="{{ data.pixel_id or '' }}"
+                                   placeholder="e.g., 7eda10b7-a5fe-4ac6-80f4-417e68d748fb">
+                            <div class="help-text">Enter your Snapchat Pixel ID from your Snapchat Business account</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bidding & Optimization Section -->
+                <div class="form-section">
+                    <h3>💰 Bidding & Optimization</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="goal_type">Campaign Goal & Bid</label>
+                            <select id="goal_type" name="goal_type" required>
+                                <option value="">Select Goal Type</option>
+                                <option value="CONVERSIONS" {% if data.goal_type == 'CONVERSIONS' %}selected{% endif %}>🎯 Conversions - Optimize for purchases/actions</option>
+                                <option value="TRAFFIC" {% if data.goal_type == 'TRAFFIC' %}selected{% endif %}>👥 Traffic - Drive website visits</option>
+                                <option value="REACH" {% if data.goal_type == 'REACH' %}selected{% endif %}>📢 Reach - Maximize unique people reached</option>
+                                <option value="BRAND_AWARENESS" {% if data.goal_type == 'BRAND_AWARENESS' %}selected{% endif %}>🏆 Brand Awareness - Increase brand recognition</option>
+                            </select>
+                            <div class="help-text">Choose what you want to optimize for</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="bid_strategy">Bid Strategy</label>
+                            <select id="bid_strategy" name="bid_strategy" required>
+                                <option value="">Select Bid Strategy</option>
+                                <option value="AUTO_BID" {% if data.bid_strategy == 'AUTO_BID' %}selected{% endif %}>🤖 Auto Bid - Let Snapchat optimize (Recommended)</option>
+                                <option value="TARGET_BID" {% if data.bid_strategy == 'TARGET_BID' %}selected{% endif %}>🎯 Target Bid - Set specific bid amount</option>
+                                <option value="MAX_BID" {% if data.bid_strategy == 'MAX_BID' %}selected{% endif %}>📈 Max Bid - Set maximum bid limit</option>
+                            </select>
+                            <div class="help-text">Auto bid works best for most campaigns</div>
+                        </div>
+                    </div>
+                    <div class="form-row" id="bid_amount_section" style="display: none;">
+                        <div class="form-group">
+                            <label for="bid_amount">Bid Amount (USD)</label>
+                            <div class="currency-input">
+                                <input type="number" id="bid_amount" name="bid_amount"
+                                       value="{{ data.bid_amount or '2.00' }}"
+                                       min="0.01" max="100" step="0.01"
+                                       placeholder="2.00">
+                            </div>
+                            <div class="help-text">Amount to bid per result (only for Target/Max bid strategies)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Geographic Targeting Section -->
+                <div class="form-section">
+                    <h3>🌍 Geographic Targeting</h3>
+                    <div class="form-group">
+                        <label for="target_country">🌍 Target Country</label>
+                        <select id="target_country" name="countries" required>
+                            <option value="SA" {% if 'SA' in data.countries %}selected{% endif %}>🇸🇦 Saudi Arabia</option>
+                            <option value="AE" {% if 'AE' in data.countries %}selected{% endif %}>🇦🇪 United Arab Emirates</option>
+                            <option value="KW" {% if 'KW' in data.countries %}selected{% endif %}>🇰🇼 Kuwait</option>
+                            <option value="QA" {% if 'QA' in data.countries %}selected{% endif %}>🇶🇦 Qatar</option>
+                            <option value="BH" {% if 'BH' in data.countries %}selected{% endif %}>🇧🇭 Bahrain</option>
+                            <option value="OM" {% if 'OM' in data.countries %}selected{% endif %}>🇴🇲 Oman</option>
+                            <option value="US" {% if 'US' in data.countries %}selected{% endif %}>🇺🇸 United States</option>
+                            <option value="GB" {% if 'GB' in data.countries %}selected{% endif %}>🇬🇧 United Kingdom</option>
+                            <option value="CA" {% if 'CA' in data.countries %}selected{% endif %}>🇨🇦 Canada</option>
+                            <option value="AU" {% if 'AU' in data.countries %}selected{% endif %}>🇦🇺 Australia</option>
+                            <option value="DE" {% if 'DE' in data.countries %}selected{% endif %}>🇩🇪 Germany</option>
+                            <option value="FR" {% if 'FR' in data.countries %}selected{% endif %}>🇫🇷 France</option>
+                            <option value="NL" {% if 'NL' in data.countries %}selected{% endif %}>🇳🇱 Netherlands</option>
+                            <option value="IN" {% if 'IN' in data.countries %}selected{% endif %}>🇮🇳 India</option>
+                            <option value="EG" {% if 'EG' in data.countries %}selected{% endif %}>🇪🇬 Egypt</option>
+                            <option value="JO" {% if 'JO' in data.countries %}selected{% endif %}>🇯🇴 Jordan</option>
+                            <option value="LB" {% if 'LB' in data.countries %}selected{% endif %}>🇱🇧 Lebanon</option>
+                        </select>
+                        <div class="help-text">Select the primary country to target. Saudi Arabia is recommended for best performance.</div>
+                    </div>
+                </div>
+
+                <!-- Audience Targeting Section -->
+                <div class="form-section">
+                    <h3>Audience Demographics</h3>
+                    <div class="form-group">
+                        <label>Age Range</label>
+                        <div class="age-range">
+                            <div class="age-input">
+                                <label for="min_age">Minimum Age</label>
+                                <select id="min_age" name="min_age" required>
+                                    <option value="20" {% if data.min_age == '20' %}selected{% endif %}>20</option>
+                                    <option value="21" {% if data.min_age == '21' %}selected{% endif %}>21</option>
+                                    <option value="22" {% if data.min_age == '22' %}selected{% endif %}>22</option>
+                                    <option value="25" {% if data.min_age == '25' %}selected{% endif %}>25</option>
+                                </select>
+                            </div>
+                            <span class="age-separator">to</span>
+                            <div class="age-input">
+                                <label for="max_age">Maximum Age</label>
+                                <select id="max_age" name="max_age" required>
+                                    <option value="35" {% if data.max_age == '35' %}selected{% endif %}>35</option>
+                                    <option value="45" {% if data.max_age == '45' %}selected{% endif %}>45</option>
+                                    <option value="55" {% if data.max_age == '55' %}selected{% endif %}>55</option>
+                                    <option value="55+" {% if data.max_age == '55+' %}selected{% endif %}>55+</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="help-text">Age range 22-55+ is pre-configured as requested</div>
+                    </div>
+                </div>
+
+                <!-- Budget Section -->
+                <div class="form-section">
+                    <h3>Budget Allocation</h3>
+                    <div class="form-group">
+                        <label for="adset_budget">Ad Set Daily Budget (USD)</label>
+                        <div class="currency-input">
+                            <input type="number" id="adset_budget" name="adset_budget"
+                                   value="{{ data.adset_budget or '20' }}"
+                                   min="5" max="1000" step="1"
+                                   placeholder="20"
+                                   required>
+                        </div>
+                        <div class="help-text">Budget per ad set per day. Total daily spend will be this amount × number of ad sets</div>
+                    </div>
+                </div>
+
+                <!-- Live Targeting Preview -->
+                <div class="targeting-preview" id="targetingPreview" style="display: none;">
+                    <h3>🎯 Targeting Preview</h3>
+                    <div class="preview-grid">
+                        <div class="preview-item">
+                            <div class="preview-label">Countries</div>
+                            <div class="preview-value" id="previewCountries">-</div>
+                        </div>
+                        <div class="preview-item">
+                            <div class="preview-label">Age Range</div>
+                            <div class="preview-value" id="previewAge">-</div>
+                        </div>
+                        <div class="preview-item">
+                            <div class="preview-label">Ad Sets</div>
+                            <div class="preview-value" id="previewAdSets">-</div>
+                        </div>
+                        <div class="preview-item">
+                            <div class="preview-label">Total Daily Budget</div>
+                            <div class="preview-value" id="previewTotalBudget">-</div>
+                        </div>
+                        <div class="preview-item">
+                            <div class="preview-label">Estimated Reach</div>
+                            <div class="preview-value" id="previewReach">-</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <a href="/folder-beast/prev" class="btn btn-secondary">← Previous: Campaign</a>
+                <button type="submit" class="btn btn-primary">Next: Ads →</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Country search and control functions
+        function searchCountries() {
+            const searchTerm = document.getElementById('countrySearch').value.toLowerCase();
+            const countryItems = document.querySelectorAll('.country-item');
+
+            countryItems.forEach(item => {
+                const countryName = item.dataset.country;
+                if (countryName.includes(searchTerm)) {
+                    item.classList.remove('hidden');
+                } else {
+                    item.classList.add('hidden');
+                }
+            });
+        }
+
+        function selectAllCountries() {
+            const checkboxes = document.querySelectorAll('input[name="countries"]:not(.country-item.hidden input)');
+            checkboxes.forEach(cb => cb.checked = true);
+            updateSelectedCount();
+            updatePreview();
+        }
+
+        function deselectAllCountries() {
+            const checkboxes = document.querySelectorAll('input[name="countries"]');
+            checkboxes.forEach(cb => cb.checked = false);
+            updateSelectedCount();
+            updatePreview();
+        }
+
+        function selectRecommended() {
+            deselectAllCountries();
+            const saCheckbox = document.getElementById('country_sa');
+            const aeCheckbox = document.getElementById('country_ae');
+            if (saCheckbox) saCheckbox.checked = true;
+            if (aeCheckbox) aeCheckbox.checked = true;
+            updateSelectedCount();
+            updatePreview();
+        }
+
+        function updateSelectedCount() {
+            const selectedCountries = document.querySelectorAll('input[name="countries"]:checked');
+            document.getElementById('selectedCount').textContent = selectedCountries.length;
+        }
+
+        // Set default values
+        document.addEventListener('DOMContentLoaded', function() {
+            // Pre-select Saudi Arabia and UAE
+            const saCheckbox = document.getElementById('country_sa');
+            const aeCheckbox = document.getElementById('country_ae');
+            if (saCheckbox) saCheckbox.checked = true;
+            if (aeCheckbox) aeCheckbox.checked = true;
+
+            // Set age range to 22-55+
+            document.getElementById('min_age').value = '22';
+            document.getElementById('max_age').value = '55';
+
+            // Set default adset status to active
+            document.getElementById('adset_status').value = 'ACTIVE';
+
+            // Set default pixel tracking to enabled
+            document.getElementById('enable_pixel').value = 'true';
+
+            updatePreview();
+            toggleBidAmount();
+            updateSelectedCount();
+
+            // Add search functionality
+            document.getElementById('countrySearch').addEventListener('input', searchCountries);
+
+            // Add change listeners to all country checkboxes
+            document.querySelectorAll('input[name="countries"]').forEach(cb => {
+                cb.addEventListener('change', function() {
+                    updateSelectedCount();
+                    updatePreview();
+                });
+            });
+        });
+
+        // Toggle bid amount field based on bid strategy
+        function toggleBidAmount() {
+            const bidStrategy = document.getElementById('bid_strategy').value;
+            const bidAmountSection = document.getElementById('bid_amount_section');
+
+            if (bidStrategy === 'TARGET_BID' || bidStrategy === 'MAX_BID') {
+                bidAmountSection.style.display = 'block';
+                document.getElementById('bid_amount').required = true;
+            } else {
+                bidAmountSection.style.display = 'none';
+                document.getElementById('bid_amount').required = false;
+            }
+        }
+
+        // Add event listener for bid strategy change
+        document.getElementById('bid_strategy').addEventListener('change', toggleBidAmount);
+
+        // Live preview functionality
+        function updatePreview() {
+            const countries = Array.from(document.querySelectorAll('input[name="countries"]:checked'))
+                .map(cb => cb.nextElementSibling.nextElementSibling.textContent);
+            const minAge = document.getElementById('min_age').value;
+            const maxAge = document.getElementById('max_age').value;
+            const numAdSets = document.getElementById('num_adsets').value;
+            const adSetBudget = document.getElementById('adset_budget').value;
+
+            if (countries.length > 0 || minAge || maxAge || adSetBudget) {
+                document.getElementById('targetingPreview').style.display = 'block';
+
+                document.getElementById('previewCountries').textContent =
+                    countries.length > 0 ? countries.join(', ') : 'None selected';
+
+                document.getElementById('previewAge').textContent =
+                    minAge && maxAge ? `${minAge}-${maxAge} years` : 'Not set';
+
+                document.getElementById('previewAdSets').textContent =
+                    numAdSets ? `${numAdSets} ad sets` : 'Not set';
+
+                const totalBudget = adSetBudget && numAdSets ?
+                    parseInt(adSetBudget) * parseInt(numAdSets) : 0;
+                document.getElementById('previewTotalBudget').textContent =
+                    totalBudget ? `$${totalBudget}/day` : 'Not calculated';
+
+                // Estimate reach based on countries and budget
+                const countryMultiplier = countries.length * 1000000; // Rough population multiplier
+                const budgetMultiplier = totalBudget * 50;
+                const estimatedReach = Math.floor((countryMultiplier + budgetMultiplier) * (Math.random() * 0.3 + 0.1));
+                document.getElementById('previewReach').textContent =
+                    estimatedReach ? `${estimatedReach.toLocaleString()} people` : '-';
+            } else {
+                document.getElementById('targetingPreview').style.display = 'none';
+            }
+        }
+
+        // Show/hide pixel_id field based on enable_pixel dropdown
+        function togglePixelIdField() {
+            const enablePixel = document.getElementById('enable_pixel').value;
+            const pixelIdGroup = document.getElementById('pixel_id_group');
+
+            if (enablePixel === 'true') {
+                pixelIdGroup.style.display = 'block';
+                document.getElementById('pixel_id').required = true;
+            } else {
+                pixelIdGroup.style.display = 'none';
+                document.getElementById('pixel_id').required = false;
+            }
+        }
+
+        // Add event listeners
+        document.querySelectorAll('input[name="countries"]').forEach(cb => {
+            cb.addEventListener('change', updatePreview);
+        });
+        document.getElementById('min_age').addEventListener('change', updatePreview);
+        document.getElementById('max_age').addEventListener('change', updatePreview);
+        document.getElementById('num_adsets').addEventListener('change', updatePreview);
+        document.getElementById('adset_budget').addEventListener('input', updatePreview);
+        document.getElementById('enable_pixel').addEventListener('change', togglePixelIdField);
+
+        // Form validation
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const countries = document.querySelectorAll('input[name="countries"]:checked');
+            const minAge = parseInt(document.getElementById('min_age').value);
+            const maxAge = parseInt(document.getElementById('max_age').value);
+            const budget = parseInt(document.getElementById('adset_budget').value);
+
+            if (countries.length === 0) {
+                alert('Please select at least one country');
+                e.preventDefault();
+                return;
+            }
+
+            if (minAge >= maxAge) {
+                alert('Maximum age must be greater than minimum age');
+                e.preventDefault();
+                return;
+            }
+
+            if (!budget || budget < 5) {
+                alert('Ad set budget must be at least $5');
+                e.preventDefault();
+                return;
+            }
+
+            // Validate pixel_id if pixel tracking is enabled
+            const enablePixel = document.getElementById('enable_pixel').value;
+            const pixelId = document.getElementById('pixel_id').value.trim();
+
+            if (enablePixel === 'true' && !pixelId) {
+                alert('Please enter a Snapchat Pixel ID when pixel tracking is enabled');
+                e.preventDefault();
+                return;
+            }
+        });
+
+        // Initialize pixel field visibility on page load
+        togglePixelIdField();
+    </script>
+</body>
+</html>

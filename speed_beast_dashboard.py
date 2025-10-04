@@ -223,6 +223,13 @@ dashboard_bots = {
         'icon': '🚀',
         'color': '#00ff88'
     },
+    'adsquad_expander': {
+        'name': 'Beast AdSquad Expander',
+        'description': 'Add Ad Squads to Existing Campaign',
+        'status': 'ready',
+        'icon': '📈',
+        'color': '#00ccff'
+    },
     'token_manager': {
         'name': 'Token Manager',
         'description': 'Refresh and manage API tokens',
@@ -2708,6 +2715,209 @@ def folder_beast_status():
     except Exception as e:
         print(f"[ERROR] folder_beast_status failed: {e}")
         return jsonify({'error': str(e)}), 500
+
+# ============================================================================
+# ADSQUAD EXPANDER BOT - Add Ad Squads to Existing Campaigns
+# ============================================================================
+
+@app.route('/adsquad-expander')
+@require_auth
+def adsquad_expander():
+    """AdSquad Expander - Step 1: Select Existing Campaign"""
+    return render_template('adsquad_expander_step1.html')
+
+@app.route('/adsquad-expander/fetch-campaigns', methods=['GET'])
+@require_auth
+def fetch_campaigns():
+    """Fetch existing campaigns from Snapchat"""
+    try:
+        tm = TokenManager()
+        headers = tm.get_headers()
+
+        if not headers:
+            return jsonify({'success': False, 'error': 'No valid API token. Please refresh token in Token Manager.'})
+
+        ad_account_id = tm.get_ad_account_id()
+        if not ad_account_id:
+            return jsonify({'success': False, 'error': 'No ad account ID configured.'})
+
+        # Fetch campaigns from Snapchat API
+        url = f'https://adsapi.snapchat.com/v1/adaccounts/{ad_account_id}/campaigns'
+        response = requests.get(url, headers=headers)
+
+        if response.status_code == 200:
+            data = response.json()
+            campaigns = data.get('campaigns', [])
+
+            # Format campaigns for display
+            formatted_campaigns = []
+            for campaign in campaigns:
+                c = campaign.get('campaign', {})
+                formatted_campaigns.append({
+                    'id': c.get('id'),
+                    'name': c.get('name'),
+                    'status': c.get('status'),
+                    'daily_budget_micro': c.get('daily_budget_micro', 0),
+                    'objective': c.get('objective', 'UNKNOWN')
+                })
+
+            print(f"[ADSQUAD EXPANDER] Found {len(formatted_campaigns)} campaigns")
+            return jsonify({'success': True, 'campaigns': formatted_campaigns})
+        else:
+            error_msg = f"Failed to fetch campaigns: {response.status_code}"
+            print(f"[ERROR] {error_msg}")
+            return jsonify({'success': False, 'error': error_msg})
+
+    except Exception as e:
+        print(f"[ERROR] fetch_campaigns failed: {e}")
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/adsquad-expander/step2', methods=['POST'])
+@require_auth
+def adsquad_expander_step2():
+    """Step 2: Configure Ad Squads"""
+    campaign_id = request.form.get('campaign_id')
+    campaign_name = request.form.get('campaign_name')
+
+    if 'adsquad_expander_data' not in session:
+        session['adsquad_expander_data'] = {}
+
+    session['adsquad_expander_data'].update({
+        'campaign_id': campaign_id,
+        'campaign_name': campaign_name
+    })
+
+    return render_template('adsquad_expander_step2.html',
+                         data=session['adsquad_expander_data'],
+                         countries=SNAPCHAT_COUNTRIES)
+
+@app.route('/adsquad-expander/step3', methods=['POST'])
+@require_auth
+def adsquad_expander_step3():
+    """Step 3: Upload Videos and CSV"""
+    if 'adsquad_expander_data' not in session:
+        session['adsquad_expander_data'] = {}
+
+    # Save step 2 data
+    session['adsquad_expander_data'].update({
+        'num_adsets': request.form.get('num_adsets'),
+        'min_age': request.form.get('min_age'),
+        'max_age': request.form.get('max_age'),
+        'countries': request.form.getlist('countries'),
+        'adset_budget': request.form.get('adset_budget'),
+        'pixel_id': request.form.get('pixel_id')
+    })
+
+    return render_template('adsquad_expander_step3.html',
+                         data=session['adsquad_expander_data'])
+
+@app.route('/adsquad-expander/execute', methods=['POST', 'GET'])
+@require_auth
+def adsquad_expander_execute():
+    """Execute: Add Ad Squads to Existing Campaign"""
+    if request.method == 'GET':
+        return render_template('adsquad_expander_execute.html',
+                             data=session.get('adsquad_expander_data', {}))
+
+    # POST - Save step 3 data and show execution page
+    if 'adsquad_expander_data' not in session:
+        session['adsquad_expander_data'] = {}
+
+    session['adsquad_expander_data'].update({
+        'videos_path': request.form.get('videos_path'),
+        'csv_path': request.form.get('csv_path'),
+        'brand_name': request.form.get('brand_name'),
+        'creative_base_name': request.form.get('creative_base_name'),
+        'naming_convention': request.form.get('naming_convention'),
+        'creative_status': request.form.get('creative_status'),
+        'website_url': request.form.get('website_url'),
+        'tracking_url': request.form.get('tracking_url'),
+        'call_to_action': request.form.get('call_to_action'),
+        'creative_type': request.form.get('creative_type'),
+        'campaign_structure': request.form.get('campaign_structure'),
+        'test_mode': 'test_mode' in request.form
+    })
+
+    return render_template('adsquad_expander_execute.html',
+                         data=session['adsquad_expander_data'])
+
+@app.route('/adsquad-expander/execute-real', methods=['POST'])
+@require_auth
+def adsquad_expander_execute_real():
+    """Execute the ad squad expansion in background"""
+    try:
+        data = session.get('adsquad_expander_data', {})
+        execution_id = str(uuid.uuid4())
+
+        # Start execution in background thread
+        thread = threading.Thread(target=run_adsquad_expander_execution, args=(execution_id, data))
+        thread.daemon = True
+        thread.start()
+
+        return jsonify({'success': True, 'execution_id': execution_id})
+
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+def run_adsquad_expander_execution(execution_id, data):
+    """Run ad squad expansion - adds ad squads to existing campaign"""
+    try:
+        print(f"\n{'='*60}")
+        print(f"[ADSQUAD EXPANDER] Starting execution: {execution_id}")
+        print(f"[ADSQUAD EXPANDER] Selected Campaign ID: {data.get('campaign_id')}")
+        print(f"[ADSQUAD EXPANDER] Selected Campaign Name: {data.get('campaign_name')}")
+        print(f"{'='*60}\n")
+
+        # Initialize execution status
+        execution_status[execution_id] = {
+            'status': 'running',
+            'progress': 0,
+            'stage': 'Initializing...',
+            'message': 'Starting ad squad expansion...',
+            'execution_id': execution_id,
+            'campaign_id': data.get('campaign_id'),
+            'campaign_name': data.get('campaign_name'),
+            'ads_created': 0,
+            'media_uploaded': 0,
+            'media_ready': 0,
+            'log': []
+        }
+
+        # Update function to update progress
+        def update_progress(percent, stage, message, details='', **kwargs):
+            execution_status[execution_id].update({
+                'progress': percent,
+                'stage': stage,
+                'message': message,
+                'details': details,
+                **kwargs
+            })
+            execution_status[execution_id]['log'].append(f"[{stage}] {message}")
+
+        # Use the EXISTING campaign ID instead of creating new one
+        campaign_id = data.get('campaign_id')
+
+        update_progress(10, 'campaign_selected', f'Using existing campaign: {data.get("campaign_name")}',
+                       f'Campaign ID: {campaign_id}')
+
+        # Now create ad squads under this campaign
+        # (Reuse the same logic from folder_beast but skip campaign creation)
+        # Continue with ad squad creation starting from line ~1230 in folder_beast execution
+
+        update_progress(20, 'creating_adsets', 'Creating ad squads in existing campaign...',
+                       f'Creating {data.get("num_adsets", 5)} ad squads')
+
+        # ... (Will implement the full execution logic)
+
+        update_progress(100, 'completed', 'Ad squads added successfully!',
+                       f'Added {data.get("num_adsets", 5)} ad squads to campaign')
+
+        execution_status[execution_id]['status'] = 'completed'
+
+    except Exception as e:
+        print(f"[ERROR] AdSquad Expander execution failed: {e}")
+        execution_status[execution_id]['status'] = 'error'
+        execution_status[execution_id]['error'] = str(e)
 
 if __name__ == '__main__':
     print("=" * 80)

@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Step 1: Select Campaign | Beast AdSquad Expander</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #000000 100%);
+            min-height: 100vh;
+            color: #ffffff;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 40px;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            margin: 0 10px;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 10px;
+            color: white;
+        }
+
+        .step.active .step-number {
+            background: #00f5ff;
+            color: #000000;
+            box-shadow: 0 0 20px rgba(0, 245, 255, 0.5);
+        }
+
+        .step.inactive .step-number {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .step-label {
+            color: white;
+            font-weight: 500;
+        }
+
+        .form-card {
+            background: rgba(0,0,0,0.6);
+            border: 1px solid rgba(0, 245, 255, 0.3);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 245, 255, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .loading-spinner {
+            border: 4px solid rgba(0, 0, 0, 0.3);
+            border-top: 4px solid #00f5ff;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .campaigns-list {
+            margin-top: 30px;
+        }
+
+        .campaign-item {
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid rgba(0, 245, 255, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .campaign-item:hover {
+            border-color: rgba(0, 245, 255, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0, 245, 255, 0.2);
+        }
+
+        .campaign-item.selected {
+            border-color: #00f5ff;
+            background: rgba(0, 245, 255, 0.1);
+        }
+
+        .campaign-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #00f5ff;
+            margin-bottom: 8px;
+        }
+
+        .campaign-details {
+            display: flex;
+            gap: 20px;
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .campaign-status {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-ACTIVE {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+        }
+
+        .status-PAUSED {
+            background: rgba(255, 165, 0, 0.2);
+            color: #ffa500;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ff1a1a, #ff4444);
+            color: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            font-size: 1.1rem;
+            padding: 18px 40px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 26, 26, 0.4);
+        }
+
+        .btn-primary:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 40px;
+        }
+
+        .error-message {
+            background: rgba(255, 26, 26, 0.15);
+            border: 2px solid #ff1a1a;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📈 Beast AdSquad Expander</h1>
+            <p>Step 1: Select Existing Campaign</p>
+        </div>
+
+        <div class="step-indicator">
+            <div class="step active">
+                <div class="step-number">1</div>
+                <div class="step-label">Select Campaign</div>
+            </div>
+            <div class="step inactive">
+                <div class="step-number">2</div>
+                <div class="step-label">Configure Ad Squads</div>
+            </div>
+            <div class="step inactive">
+                <div class="step-number">3</div>
+                <div class="step-label">Upload Media</div>
+            </div>
+        </div>
+
+        <div class="form-card">
+            <div id="loadingSection" class="loading">
+                <div class="loading-spinner"></div>
+                <p>Fetching your Snapchat campaigns...</p>
+            </div>
+
+            <div id="campaignsSection" style="display: none;">
+                <h2 style="margin-bottom: 20px; color: #00f5ff;">Select a Campaign to Expand:</h2>
+                <div id="campaignsList" class="campaigns-list"></div>
+
+                <form method="POST" action="/adsquad-expander/step2" id="campaignForm">
+                    <input type="hidden" name="campaign_id" id="selectedCampaignId" required>
+                    <input type="hidden" name="campaign_name" id="selectedCampaignName">
+
+                    <div class="button-group">
+                        <a href="/" class="btn" style="background: #95a5a6; color: white;">← Back to Dashboard</a>
+                        <button type="submit" class="btn btn-primary" id="continueBtn" disabled>Continue to Ad Squads →</button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="errorSection" style="display: none;">
+                <div class="error-message">
+                    <h2>❌ Error</h2>
+                    <p id="errorText"></p>
+                </div>
+                <div class="button-group">
+                    <a href="/" class="btn" style="background: #95a5a6; color: white;">← Back to Dashboard</a>
+                    <button onclick="loadCampaigns()" class="btn btn-primary">🔄 Retry</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedCampaignId = null;
+
+        // Load campaigns on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCampaigns();
+        });
+
+        function loadCampaigns() {
+            document.getElementById('loadingSection').style.display = 'block';
+            document.getElementById('campaignsSection').style.display = 'none';
+            document.getElementById('errorSection').style.display = 'none';
+
+            fetch('/adsquad-expander/fetch-campaigns')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        displayCampaigns(data.campaigns);
+                    } else {
+                        showError(data.error || 'Failed to fetch campaigns');
+                    }
+                })
+                .catch(error => {
+                    showError('Network error: ' + error.message);
+                });
+        }
+
+        function displayCampaigns(campaigns) {
+            document.getElementById('loadingSection').style.display = 'none';
+            document.getElementById('campaignsSection').style.display = 'block';
+
+            const campaignsList = document.getElementById('campaignsList');
+            campaignsList.innerHTML = '';
+
+            if (campaigns.length === 0) {
+                campaignsList.innerHTML = '<p style="text-align: center; padding: 40px; color: rgba(255,255,255,0.6);">No campaigns found in your account.</p>';
+                return;
+            }
+
+            campaigns.forEach(campaign => {
+                const campaignDiv = document.createElement('div');
+                campaignDiv.className = 'campaign-item';
+                campaignDiv.onclick = () => selectCampaign(campaign.id, campaign.name, campaignDiv);
+
+                const budget = (campaign.daily_budget_micro / 1000000).toFixed(2);
+
+                campaignDiv.innerHTML = `
+                    <div class="campaign-name">${campaign.name}</div>
+                    <div class="campaign-details">
+                        <span><strong>ID:</strong> ${campaign.id}</span>
+                        <span class="campaign-status status-${campaign.status}">${campaign.status}</span>
+                        <span><strong>Budget:</strong> $${budget}/day</span>
+                        <span><strong>Objective:</strong> ${campaign.objective}</span>
+                    </div>
+                `;
+
+                campaignsList.appendChild(campaignDiv);
+            });
+        }
+
+        function selectCampaign(id, name, element) {
+            // Remove previous selection
+            document.querySelectorAll('.campaign-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+
+            // Add selection to clicked item
+            element.classList.add('selected');
+
+            // Update form fields
+            selectedCampaignId = id;
+            document.getElementById('selectedCampaignId').value = id;
+            document.getElementById('selectedCampaignName').value = name;
+
+            // Enable continue button
+            document.getElementById('continueBtn').disabled = false;
+        }
+
+        function showError(message) {
+            document.getElementById('loadingSection').style.display = 'none';
+            document.getElementById('campaignsSection').style.display = 'none';
+            document.getElementById('errorSection').style.display = 'block';
+            document.getElementById('errorText').textContent = message;
+        }
+    </script>
+</body>
+</html>
