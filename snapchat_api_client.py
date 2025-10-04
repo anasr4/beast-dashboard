@@ -210,7 +210,7 @@ class SnapchatAPIClient:
         print(f"Timeout waiting for media {media_id} to be ready after {timeout}s")
         return False
 
-    def upload_media(self, ad_account_id: str, media_file_path: str, media_type: str = 'IMAGE') -> Dict:
+    def upload_media(self, ad_account_id: str, media_file_path: str, media_type: str = 'IMAGE', wait_for_ready: bool = False) -> Dict:
         import os
         media_name = os.path.basename(media_file_path)
 
@@ -235,9 +235,11 @@ class SnapchatAPIClient:
         # Then upload the file to that media ID
         self.upload_media_file(media_id, media_file_path)
 
-        # Wait for media to be ready before proceeding
-        if not self.wait_for_media_ready(media_id):
-            print(f"Warning: Media {media_id} may not be ready, continuing anyway...")
+        # FAST MODE: Skip waiting for each video (batch wait later instead)
+        # Only wait if explicitly requested
+        if wait_for_ready:
+            if not self.wait_for_media_ready(media_id):
+                print(f"Warning: Media {media_id} may not be ready, continuing anyway...")
 
         return media
 
