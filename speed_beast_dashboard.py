@@ -217,7 +217,7 @@ def require_auth(f):
 # Global variables to track progress
 dashboard_bots = {
     'folder_beast': {
-        'name': 'Optimized Folder Beast Mode',
+        'name': 'Beast Campaign Bot',
         'description': '200 Ads in Under 10 Minutes!',
         'status': 'ready',
         'icon': '🚀',
