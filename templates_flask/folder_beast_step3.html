@@ -629,15 +629,35 @@
                             <div id="video_validation" class="file-validation" style="display: none;"></div>
                         </div>
                         <div class="form-group">
-                            <label for="csv_path">📄 Headlines CSV File Path</label>
-                            <div class="path-input">
-                                <input type="text" id="csv_path" name="csv_path"
-                                       value="{{ data.csv_path or 'D:\\snapchat_headlines_khaleeji_200 (1) - snapchat_headlines_khaleeji_200 (1).csv.csv' }}"
-                                       placeholder="Path to your headlines CSV file"
-                                       required>
-                                <button type="button" class="browse-btn" onclick="selectFile('csv_path')">📄 Browse</button>
+                            <label for="csv_path">📄 Headlines CSV File - Upload to Server</label>
+
+                            <!-- CSV Upload Button -->
+                            <div style="border: 2px dashed #667eea; border-radius: 12px; padding: 30px; text-align: center; background: rgba(102, 126, 234, 0.1); cursor: pointer;">
+                                <div style="font-size: 2.5rem;">📄</div>
+                                <div style="font-size: 1.1rem; font-weight: bold; color: #ffffff; margin: 10px 0;">Upload Headlines CSV File</div>
+                                <button type="button" class="browse-btn" onclick="document.getElementById('csv_upload').click()" style="position: relative; transform: none; padding: 12px 24px; font-size: 1rem;">📄 Browse CSV</button>
+                                <input type="file" id="csv_upload" accept=".csv,.txt" style="display: none;">
                             </div>
-                            <div class="help-text">📝 CSV file with exactly 200 unique headlines/descriptions</div>
+
+                            <!-- Hidden input for server path (auto-filled after upload) -->
+                            <input type="hidden" id="csv_path" name="csv_path" required>
+
+                            <!-- Upload Progress -->
+                            <div id="csv_upload_progress" style="display: none; margin-top: 15px;">
+                                <div style="background: rgba(0,0,0,0.4); border-radius: 10px; overflow: hidden; height: 25px; margin-bottom: 10px;">
+                                    <div id="csv_upload_bar" style="background: linear-gradient(90deg, #00f5ff, #0080ff); height: 100%; width: 0%; transition: width 0.3s; display: flex; align-items: center; justify-content: center; color: #000; font-weight: bold; font-size: 0.9rem;"></div>
+                                </div>
+                                <div id="csv_upload_status" style="text-align: center; color: #00f5ff; font-weight: 600; font-size: 0.9rem;"></div>
+                            </div>
+
+                            <!-- Success Confirmation -->
+                            <div id="csv_confirmation" style="display: none; margin-top: 15px; background: rgba(0, 245, 255, 0.2); border: 2px solid #00f5ff; border-radius: 10px; padding: 15px; text-align: center;">
+                                <div style="font-size: 1.5rem; margin-bottom: 8px;">✅</div>
+                                <div style="font-size: 1.1rem; font-weight: bold; color: #00f5ff; margin-bottom: 5px;">CSV UPLOADED TO SERVER</div>
+                                <div id="csv_info" style="color: rgba(255,255,255,0.9); font-size: 0.9rem;"></div>
+                            </div>
+
+                            <div class="help-text">📝 CSV file with headlines/descriptions - Will be uploaded to Railway server</div>
                             <div id="csv_validation" class="file-validation" style="display: none;"></div>
                         </div>
                     </div>
@@ -1016,6 +1036,90 @@
 
             // Send request
             xhr.open('POST', '/api/upload-videos');
+            xhr.send(formData);
+        }
+
+        // CSV upload handling
+        const csvUploadInput = document.getElementById('csv_upload');
+        const csvUploadProgress = document.getElementById('csv_upload_progress');
+        const csvUploadBar = document.getElementById('csv_upload_bar');
+        const csvUploadStatus = document.getElementById('csv_upload_status');
+        const csvConfirmation = document.getElementById('csv_confirmation');
+        const csvInfo = document.getElementById('csv_info');
+        const csvPathInput = document.getElementById('csv_path');
+
+        csvUploadInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                uploadCSVToServer(file);
+            }
+        });
+
+        async function uploadCSVToServer(file) {
+            console.log(`[CSV UPLOAD] Starting upload of ${file.name}`);
+
+            // Show progress
+            csvUploadProgress.style.display = 'block';
+            csvConfirmation.style.display = 'none';
+
+            // Create FormData
+            const formData = new FormData();
+            formData.append('csv_file', file);
+
+            // Create XMLHttpRequest for progress tracking
+            const xhr = new XMLHttpRequest();
+
+            // Progress event
+            xhr.upload.addEventListener('progress', (e) => {
+                if (e.lengthComputable) {
+                    const percent = (e.loaded / e.total) * 100;
+                    csvUploadBar.style.width = percent + '%';
+                    csvUploadBar.textContent = Math.round(percent) + '%';
+                    csvUploadStatus.textContent = `Uploading ${file.name}... ${(e.loaded / 1024).toFixed(1)} KB / ${(e.total / 1024).toFixed(1)} KB`;
+                }
+            });
+
+            // Load event (upload complete)
+            xhr.addEventListener('load', () => {
+                if (xhr.status === 200) {
+                    try {
+                        const result = JSON.parse(xhr.responseText);
+                        console.log('[CSV UPLOAD] Success:', result);
+
+                        // Hide progress
+                        csvUploadProgress.style.display = 'none';
+
+                        // Show confirmation
+                        csvConfirmation.style.display = 'block';
+                        csvInfo.textContent = `File uploaded to: ${result.file_path}`;
+
+                        // AUTO-FILL THE PATH!
+                        csvPathInput.value = result.file_path;
+                        console.log('[CSV UPLOAD] Auto-filled path:', result.file_path);
+
+                        // Update preview
+                        updatePreview();
+                    } catch (error) {
+                        console.error('[CSV UPLOAD] Parse error:', error);
+                        alert('CSV upload completed but response parsing failed');
+                        csvUploadProgress.style.display = 'none';
+                    }
+                } else {
+                    console.error('[CSV UPLOAD] HTTP error:', xhr.status, xhr.responseText);
+                    alert('CSV upload failed: ' + xhr.statusText);
+                    csvUploadProgress.style.display = 'none';
+                }
+            });
+
+            // Error event
+            xhr.addEventListener('error', () => {
+                console.error('[CSV UPLOAD] Network error');
+                alert('CSV upload failed: Network error');
+                csvUploadProgress.style.display = 'none';
+            });
+
+            // Send request
+            xhr.open('POST', '/api/upload-csv');
             xhr.send(formData);
         }
 

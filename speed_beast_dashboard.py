@@ -354,6 +354,42 @@ def upload_videos():
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
 
+@app.route('/api/upload-csv', methods=['POST'])
+@require_auth
+def upload_csv():
+    """Upload CSV file to server"""
+    try:
+        if 'csv_file' not in request.files:
+            return jsonify({'success': False, 'error': 'No CSV file in request'})
+
+        csv_file = request.files['csv_file']
+
+        if csv_file.filename == '':
+            return jsonify({'success': False, 'error': 'No file selected'})
+
+        # Create upload folder with timestamp
+        upload_folder = f'/tmp/beast_uploads/csv_{int(time.time())}'
+        os.makedirs(upload_folder, exist_ok=True)
+
+        # Save CSV file
+        filename = secure_filename(csv_file.filename)
+        filepath = os.path.join(upload_folder, filename)
+        csv_file.save(filepath)
+
+        print(f"[CSV UPLOAD] Saved CSV file to: {filepath}")
+
+        # Return FULL path
+        return jsonify({
+            'success': True,
+            'file_path': filepath,  # Full path like /tmp/beast_uploads/csv_1234567890/headlines.csv
+            'filename': filename,
+            'message': f'CSV file uploaded successfully'
+        })
+
+    except Exception as e:
+        print(f"[CSV UPLOAD ERROR] {str(e)}")
+        return jsonify({'success': False, 'error': str(e)})
+
 @app.route('/folder-beast')
 @require_auth
 def folder_beast():
