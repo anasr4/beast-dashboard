@@ -1391,7 +1391,7 @@ def execute_optimized_beast_mode(execution_id, data):
             else:
                 with open(csv_file, 'r', encoding='utf-8') as f:
                     lines = f.readlines()
-                    for line in lines[1:]:  # Skip header
+                    for line in lines:  # Don't skip first line - use all headlines from CSV
                         headline = line.strip()
                         if headline and len(headline) <= 34:  # Snapchat limit
                             headlines.append(headline)
@@ -1528,7 +1528,7 @@ def execute_optimized_beast_mode(execution_id, data):
                                     'deep_link_urls': [],
                                     'block_preload': True
                                 },
-                                'shareable': True
+                                'shareable': False
                             }]
                         }
 

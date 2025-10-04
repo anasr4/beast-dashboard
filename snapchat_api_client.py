@@ -473,7 +473,7 @@ class SnapchatCampaignBuilder:
             'headline': headline,
             'brand_name': brand_name or 'anas',  # Use brand name from manual
             'top_snap_media_id': media_id,
-            'shareable': True,
+            'shareable': False,
             'call_to_action': cta_type.upper(),
             'web_view_properties': {
                 'url': landing_page_url,
