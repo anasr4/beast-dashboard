@@ -500,23 +500,24 @@
                     <div class="section-content" id="ads-content">
                         <div class="form-grid">
                             <div class="form-group">
-                                <label for="videos_upload">Select Video Folder:</label>
+                                <label for="videos_folder_path">Video Folder Path:</label>
 
-                                <div class="file-upload-area" onclick="document.getElementById('videos_upload').click()" style="cursor: pointer; border: 2px dashed #ff1a1a; padding: 20px; border-radius: 10px; text-align: center; background: rgba(255, 26, 26, 0.1);">
-                                    <div style="font-size: 3rem; margin-bottom: 15px;">📁</div>
-                                    <div id="upload-text" style="font-size: 1.1rem; font-weight: bold;">Click to select folder with videos</div>
-                                    <div style="font-size: 0.9rem; opacity: 0.7; margin-top: 10px;">
-                                        Bot will upload videos automatically when you start campaign
-                                    </div>
+                                <!-- Folder Browse Button -->
+                                <div style="display: flex; gap: 10px; align-items: center;">
+                                    <input type="text" id="videos_folder_path" name="videos_folder"
+                                           class="modern-input"
+                                           placeholder="C:\path\to\videos or click Browse..."
+                                           style="flex: 1;" required>
+
+                                    <button type="button" onclick="document.getElementById('folder_browser').click()"
+                                            style="padding: 12px 24px; background: linear-gradient(135deg, #ff1a1a, #cc0000); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; white-space: nowrap;">
+                                        📁 Browse
+                                    </button>
+
+                                    <input type="file" id="folder_browser" webkitdirectory directory multiple style="display: none;">
                                 </div>
 
-                                <input type="file" id="videos_upload" name="videos"
-                                       webkitdirectory directory multiple
-                                       onchange="alert('✅ Files selected: ' + this.files.length);"
-                                       style="display: none;">
-
-                                <input type="hidden" id="videos_folder" name="videos_folder" value="">
-
+                                <!-- GREEN CONFIRMATION -->
                                 <div id="folder-confirmation" style="display: none; margin-top: 15px; padding: 20px; background: linear-gradient(135deg, #00ff88, #00cc66); color: #000; border-radius: 10px; text-align: center; font-weight: bold; font-size: 18px; box-shadow: 0 4px 15px rgba(0, 255, 136, 0.5);">
                                     ✅ FOLDER SELECTED
                                     <div id="folder-info" style="font-size: 14px; margin-top: 10px; opacity: 0.8;"></div>
@@ -600,70 +601,65 @@
             }
         });
 
-        // Video folder selection handler - JUST SELECT, NO UPLOAD YET
+        // SIMPLE folder path handler
         let selectedVideos = [];
-        const videosUploadInput = document.getElementById('videos_upload');
+        const folderPathInput = document.getElementById('videos_folder_path');
+        const folderBrowser = document.getElementById('folder_browser');
         const folderConfirmation = document.getElementById('folder-confirmation');
         const folderInfo = document.getElementById('folder-info');
 
-        videosUploadInput.addEventListener('change', function(e) {
-            console.log('🔔 Change event fired!');
-            console.log('Files count:', e.target.files.length);
+        // When user TYPES a path
+        folderPathInput.addEventListener('input', function() {
+            const path = this.value.trim();
+            if (path.length > 0) {
+                // Show GREEN confirmation
+                folderConfirmation.style.display = 'block';
+                folderInfo.textContent = `Path: "${path}" • Bot will load videos during execution`;
+            } else {
+                folderConfirmation.style.display = 'none';
+            }
+        });
 
+        // When user BROWSES for folder
+        folderBrowser.addEventListener('change', function(e) {
             const files = Array.from(e.target.files);
 
             if (files.length === 0) {
-                console.log('❌ No files selected');
-                alert('No files selected. Please select a folder with video files.');
                 return;
             }
 
-            console.log('📁 Processing', files.length, 'files...');
-
             // Filter video files
             selectedVideos = files.filter(f => {
-                const isVideo = f.type.startsWith('video/') ||
+                return f.type.startsWith('video/') ||
                        f.name.toLowerCase().endsWith('.mp4') ||
                        f.name.toLowerCase().endsWith('.mov') ||
                        f.name.toLowerCase().endsWith('.avi') ||
                        f.name.toLowerCase().endsWith('.mkv') ||
                        f.name.toLowerCase().endsWith('.wmv') ||
                        f.name.toLowerCase().endsWith('.flv');
-
-                if (isVideo) console.log('✅ Video:', f.name);
-                return isVideo;
             });
 
-            console.log('🎬 Total video files:', selectedVideos.length);
-
             if (selectedVideos.length === 0) {
-                alert('No video files found! Please select a folder containing video files (.mp4, .mov, etc)');
+                alert('No video files found in folder!');
                 return;
             }
 
-            // Get folder name from first file's path
-            let folderName = 'selected_folder';
+            // Get folder path
+            let folderPath = 'selected_folder';
             if (selectedVideos[0].webkitRelativePath) {
-                folderName = selectedVideos[0].webkitRelativePath.split('/')[0];
+                folderPath = selectedVideos[0].webkitRelativePath.split('/')[0];
             }
 
             const totalSizeMB = (selectedVideos.reduce((sum, f) => sum + f.size, 0) / 1024 / 1024).toFixed(1);
 
-            console.log('📂 Folder name:', folderName);
-            console.log('💾 Total size:', totalSizeMB, 'MB');
-
-            // Store folder name in hidden field
-            document.getElementById('videos_folder').value = folderName;
+            // Set path in text input
+            folderPathInput.value = folderPath;
 
             // Show GREEN CONFIRMATION
-            console.log('🟢 Showing green confirmation box...');
             folderConfirmation.style.display = 'block';
-            folderInfo.textContent = `Folder: "${folderName}" • ${selectedVideos.length} videos • ${totalSizeMB} MB`;
+            folderInfo.textContent = `Folder: "${folderPath}" • ${selectedVideos.length} videos • ${totalSizeMB} MB`;
 
-            // Also show alert for debugging
-            alert(`✅ FOLDER SELECTED!\n\nFolder: ${folderName}\nVideos: ${selectedVideos.length}\nSize: ${totalSizeMB} MB`);
-
-            console.log('✅ Folder selected successfully!');
+            console.log('✅ Folder selected:', folderPath, selectedVideos.length, 'videos');
         });
 
         function showGreenPopup(title, subtitle) {
@@ -721,21 +717,20 @@
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            // Check if folder selected
-            if (selectedVideos.length === 0) {
-                alert('Please select a video folder first!');
-                return;
-            }
-
             const formData = new FormData(form);
 
-            // Add all video files to form data
-            selectedVideos.forEach(file => {
-                formData.append('videos', file);
-            });
+            // If user BROWSED and selected files, add them
+            if (selectedVideos.length > 0) {
+                selectedVideos.forEach(file => {
+                    formData.append('videos', file);
+                });
+                startBtn.innerHTML = '🔄 Uploading videos & creating campaign...';
+            } else {
+                // User typed a path - bot will load from that path
+                startBtn.innerHTML = '🔄 Creating campaign...';
+            }
 
             startBtn.disabled = true;
-            startBtn.innerHTML = '🔄 Uploading videos & creating campaign...';
 
             try {
                 const response = await fetch('/folder-beast/execute-real', {
