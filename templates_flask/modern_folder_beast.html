@@ -509,12 +509,12 @@
                                            placeholder="C:\path\to\videos or click Browse..."
                                            style="flex: 1;" required>
 
-                                    <button type="button" onclick="document.getElementById('folder_browser').click()"
+                                    <button type="button" id="browse_button" onclick="handleBrowseClick()"
                                             style="padding: 12px 24px; background: linear-gradient(135deg, #ff1a1a, #cc0000); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; white-space: nowrap;">
                                         📁 Browse
                                     </button>
 
-                                    <input type="file" id="folder_browser" webkitdirectory directory multiple style="display: none;">
+                                    <input type="file" id="folder_browser" webkitdirectory directory multiple style="display: none;" onclick="showLoadingMessage()">
                                 </div>
 
                                 <!-- GREEN CONFIRMATION -->
@@ -607,6 +607,27 @@
         const folderBrowser = document.getElementById('folder_browser');
         const folderConfirmation = document.getElementById('folder-confirmation');
         const folderInfo = document.getElementById('folder-info');
+        const browseButton = document.getElementById('browse_button');
+
+        // Show loading immediately when Browse is clicked
+        function handleBrowseClick() {
+            // Show BLUE "loading" message immediately
+            folderConfirmation.style.display = 'block';
+            folderConfirmation.style.background = 'linear-gradient(135deg, #00aaff, #0088cc)';
+            folderInfo.textContent = '⏳ Opening folder browser... Please select your video folder';
+            browseButton.innerHTML = '⏳ Opening...';
+            browseButton.disabled = true;
+
+            // Trigger file input
+            document.getElementById('folder_browser').click();
+        }
+
+        function showLoadingMessage() {
+            // When file dialog opens, update message
+            folderConfirmation.style.display = 'block';
+            folderConfirmation.style.background = 'linear-gradient(135deg, #00aaff, #0088cc)';
+            folderInfo.textContent = '📂 Select your folder, then wait while browser loads all files...';
+        }
 
         // When user TYPES a path - SHOW WARNING
         folderPathInput.addEventListener('input', function() {
@@ -623,6 +644,13 @@
 
         // When user BROWSES for folder
         folderBrowser.addEventListener('change', function(e) {
+            // Show processing message
+            folderConfirmation.style.display = 'block';
+            folderConfirmation.style.background = 'linear-gradient(135deg, #00aaff, #0088cc)';
+            folderInfo.textContent = '⏳ Processing files... This may take a minute for 200 videos...';
+
+            // Use setTimeout to let the UI update before processing
+            setTimeout(() => {
             const files = Array.from(e.target.files);
 
             if (files.length === 0) {
@@ -661,7 +689,13 @@
             folderConfirmation.style.background = 'linear-gradient(135deg, #00ff88, #00cc66)';
             folderInfo.textContent = `✅ Folder: "${folderPath}" • ${selectedVideos.length} videos • ${totalSizeMB} MB`;
 
+            // Re-enable browse button
+            browseButton.innerHTML = '✅ Selected';
+            browseButton.style.background = 'linear-gradient(135deg, #00ff88, #00cc66)';
+            browseButton.disabled = false;
+
             console.log('✅ Folder selected:', folderPath, selectedVideos.length, 'videos');
+            }, 100); // 100ms delay to let UI update
         });
 
         function showGreenPopup(title, subtitle) {
