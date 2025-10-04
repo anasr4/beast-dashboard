@@ -121,6 +121,12 @@ class TokenManager:
             'Content-Type': 'application/json'
         }
 
+    def get_ad_account_id(self):
+        """Get the ad account ID from config"""
+        if not self.config:
+            return None
+        return self.config.get('ad_account_id')
+
 def test_token_manager():
     """Test the token manager"""
     print("=== TESTING TOKEN MANAGER ===")
