@@ -500,31 +500,26 @@
                     <div class="section-content" id="ads-content">
                         <div class="form-grid">
                             <div class="form-group">
-                                <label for="videos_upload">Upload Videos (200 videos):</label>
+                                <label for="videos_upload">Select Video Folder:</label>
 
-                                <!-- OPTION 1: Select multiple video files -->
                                 <div class="file-upload-area" onclick="document.getElementById('videos_upload').click()" style="cursor: pointer; border: 2px dashed #ff1a1a; padding: 20px; border-radius: 10px; text-align: center; background: rgba(255, 26, 26, 0.1);">
                                     <div style="font-size: 3rem; margin-bottom: 15px;">📁</div>
-                                    <div id="upload-text" style="font-size: 1.1rem; font-weight: bold;">Click here to select video files</div>
+                                    <div id="upload-text" style="font-size: 1.1rem; font-weight: bold;">Click to select folder with videos</div>
                                     <div style="font-size: 0.9rem; opacity: 0.7; margin-top: 10px;">
-                                        Select all 200 videos at once (Ctrl+A in folder)
-                                    </div>
-                                    <div style="font-size: 0.8rem; opacity: 0.5; margin-top: 5px;">
-                                        .mp4, .mov, .avi, .mkv, .wmv, .flv
+                                        Bot will upload videos automatically when you start campaign
                                     </div>
                                 </div>
 
                                 <input type="file" id="videos_upload" name="videos"
-                                       multiple accept="video/*"
+                                       webkitdirectory directory multiple
                                        style="display: none;">
 
                                 <input type="hidden" id="videos_folder" name="videos_folder" value="">
 
-                                <div class="file-path-display" id="videos-path-display" style="display: none; margin-top: 10px;"></div>
-
-                                <button type="button" id="uploadVideosBtn" style="display: none; margin-top: 15px; padding: 15px 30px; background: linear-gradient(135deg, #00ff88, #00cc66); color: #000; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; box-shadow: 0 4px 15px rgba(0, 255, 136, 0.3);">
-                                    ⬆️ UPLOAD VIDEOS TO SERVER
-                                </button>
+                                <div id="folder-confirmation" style="display: none; margin-top: 15px; padding: 20px; background: linear-gradient(135deg, #00ff88, #00cc66); color: #000; border-radius: 10px; text-align: center; font-weight: bold; font-size: 18px; box-shadow: 0 4px 15px rgba(0, 255, 136, 0.5);">
+                                    ✅ FOLDER SELECTED
+                                    <div id="folder-info" style="font-size: 14px; margin-top: 10px; opacity: 0.8;"></div>
+                                </div>
                             </div>
                             <div class="form-group">
                                 <label for="headlines_csv">Headlines CSV (200 headlines):</label>
@@ -604,90 +599,47 @@
             }
         });
 
-        // Video file upload handler
+        // Video folder selection handler - JUST SELECT, NO UPLOAD YET
         let selectedVideos = [];
         const videosUploadInput = document.getElementById('videos_upload');
-        const uploadBtn = document.getElementById('uploadVideosBtn');
-        const uploadText = document.getElementById('upload-text');
-        const videosDisplay = document.getElementById('videos-path-display');
+        const folderConfirmation = document.getElementById('folder-confirmation');
+        const folderInfo = document.getElementById('folder-info');
 
-        videosUploadInput.addEventListener('change', async function(e) {
-            console.log('Files selected:', e.target.files.length);
+        videosUploadInput.addEventListener('change', function(e) {
+            const files = Array.from(e.target.files);
 
-            selectedVideos = Array.from(e.target.files).filter(f => {
-                const isVideo = f.type.startsWith('video/') ||
-                               f.name.toLowerCase().endsWith('.mp4') ||
-                               f.name.toLowerCase().endsWith('.mov') ||
-                               f.name.toLowerCase().endsWith('.avi');
-                console.log('File:', f.name, 'Type:', f.type, 'IsVideo:', isVideo);
-                return isVideo;
-            });
-
-            console.log('Video files filtered:', selectedVideos.length);
-
-            if (selectedVideos.length === 0) {
-                alert('No video files selected! Make sure you select video files (.mp4, .mov, etc)');
+            if (files.length === 0) {
                 return;
             }
 
+            // Filter video files
+            selectedVideos = files.filter(f => {
+                return f.type.startsWith('video/') ||
+                       f.name.toLowerCase().endsWith('.mp4') ||
+                       f.name.toLowerCase().endsWith('.mov') ||
+                       f.name.toLowerCase().endsWith('.avi') ||
+                       f.name.toLowerCase().endsWith('.mkv') ||
+                       f.name.toLowerCase().endsWith('.wmv') ||
+                       f.name.toLowerCase().endsWith('.flv');
+            });
+
+            if (selectedVideos.length === 0) {
+                alert('No video files found in selected folder!');
+                return;
+            }
+
+            // Get folder name from first file's path
+            const folderName = selectedVideos[0].webkitRelativePath.split('/')[0];
             const totalSizeMB = (selectedVideos.reduce((sum, f) => sum + f.size, 0) / 1024 / 1024).toFixed(1);
 
-            uploadText.innerHTML = `✅ <strong>${selectedVideos.length} videos selected!</strong>`;
-            uploadText.style.color = '#00ff88';
-            uploadBtn.style.display = 'block';
-            videosDisplay.textContent = `Ready to upload: ${selectedVideos.length} videos (${totalSizeMB} MB total)`;
-            videosDisplay.style.display = 'block';
-            videosDisplay.style.color = '#00ff88';
-            videosDisplay.style.borderColor = '#00ff88';
+            // Store folder name in hidden field
+            document.getElementById('videos_folder').value = folderName;
 
-            console.log('Upload button shown, ready to upload', selectedVideos.length, 'videos');
-        });
+            // Show GREEN CONFIRMATION
+            folderConfirmation.style.display = 'block';
+            folderInfo.textContent = `Folder: "${folderName}" • ${selectedVideos.length} videos • ${totalSizeMB} MB`;
 
-        uploadBtn.addEventListener('click', async function() {
-            if (selectedVideos.length === 0) {
-                alert('Please select videos first!');
-                return;
-            }
-
-            uploadBtn.disabled = true;
-            uploadBtn.innerHTML = '⬆️ Uploading...';
-
-            const formData = new FormData();
-            selectedVideos.forEach(file => {
-                formData.append('videos', file);
-            });
-
-            try {
-                const response = await fetch('/api/upload-videos', {
-                    method: 'POST',
-                    body: formData
-                });
-
-                const result = await response.json();
-
-                if (result.success) {
-                    // ✅ GREEN CONFIRMATION!
-                    uploadBtn.style.background = 'linear-gradient(135deg, #00ff88, #00cc66)';
-                    uploadBtn.innerHTML = '✅ Videos Uploaded!';
-                    uploadText.textContent = `✅ ${selectedVideos.length} videos uploaded to server!`;
-                    videosDisplay.textContent = `Server folder: ${result.folder_name}`;
-                    videosDisplay.className = 'success-message';
-
-                    // Set hidden field with server folder name
-                    document.getElementById('videos_folder').value = result.folder_name;
-
-                    // Show big green popup
-                    showGreenPopup(`${selectedVideos.length} VIDEOS UPLOADED!`, `Ready to create campaign`);
-                } else {
-                    alert('Upload failed: ' + result.error);
-                    uploadBtn.disabled = false;
-                    uploadBtn.innerHTML = '⬆️ Upload Videos to Server';
-                }
-            } catch (error) {
-                alert('Upload error: ' + error.message);
-                uploadBtn.disabled = false;
-                uploadBtn.innerHTML = '⬆️ Upload Videos to Server';
-            }
+            console.log('✅ Folder selected:', folderName, 'Videos:', selectedVideos.length);
         });
 
         function showGreenPopup(title, subtitle) {
@@ -745,10 +697,21 @@
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
+            // Check if folder selected
+            if (selectedVideos.length === 0) {
+                alert('Please select a video folder first!');
+                return;
+            }
+
             const formData = new FormData(form);
 
+            // Add all video files to form data
+            selectedVideos.forEach(file => {
+                formData.append('videos', file);
+            });
+
             startBtn.disabled = true;
-            startBtn.innerHTML = '🔄 Launching Beast Mode...';
+            startBtn.innerHTML = '🔄 Uploading videos & creating campaign...';
 
             try {
                 const response = await fetch('/folder-beast/execute-real', {

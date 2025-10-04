@@ -540,6 +540,25 @@ def folder_beast_execute_real():
     # If form data is present, use it instead of session data
     form_campaign_name = request.form.get('campaign_name')
     if form_campaign_name:
+        # Save uploaded videos first
+        video_folder_path = ''
+        if 'videos' in request.files:
+            videos = request.files.getlist('videos')
+            if len(videos) > 0 and videos[0].filename:
+                # Create upload folder
+                upload_folder = f'/tmp/beast_uploads/videos_{int(time.time())}'
+                os.makedirs(upload_folder, exist_ok=True)
+
+                # Save all videos
+                for video in videos:
+                    if video.filename:
+                        filename = secure_filename(video.filename)
+                        filepath = os.path.join(upload_folder, filename)
+                        video.save(filepath)
+
+                video_folder_path = upload_folder
+                print(f"[INFO] Saved {len(videos)} videos to {upload_folder}")
+
         # Direct form submission - use form data
         execution_data = {
             'campaign': {
@@ -553,6 +572,7 @@ def folder_beast_execute_real():
                 'adset_base_name': request.form.get('adset_base_name', f'{form_campaign_name} - AdSet'),
                 'adset_status': request.form.get('adset_status', 'PAUSED'),
                 'pixel_enabled': request.form.get('pixel_enabled', 'on'),
+                'pixel_id': request.form.get('pixel_id', ''),
                 'goal_type': request.form.get('goal_type', 'CONVERSIONS'),
                 'bid_strategy': request.form.get('bid_strategy', 'AUTO_BID'),
                 'bid_amount': str(request.form.get('bid_amount', '50')),
@@ -565,7 +585,7 @@ def folder_beast_execute_real():
                 'creative_base_name': request.form.get('creative_base_name', request.form.get('brand_name', '')),
                 'naming_convention': request.form.get('naming_convention', 'sequential'),
                 'creative_status': request.form.get('creative_status', 'PAUSED'),
-                'videos_path': request.form.get('videos_folder', ''),
+                'videos_path': video_folder_path or request.form.get('videos_folder', ''),
                 'csv_path': request.form.get('headlines_csv', ''),
                 'brand_name': request.form.get('brand_name', ''),
                 'website_url': request.form.get('landing_url', 'https://www.sallagcc.com/ksagm'),
