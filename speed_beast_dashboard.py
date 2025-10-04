@@ -1604,6 +1604,7 @@ def token_manager():
                 'expires_at': config.get('expires_at', 'Unknown'),
                 'is_expired': tm.is_token_expired(),
                 'client_id': config.get('client_id', '26267fa4-831c-47fb-97b4-afca39be5877'),
+                'client_secret': config.get('client_secret', ''),
                 'ad_account_id': config.get('ad_account_id', ''),
                 'has_refresh_token': bool(config.get('refresh_token'))
             }
@@ -1613,6 +1614,7 @@ def token_manager():
                 'expires_at': None,
                 'is_expired': True,
                 'client_id': '26267fa4-831c-47fb-97b4-afca39be5877',
+                'client_secret': '',
                 'ad_account_id': '',
                 'has_refresh_token': False
             }
@@ -1623,6 +1625,7 @@ def token_manager():
             'is_expired': True,
             'error': str(e),
             'client_id': '26267fa4-831c-47fb-97b4-afca39be5877',
+            'client_secret': '',
             'ad_account_id': '',
             'has_refresh_token': False
         }
