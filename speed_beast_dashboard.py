@@ -1604,6 +1604,7 @@ def token_manager():
                 'expires_at': config.get('expires_at', 'Unknown'),
                 'is_expired': tm.is_token_expired(),
                 'client_id': config.get('client_id', '26267fa4-831c-47fb-97b4-afca39be5877'),
+                'ad_account_id': config.get('ad_account_id', ''),
                 'has_refresh_token': bool(config.get('refresh_token'))
             }
         else:
@@ -1612,6 +1613,7 @@ def token_manager():
                 'expires_at': None,
                 'is_expired': True,
                 'client_id': '26267fa4-831c-47fb-97b4-afca39be5877',
+                'ad_account_id': '',
                 'has_refresh_token': False
             }
     except Exception as e:
@@ -1621,6 +1623,7 @@ def token_manager():
             'is_expired': True,
             'error': str(e),
             'client_id': '26267fa4-831c-47fb-97b4-afca39be5877',
+            'ad_account_id': '',
             'has_refresh_token': False
         }
 
@@ -1734,6 +1737,49 @@ def update_token_config():
             'message': f'Error updating token: {str(e)}'
         })
 
+@app.route('/api/token/save-config', methods=['POST'])
+@require_auth
+def save_token_config():
+    """Save API configuration before OAuth"""
+    try:
+        data = request.get_json()
+
+        client_id = data.get('client_id')
+        client_secret = data.get('client_secret')
+        ad_account_id = data.get('ad_account_id')
+
+        if not client_id or not client_secret:
+            return jsonify({
+                'success': False,
+                'message': 'Client ID and Secret are required'
+            })
+
+        tm = TokenManager()
+        config = tm.load_config() or {}
+
+        # Save credentials (not tokens yet)
+        config['client_id'] = client_id
+        config['client_secret'] = client_secret
+        if ad_account_id:
+            config['ad_account_id'] = ad_account_id
+
+        if tm.save_config(config):
+            return jsonify({
+                'success': True,
+                'message': 'Configuration saved successfully'
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'message': 'Failed to save configuration'
+            })
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error: {str(e)}'
+        })
+
 @app.route('/auth/callback')
 def oauth_callback():
     """Handle OAuth callback from Snapchat"""
@@ -1749,9 +1795,16 @@ def oauth_callback():
         if not auth_code:
             return "No authorization code received", 400
 
-        # Exchange code for tokens
-        client_id = "26267fa4-831c-47fb-97b4-afca39be5877"
-        client_secret = "84ec597b44ef3968088c"
+        # Load saved credentials
+        tm = TokenManager()
+        config = tm.load_config()
+
+        if not config or 'client_id' not in config or 'client_secret' not in config:
+            return "Configuration not found. Please set up credentials first.", 400
+
+        client_id = config['client_id']
+        client_secret = config['client_secret']
+        ad_account_id = config.get('ad_account_id')
 
         token_url = "https://accounts.snapchat.com/login/oauth2/access_token"
         token_data = {
@@ -1767,8 +1820,7 @@ def oauth_callback():
         if response.status_code == 200:
             token_info = response.json()
 
-            # Save tokens
-            tm = TokenManager()
+            # Save tokens and keep credentials
             new_config = {
                 'access_token': token_info.get('access_token'),
                 'refresh_token': token_info.get('refresh_token'),
@@ -1776,6 +1828,9 @@ def oauth_callback():
                 'client_secret': client_secret,
                 'expires_at': (datetime.now() + timedelta(seconds=token_info.get('expires_in', 3600))).isoformat()
             }
+
+            if ad_account_id:
+                new_config['ad_account_id'] = ad_account_id
 
             if tm.save_config(new_config):
                 return redirect(url_for('token_manager') + '?success=1')
