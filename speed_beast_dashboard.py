@@ -550,14 +550,28 @@ def folder_beast_execute_real():
                 os.makedirs(upload_folder, exist_ok=True)
 
                 # Save all videos
+                saved_count = 0
                 for video in videos:
                     if video.filename:
                         filename = secure_filename(video.filename)
                         filepath = os.path.join(upload_folder, filename)
                         video.save(filepath)
+                        saved_count += 1
 
                 video_folder_path = upload_folder
-                print(f"[INFO] Saved {len(videos)} videos to {upload_folder}")
+                print(f"[INFO] ✅ Saved {saved_count} videos to {upload_folder}")
+            else:
+                # No files uploaded - user only typed path
+                print(f"[ERROR] ❌ No video files uploaded! User must click Browse button and select folder.")
+                return jsonify({
+                    'error': 'No video files uploaded! Please click the Browse button and select your video folder (typing the path is not enough).'
+                }), 400
+        else:
+            # No files in request at all
+            print(f"[ERROR] ❌ No video files in request! User must click Browse button.")
+            return jsonify({
+                'error': 'No video files uploaded! Please click the Browse button (📁 Browse) and select your video folder containing all videos.'
+            }), 400
 
         # Direct form submission - use form data
         execution_data = {

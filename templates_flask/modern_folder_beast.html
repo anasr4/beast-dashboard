@@ -608,13 +608,14 @@
         const folderConfirmation = document.getElementById('folder-confirmation');
         const folderInfo = document.getElementById('folder-info');
 
-        // When user TYPES a path
+        // When user TYPES a path - SHOW WARNING
         folderPathInput.addEventListener('input', function() {
             const path = this.value.trim();
             if (path.length > 0) {
-                // Show GREEN confirmation
+                // Show YELLOW WARNING (not green)
                 folderConfirmation.style.display = 'block';
-                folderInfo.textContent = `Path: "${path}" • Bot will load videos during execution`;
+                folderConfirmation.style.background = 'linear-gradient(135deg, #ffaa00, #ff8800)';
+                folderInfo.textContent = `⚠️ Please click the BROWSE button to select your folder! Typing the path won't work.`;
             } else {
                 folderConfirmation.style.display = 'none';
             }
@@ -657,7 +658,8 @@
 
             // Show GREEN CONFIRMATION
             folderConfirmation.style.display = 'block';
-            folderInfo.textContent = `Folder: "${folderPath}" • ${selectedVideos.length} videos • ${totalSizeMB} MB`;
+            folderConfirmation.style.background = 'linear-gradient(135deg, #00ff88, #00cc66)';
+            folderInfo.textContent = `✅ Folder: "${folderPath}" • ${selectedVideos.length} videos • ${totalSizeMB} MB`;
 
             console.log('✅ Folder selected:', folderPath, selectedVideos.length, 'videos');
         });
