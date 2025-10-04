@@ -1638,6 +1638,15 @@ def refresh_token_api():
     """API endpoint to refresh token"""
     try:
         tm = TokenManager()
+        config = tm.load_config()
+
+        # Check if we have a refresh token
+        if not config or 'refresh_token' not in config:
+            return jsonify({
+                'success': False,
+                'message': 'No refresh token found. Please authorize first using "Get Authorization Link".'
+            })
+
         success = tm.refresh_token()
 
         if success:
@@ -1651,7 +1660,7 @@ def refresh_token_api():
         else:
             return jsonify({
                 'success': False,
-                'message': 'Token refresh failed'
+                'message': 'Token refresh failed. You may need to re-authorize using "Get Authorization Link".'
             })
     except Exception as e:
         return jsonify({
