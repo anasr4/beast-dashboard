@@ -500,25 +500,35 @@
                     <div class="section-content" id="ads-content">
                         <div class="form-grid">
                             <div class="form-group">
-                                <label for="videos_folder_path">Video Folder Path (Server Path):</label>
+                                <label for="videos_upload_area">Upload Videos (Drag & Drop):</label>
 
-                                <input type="text" id="videos_folder_path" name="videos_folder"
-                                       class="modern-input"
-                                       placeholder="Enter folder path on server: /tmp/beast_uploads/videos_XXXXX"
-                                       style="width: 100%;" required>
-
-                                <div style="margin-top: 10px; padding: 15px; background: rgba(0,170,255,0.1); border-left: 4px solid #00aaff; border-radius: 5px; font-size: 13px;">
-                                    <strong>📌 How to use:</strong><br>
-                                    1. Use Video Compressor to create videos<br>
-                                    2. Copy the output folder path from Video Compressor<br>
-                                    3. Paste it here<br>
-                                    <br>
-                                    <strong>Example:</strong> <code style="background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 3px;">/tmp/beast_uploads/videos_1234567890</code>
+                                <!-- Drag and Drop Upload Area -->
+                                <div id="drop_zone" style="border: 3px dashed #ff1a1a; border-radius: 12px; padding: 40px; text-align: center; background: rgba(255, 26, 26, 0.05); cursor: pointer; transition: all 0.3s;">
+                                    <div style="font-size: 4rem; margin-bottom: 15px;">📁</div>
+                                    <div style="font-size: 1.3rem; font-weight: bold; margin-bottom: 10px;">Drag & Drop Video Folder Here</div>
+                                    <div style="font-size: 1rem; opacity: 0.7; margin-bottom: 15px;">or click to browse</div>
+                                    <button type="button" onclick="document.getElementById('videos_upload').click()" style="padding: 12px 30px; background: linear-gradient(135deg, #ff1a1a, #cc0000); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px;">
+                                        📂 Browse Videos
+                                    </button>
+                                    <input type="file" id="videos_upload" webkitdirectory directory multiple style="display: none;">
+                                    <div style="font-size: 0.85rem; opacity: 0.6; margin-top: 15px;">Videos will be uploaded to server and path auto-filled</div>
                                 </div>
 
-                                <!--GREEN CONFIRMATION -->
+                                <!-- Hidden input for server path -->
+                                <input type="hidden" id="videos_folder_path" name="videos_folder" required>
+
+                                <!-- Upload Progress -->
+                                <div id="upload_progress" style="display: none; margin-top: 15px; padding: 20px; background: rgba(0,170,255,0.1); border-radius: 10px;">
+                                    <div style="font-weight: bold; margin-bottom: 10px;">⬆️ Uploading videos...</div>
+                                    <div style="background: rgba(0,0,0,0.2); height: 25px; border-radius: 12px; overflow: hidden;">
+                                        <div id="upload_bar" style="background: linear-gradient(135deg, #00aaff, #0088cc); height: 100%; width: 0%; transition: width 0.3s; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 12px;"></div>
+                                    </div>
+                                    <div id="upload_status" style="margin-top: 10px; font-size: 13px; opacity: 0.8;"></div>
+                                </div>
+
+                                <!-- Success Confirmation -->
                                 <div id="folder-confirmation" style="display: none; margin-top: 15px; padding: 20px; background: linear-gradient(135deg, #00ff88, #00cc66); color: #000; border-radius: 10px; text-align: center; font-weight: bold; font-size: 18px; box-shadow: 0 4px 15px rgba(0, 255, 136, 0.5);">
-                                    ✅ PATH ENTERED
+                                    ✅ VIDEOS UPLOADED TO SERVER
                                     <div id="folder-info" style="font-size: 14px; margin-top: 10px; opacity: 0.8;"></div>
                                 </div>
                             </div>
@@ -600,24 +610,111 @@
             }
         });
 
-        // SIMPLE folder path handler - JUST TYPE PATH
+        // VIDEO UPLOAD WITH PROGRESS
         let selectedVideos = [];
+        const videosUpload = document.getElementById('videos_upload');
+        const dropZone = document.getElementById('drop_zone');
+        const uploadProgress = document.getElementById('upload_progress');
+        const uploadBar = document.getElementById('upload_bar');
+        const uploadStatus = document.getElementById('upload_status');
         const folderPathInput = document.getElementById('videos_folder_path');
         const folderConfirmation = document.getElementById('folder-confirmation');
         const folderInfo = document.getElementById('folder-info');
 
-        // When user TYPES a path - SHOW GREEN
-        folderPathInput.addEventListener('input', function() {
-            const path = this.value.trim();
-            if (path.length > 5) {
-                // Show GREEN confirmation
-                folderConfirmation.style.display = 'block';
-                folderConfirmation.style.background = 'linear-gradient(135deg, #00ff88, #00cc66)';
-                folderInfo.textContent = `✅ Path entered: "${path}"`;
-            } else {
-                folderConfirmation.style.display = 'none';
-            }
+        // Drag and drop handlers
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = '#00ff88';
+            dropZone.style.background = 'rgba(0, 255, 136, 0.1)';
         });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.style.borderColor = '#ff1a1a';
+            dropZone.style.background = 'rgba(255, 26, 26, 0.05)';
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = '#ff1a1a';
+            dropZone.style.background = 'rgba(255, 26, 26, 0.05)';
+
+            const files = Array.from(e.dataTransfer.files);
+            uploadVideosToServer(files);
+        });
+
+        // File select handler
+        videosUpload.addEventListener('change', (e) => {
+            const files = Array.from(e.target.files);
+            uploadVideosToServer(files);
+        });
+
+        async function uploadVideosToServer(files) {
+            // Filter video files
+            selectedVideos = files.filter(f =>
+                f.type.startsWith('video/') ||
+                f.name.toLowerCase().endsWith('.mp4') ||
+                f.name.toLowerCase().endsWith('.mov') ||
+                f.name.toLowerCase().endsWith('.avi')
+            );
+
+            if (selectedVideos.length === 0) {
+                alert('No video files selected!');
+                return;
+            }
+
+            // Show upload progress
+            uploadProgress.style.display = 'block';
+            folderConfirmation.style.display = 'none';
+
+            const formData = new FormData();
+            selectedVideos.forEach(file => formData.append('videos', file));
+
+            try {
+                const xhr = new XMLHttpRequest();
+
+                // Progress tracking
+                xhr.upload.addEventListener('progress', (e) => {
+                    if (e.lengthComputable) {
+                        const percent = (e.loaded / e.total) * 100;
+                        uploadBar.style.width = percent + '%';
+                        uploadBar.textContent = Math.round(percent) + '%';
+                        uploadStatus.textContent = `Uploading ${selectedVideos.length} videos... ${(e.loaded / 1024 / 1024).toFixed(1)} MB / ${(e.total / 1024 / 1024).toFixed(1)} MB`;
+                    }
+                });
+
+                // Upload complete
+                xhr.addEventListener('load', () => {
+                    if (xhr.status === 200) {
+                        const result = JSON.parse(xhr.responseText);
+
+                        // Hide progress, show success
+                        uploadProgress.style.display = 'none';
+                        folderConfirmation.style.display = 'block';
+                        folderInfo.textContent = `${selectedVideos.length} videos uploaded to: ${result.folder_path}`;
+
+                        // AUTO-FILL the path!
+                        folderPathInput.value = result.folder_path;
+
+                        console.log('✅ Upload complete! Path:', result.folder_path);
+                    } else {
+                        alert('Upload failed: ' + xhr.responseText);
+                        uploadProgress.style.display = 'none';
+                    }
+                });
+
+                xhr.addEventListener('error', () => {
+                    alert('Upload error!');
+                    uploadProgress.style.display = 'none';
+                });
+
+                xhr.open('POST', '/api/upload-videos');
+                xhr.send(formData);
+
+            } catch (error) {
+                alert('Error: ' + error.message);
+                uploadProgress.style.display = 'none';
+            }
+        }
 
         // When user BROWSES for folder
         folderBrowser.addEventListener('change', function(e) {

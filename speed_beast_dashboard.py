@@ -343,12 +343,10 @@ def upload_videos():
         if saved_count == 0:
             return jsonify({'success': False, 'error': 'No valid video files uploaded'})
 
-        # Return folder name (not full path) so it can be used in campaign
-        folder_name = os.path.basename(upload_folder)
-
+        # Return FULL path so it can be used directly in campaign
         return jsonify({
             'success': True,
-            'folder_name': folder_name,
+            'folder_path': upload_folder,  # Full path like /tmp/beast_uploads/videos_1234567890
             'count': saved_count,
             'message': f'{saved_count} videos uploaded successfully'
         })
