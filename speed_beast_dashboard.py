@@ -542,8 +542,16 @@ def folder_beast_execute_real():
     if form_campaign_name:
         # Save uploaded videos first
         video_folder_path = ''
+
+        print(f"[DEBUG] ===== VIDEO UPLOAD DEBUG =====")
+        print(f"[DEBUG] 'videos' in request.files: {'videos' in request.files}")
+        print(f"[DEBUG] request.form.get('videos_folder'): '{request.form.get('videos_folder', '')}'")
+
         if 'videos' in request.files:
             videos = request.files.getlist('videos')
+            print(f"[DEBUG] Videos count in request: {len(videos)}")
+            print(f"[DEBUG] First video filename: {videos[0].filename if videos else 'None'}")
+
             if len(videos) > 0 and videos[0].filename:
                 # Create upload folder
                 upload_folder = f'/tmp/beast_uploads/videos_{int(time.time())}'
@@ -560,6 +568,7 @@ def folder_beast_execute_real():
 
                 video_folder_path = upload_folder
                 print(f"[INFO] ✅ Saved {saved_count} videos to {upload_folder}")
+                print(f"[DEBUG] video_folder_path set to: '{video_folder_path}'")
             else:
                 # No files uploaded - user only typed path
                 print(f"[ERROR] ❌ No video files uploaded! User must click Browse button and select folder.")
@@ -574,6 +583,12 @@ def folder_beast_execute_real():
             }), 400
 
         # Direct form submission - use form data
+        final_videos_path = video_folder_path if video_folder_path else request.form.get('videos_folder', '')
+        print(f"[DEBUG] final_videos_path calculation:")
+        print(f"[DEBUG]   video_folder_path (uploaded): '{video_folder_path}'")
+        print(f"[DEBUG]   request.form.get('videos_folder'): '{request.form.get('videos_folder', '')}'")
+        print(f"[DEBUG]   final_videos_path: '{final_videos_path}'")
+
         execution_data = {
             'campaign': {
                 'campaign_name': form_campaign_name,
@@ -599,7 +614,7 @@ def folder_beast_execute_real():
                 'creative_base_name': request.form.get('creative_base_name', request.form.get('brand_name', '')),
                 'naming_convention': request.form.get('naming_convention', 'sequential'),
                 'creative_status': request.form.get('creative_status', 'PAUSED'),
-                'videos_path': video_folder_path or request.form.get('videos_folder', ''),
+                'videos_path': final_videos_path,
                 'csv_path': request.form.get('headlines_csv', ''),
                 'brand_name': request.form.get('brand_name', ''),
                 'website_url': request.form.get('landing_url', 'https://www.sallagcc.com/ksagm'),
@@ -608,6 +623,8 @@ def folder_beast_execute_real():
                 'creative_type': request.form.get('creative_type', 'WEB_VIEW')
             }
         }
+
+        print(f"[DEBUG] execution_data['ads']['videos_path']: '{execution_data['ads']['videos_path']}'")
     else:
         # Session-based submission - use session data
         execution_data = {
