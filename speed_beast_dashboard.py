@@ -1279,24 +1279,41 @@ def execute_optimized_beast_mode(execution_id, data):
 
         # Load videos and headlines
         try:
-            video_folder = videos_path
+            # Fix video folder path - check multiple possible locations
+            possible_paths = [
+                videos_path,  # Original path
+                os.path.join('/tmp/beast_uploads', videos_path),  # Railway temp uploads
+                os.path.join('uploads', videos_path),  # Local uploads
+                os.path.join('/tmp/beast_uploads/videos', videos_path),  # Nested in videos folder
+            ]
+
+            video_folder = None
+            for path in possible_paths:
+                if os.path.exists(path) and os.path.isdir(path):
+                    video_folder = path
+                    print(f"[DEBUG] Found video folder at: {path}")
+                    break
+
+            if not video_folder:
+                video_folder = videos_path  # Fallback to original
+
             csv_file = csv_path
 
             # Debug output
             print(f"[DEBUG] videos_path = '{videos_path}'")
             print(f"[DEBUG] csv_path = '{csv_path}'")
-            print(f"[DEBUG] video_folder = '{video_folder}'")
+            print(f"[DEBUG] video_folder (resolved) = '{video_folder}'")
             print(f"[DEBUG] csv_file = '{csv_file}'")
             print(f"[DEBUG] brand_name = '{brand_name}'")
             print(f"[DEBUG] website_url = '{website_url}'")
             print(f"[DEBUG] call_to_action = '{call_to_action}'")
 
-            # Handle dummy files for testing when folder doesn't exist
+            # Handle missing folder - throw error instead of using dummy files
             if not os.path.exists(video_folder):
-                print(f"[INFO] Video folder doesn't exist: {video_folder}")
-                print(f"[INFO] Creating dummy video files for testing...")
-                video_files = [f'test_video_{i}.mp4' for i in range(1, 4)]  # Create 3 dummy videos
-                update_progress(50, 'uploading_media', 'Using dummy videos for testing...', f'Created {len(video_files)} dummy videos')
+                error_msg = f"Video folder not found: {video_folder}. Please upload videos first."
+                print(f"[ERROR] {error_msg}")
+                update_progress(0, 'error', 'Video Folder Error', error_msg, error=error_msg)
+                return
             else:
                 # Load videos - use dynamic limit based on campaign structure
                 total_ads_limit = ads_data.get('total_ads', 200) if isinstance(ads_data, dict) else 200
@@ -1362,22 +1379,6 @@ def execute_optimized_beast_mode(execution_id, data):
                 try:
                     headers = tm.get_headers()
                     if not headers:
-                        continue
-
-                    # Handle dummy files for testing when folder doesn't exist
-                    if video_file.startswith('test_video_') and not os.path.exists(video_folder):
-                        print(f"[INFO] Using dummy media file for testing: {video_file}")
-                        # Create dummy media entry for testing with headline
-                        headline = headlines[i-1] if i-1 < len(headlines) else f"{brand_name} Ad {i}"
-                        if len(headline) > 34:
-                            headline = headline[:31] + "..."
-
-                        dummy_media = {
-                            'media_id': f'dummy_media_{i}_{int(time.time())}',
-                            'headline': headline,
-                            'video_name': video_file
-                        }
-                        uploaded_media.append(dummy_media)
                         continue
 
                     # FIXED: Use proper video upload mechanism
@@ -1474,12 +1475,6 @@ def execute_optimized_beast_mode(execution_id, data):
                         update_progress(progress_percent, 'creating_ads', f'Creating ads... ({created_ads + failed_ads}/{len(uploaded_media)})', f'Progress: {created_ads} created, {failed_ads} failed', ads_created=created_ads)
 
                     try:
-                        # Skip dummy media to avoid API calls
-                        if media_info['media_id'].startswith('dummy_media_'):
-                            print(f"[INFO] Skipping ad creation for dummy media: {media_info['video_name']}")
-                            created_ads += 1  # Count as created for testing
-                            continue
-
                         headers = tm.get_headers()
                         if not headers:
                             failed_ads += 1
