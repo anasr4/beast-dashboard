@@ -1783,9 +1783,9 @@ def save_token_config():
             'message': f'Error: {str(e)}'
         })
 
-@app.route('/auth/callback')
-def oauth_callback():
-    """Handle OAuth callback from Snapchat"""
+@app.route('/api/oauth/callback')
+def api_oauth_callback():
+    """Handle OAuth callback from Snapchat (Snap redirect URI)"""
     try:
         # Get authorization code from callback
         auth_code = request.args.get('code')
@@ -1815,7 +1815,7 @@ def oauth_callback():
             "client_secret": client_secret,
             "code": auth_code,
             "grant_type": "authorization_code",
-            "redirect_uri": "https://web-production-95efb.up.railway.app/auth/callback"
+            "redirect_uri": "https://web-production-95efb.up.railway.app/api/oauth/callback"
         }
 
         response = requests.post(token_url, data=token_data)
@@ -1844,6 +1844,11 @@ def oauth_callback():
 
     except Exception as e:
         return f"OAuth callback error: {str(e)}", 500
+
+@app.route('/auth/callback')
+def oauth_callback():
+    """Legacy OAuth callback - redirects to new endpoint"""
+    return redirect('/api/oauth/callback?' + request.query_string.decode())
 
 @app.route('/analytics-bot')
 @require_auth
