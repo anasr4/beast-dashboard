@@ -606,40 +606,63 @@
         const folderInfo = document.getElementById('folder-info');
 
         videosUploadInput.addEventListener('change', function(e) {
+            console.log('🔔 Change event fired!');
+            console.log('Files count:', e.target.files.length);
+
             const files = Array.from(e.target.files);
 
             if (files.length === 0) {
+                console.log('❌ No files selected');
+                alert('No files selected. Please select a folder with video files.');
                 return;
             }
 
+            console.log('📁 Processing', files.length, 'files...');
+
             // Filter video files
             selectedVideos = files.filter(f => {
-                return f.type.startsWith('video/') ||
+                const isVideo = f.type.startsWith('video/') ||
                        f.name.toLowerCase().endsWith('.mp4') ||
                        f.name.toLowerCase().endsWith('.mov') ||
                        f.name.toLowerCase().endsWith('.avi') ||
                        f.name.toLowerCase().endsWith('.mkv') ||
                        f.name.toLowerCase().endsWith('.wmv') ||
                        f.name.toLowerCase().endsWith('.flv');
+
+                if (isVideo) console.log('✅ Video:', f.name);
+                return isVideo;
             });
 
+            console.log('🎬 Total video files:', selectedVideos.length);
+
             if (selectedVideos.length === 0) {
-                alert('No video files found in selected folder!');
+                alert('No video files found! Please select a folder containing video files (.mp4, .mov, etc)');
                 return;
             }
 
             // Get folder name from first file's path
-            const folderName = selectedVideos[0].webkitRelativePath.split('/')[0];
+            let folderName = 'selected_folder';
+            if (selectedVideos[0].webkitRelativePath) {
+                folderName = selectedVideos[0].webkitRelativePath.split('/')[0];
+            }
+
             const totalSizeMB = (selectedVideos.reduce((sum, f) => sum + f.size, 0) / 1024 / 1024).toFixed(1);
+
+            console.log('📂 Folder name:', folderName);
+            console.log('💾 Total size:', totalSizeMB, 'MB');
 
             // Store folder name in hidden field
             document.getElementById('videos_folder').value = folderName;
 
             // Show GREEN CONFIRMATION
+            console.log('🟢 Showing green confirmation box...');
             folderConfirmation.style.display = 'block';
             folderInfo.textContent = `Folder: "${folderName}" • ${selectedVideos.length} videos • ${totalSizeMB} MB`;
 
-            console.log('✅ Folder selected:', folderName, 'Videos:', selectedVideos.length);
+            // Also show alert for debugging
+            alert(`✅ FOLDER SELECTED!\n\nFolder: ${folderName}\nVideos: ${selectedVideos.length}\nSize: ${totalSizeMB} MB`);
+
+            console.log('✅ Folder selected successfully!');
         });
 
         function showGreenPopup(title, subtitle) {
