@@ -654,6 +654,8 @@
             }
         });
 
+        let uploadConfirmationShown = false;
+
         function startMonitoring(executionId) {
             const interval = setInterval(async () => {
                 try {
@@ -663,7 +665,59 @@
                     progressFill.style.width = status.progress + '%';
                     statusText.textContent = status.stage || status.status;
                     adsCount.textContent = `Ads created: ${status.ads_created || 0}/200`;
-                    videosUploaded.textContent = `Videos uploaded: ${status.videos_uploaded || 0}/200`;
+
+                    // Handle both media_uploaded and videos_uploaded
+                    const uploaded = status.media_uploaded || status.videos_uploaded || 0;
+                    videosUploaded.textContent = `Videos uploaded: ${uploaded}/200`;
+
+                    // GREEN CONFIRMATION when videos are uploaded (status = media_uploaded)
+                    if (status.status === 'media_uploaded' && !uploadConfirmationShown) {
+                        uploadConfirmationShown = true;
+
+                        // Show big green success banner
+                        const banner = document.createElement('div');
+                        banner.style.cssText = `
+                            position: fixed;
+                            top: 50%;
+                            left: 50%;
+                            transform: translate(-50%, -50%);
+                            background: linear-gradient(135deg, #00ff88 0%, #00cc66 100%);
+                            color: #000;
+                            padding: 40px 60px;
+                            border-radius: 20px;
+                            font-size: 28px;
+                            font-weight: bold;
+                            z-index: 10000;
+                            box-shadow: 0 20px 60px rgba(0, 255, 136, 0.5);
+                            text-align: center;
+                            animation: popIn 0.5s ease;
+                        `;
+                        banner.innerHTML = `
+                            <div style="font-size: 60px; margin-bottom: 10px;">✅</div>
+                            <div>ALL VIDEOS UPLOADED!</div>
+                            <div style="font-size: 18px; margin-top: 10px; opacity: 0.8;">${uploaded} videos ready • Processing started</div>
+                        `;
+                        document.body.appendChild(banner);
+
+                        // Add animation
+                        const style = document.createElement('style');
+                        style.textContent = `
+                            @keyframes popIn {
+                                0% { transform: translate(-50%, -50%) scale(0); }
+                                50% { transform: translate(-50%, -50%) scale(1.1); }
+                                100% { transform: translate(-50%, -50%) scale(1); }
+                            }
+                        `;
+                        document.head.appendChild(style);
+
+                        // Remove banner after 4 seconds
+                        setTimeout(() => {
+                            banner.style.transition = 'all 0.5s ease';
+                            banner.style.opacity = '0';
+                            banner.style.transform = 'translate(-50%, -50%) scale(0.8)';
+                            setTimeout(() => banner.remove(), 500);
+                        }, 4000);
+                    }
 
                     if (status.status === 'completed' || status.progress >= 100) {
                         clearInterval(interval);
