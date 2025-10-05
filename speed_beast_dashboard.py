@@ -694,14 +694,17 @@ def folder_beast_execute_real():
 @require_auth
 def get_execution_status(execution_id):
     """Get the current status of campaign execution with detailed progress"""
-    if execution_id in progress_tracker:
+    # Check execution_status first (used by folder_beast and adsquad_expander)
+    if execution_id in execution_status:
+        return jsonify(execution_status[execution_id])
+    # Fallback to progress_tracker for other bots
+    elif execution_id in progress_tracker:
         # Calculate execution time
         if progress_tracker[execution_id]['start_time']:
             progress_tracker[execution_id]['execution_time'] = time.time() - progress_tracker[execution_id]['start_time']
-
         return jsonify(progress_tracker[execution_id])
     else:
-        return jsonify({'error': 'Execution not found'}), 404
+        return jsonify({'error': 'Execution not found', 'execution_id': execution_id}), 404
 
 def execute_single_ad_mode(execution_id, data):
     """Execute single ad creation"""
