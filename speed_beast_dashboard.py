@@ -3046,6 +3046,9 @@ def run_adsquad_expander_execution(execution_id, data):
                 ad_set_data_api['adsquads'][0]['pixel_id'] = pixel_id
 
             try:
+                print(f"[DEBUG] Creating ad squad {ad_set_num} with data: {ad_set_data_api}")
+                sys.stdout.flush()
+
                 ad_set_response = make_robust_api_request(
                     'POST',
                     f'https://adsapi.snapchat.com/v1/adaccounts/{ad_account_id}/adsquads',
@@ -3054,18 +3057,40 @@ def run_adsquad_expander_execution(execution_id, data):
                     max_retries=3
                 )
 
+                print(f"[DEBUG] Ad squad {ad_set_num} response: {ad_set_response.status_code}")
+                sys.stdout.flush()
+
                 if ad_set_response.status_code == 200:
                     ad_set_result = ad_set_response.json()
                     ad_set_id = ad_set_result['adsquads'][0]['adsquad']['id']
                     ad_sets.append(ad_set_id)
                     print(f"[SUCCESS] Created ad squad {ad_set_num}: {ad_set_id}")
+                    sys.stdout.flush()
                 else:
-                    print(f"[ERROR] Failed to create ad squad {ad_set_num}: {ad_set_response.text}")
+                    error_detail = ad_set_response.text
+                    print(f"[ERROR] Failed to create ad squad {ad_set_num}")
+                    print(f"[ERROR] Status: {ad_set_response.status_code}")
+                    print(f"[ERROR] Response: {error_detail}")
+                    sys.stdout.flush()
+                    update_progress(0, 'error', f'AdSquad {ad_set_num} Failed',
+                                  f'API Error: {error_detail[:200]}',
+                                  error=f'Status {ad_set_response.status_code}: {error_detail[:500]}')
+                    execution_status[execution_id]['status'] = 'error'
+                    return
             except Exception as e:
                 print(f"[ERROR] Exception creating ad squad {ad_set_num}: {e}")
+                import traceback
+                traceback.print_exc()
+                sys.stdout.flush()
+                update_progress(0, 'error', f'AdSquad {ad_set_num} Exception',
+                              str(e), error=str(e))
+                execution_status[execution_id]['status'] = 'error'
+                return
 
         if len(ad_sets) == 0:
-            update_progress(0, 'error', 'AdSquad Creation Failed', 'No ad squads created', error='Failed to create ad squads')
+            update_progress(0, 'error', 'AdSquad Creation Failed',
+                          'No ad squads created - check logs above for API errors',
+                          error='Failed to create ad squads')
             execution_status[execution_id]['status'] = 'error'
             return
 
