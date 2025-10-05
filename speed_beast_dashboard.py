@@ -2816,8 +2816,10 @@ def adsquad_expander_step3():
 def adsquad_expander_execute():
     """Execute: Add Ad Squads to Existing Campaign"""
     if request.method == 'GET':
-        return render_template('adsquad_expander_execute.html',
-                             data=session.get('adsquad_expander_data', {}))
+        raw_data = session.get('adsquad_expander_data', {})
+        # Restructure data for template
+        formatted_data = format_adsquad_data(raw_data)
+        return render_template('adsquad_expander_execute.html', data=formatted_data)
 
     # POST - Save step 3 data and show execution page
     if 'adsquad_expander_data' not in session:
@@ -2838,8 +2840,35 @@ def adsquad_expander_execute():
         'test_mode': 'test_mode' in request.form
     })
 
-    return render_template('adsquad_expander_execute.html',
-                         data=session['adsquad_expander_data'])
+    # Format data for template
+    raw_data = session['adsquad_expander_data']
+    formatted_data = format_adsquad_data(raw_data)
+
+    return render_template('adsquad_expander_execute.html', data=formatted_data)
+
+def format_adsquad_data(raw_data):
+    """Format flat data structure into nested structure for template"""
+    return {
+        'campaign': {
+            'campaign_name': raw_data.get('campaign_name', 'Unknown Campaign'),
+            'campaign_id': raw_data.get('campaign_id', ''),
+            'objective': 'Expanding Existing Campaign',
+            'daily_budget': 'Existing Budget'
+        },
+        'adsets': {
+            'countries': raw_data.get('countries', ['SA']),
+            'min_age': raw_data.get('min_age', 20),
+            'max_age': raw_data.get('max_age', '55+'),
+            'num_adsets': raw_data.get('num_adsets', 5)
+        },
+        'ads': {
+            'brand_name': raw_data.get('brand_name', ''),
+            'website_url': raw_data.get('website_url', ''),
+            'call_to_action': raw_data.get('call_to_action', ''),
+            'videos_path': raw_data.get('videos_path', ''),
+            'csv_path': raw_data.get('csv_path', '')
+        }
+    }
 
 @app.route('/adsquad-expander/execute-real', methods=['POST'])
 @require_auth
