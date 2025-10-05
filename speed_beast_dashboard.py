@@ -693,9 +693,9 @@ def folder_beast_execute_real():
 
 @app.route('/api/execution-status/<execution_id>')
 @require_auth
-    global execution_status
 def get_execution_status(execution_id):
     """Get the current status of campaign execution with detailed progress"""
+    global execution_status
     # Check execution_status first (used by folder_beast and adsquad_expander)
     if execution_id in execution_status:
         return jsonify(execution_status[execution_id])
@@ -1098,7 +1098,7 @@ def execute_test_bot_mode(execution_id, data):
 
 def execute_optimized_beast_mode(execution_id, data):
     """Execute the actual Optimized Beast Mode campaign creation"""
-    global execution_status
+    global execution_status, progress_tracker
     try:
         # Update progress function with detailed tracking
         def update_progress(progress, status, stage, log_msg, **kwargs):
@@ -2704,10 +2704,9 @@ def start_folder_beast():
 @app.route('/folder_beast_status')
 @require_auth
 def folder_beast_status():
-    global execution_status
     """Get status of folder beast execution (legacy endpoint)"""
+    global execution_status
     try:
-        global execution_status
 
         # Get the most recent execution status
         if not execution_status:
@@ -2909,8 +2908,8 @@ def adsquad_expander_execute_real():
         return jsonify({'success': False, 'error': str(e)})
 
 def run_adsquad_expander_execution(execution_id, data):
-    global execution_status
     """Run ad squad expansion - adds ad squads to existing campaign"""
+    global execution_status
     try:
         print(f"\n{'='*60}")
         print(f"[ADSQUAD EXPANDER] Starting execution: {execution_id}")
