@@ -2923,28 +2923,262 @@ def run_adsquad_expander_execution(execution_id, data):
             })
             execution_status[execution_id]['log'].append(f"[{stage}] {message}")
 
-        # Use the EXISTING campaign ID instead of creating new one
+        # Use the EXISTING campaign ID (DO NOT CREATE NEW CAMPAIGN)
         campaign_id = data.get('campaign_id')
+        campaign_name = data.get('campaign_name')
 
-        update_progress(10, 'campaign_selected', f'Using existing campaign: {data.get("campaign_name")}',
+        if not campaign_id:
+            update_progress(0, 'error', 'Missing Campaign ID', 'No campaign selected', error='No campaign ID')
+            execution_status[execution_id]['status'] = 'error'
+            return
+
+        update_progress(10, 'campaign_selected', f'Using existing campaign: {campaign_name}',
                        f'Campaign ID: {campaign_id}')
 
-        # Now create ad squads under this campaign
-        # (Reuse the same logic from folder_beast but skip campaign creation)
-        # Continue with ad squad creation starting from line ~1230 in folder_beast execution
+        # Get token manager
+        tm = TokenManager()
+        headers = tm.get_headers()
+        if not headers:
+            update_progress(0, 'error', 'Token Error', 'Failed to get valid token', error='Token error')
+            execution_status[execution_id]['status'] = 'error'
+            return
 
-        update_progress(20, 'creating_adsets', 'Creating ad squads in existing campaign...',
-                       f'Creating {data.get("num_adsets", 5)} ad squads')
+        ad_account_id = tm.get_ad_account_id()
+        if not ad_account_id:
+            update_progress(0, 'error', 'Account Error', 'No ad account ID configured', error='No ad account')
+            execution_status[execution_id]['status'] = 'error'
+            return
 
-        # ... (Will implement the full execution logic)
+        # Parse data
+        num_adsets = int(data.get('num_adsets', 5))
+        countries = data.get('countries', ['SA'])
+        min_age = int(data.get('min_age', 20))
+        max_age_setting = data.get('max_age', '55+')
+        if str(max_age_setting).endswith('+'):
+            max_age = 65
+        else:
+            max_age = int(max_age_setting) if int(max_age_setting) < 65 else 65
 
-        update_progress(100, 'completed', 'Ad squads added successfully!',
-                       f'Added {data.get("num_adsets", 5)} ad squads to campaign')
+        adset_budget = float(data.get('adset_budget', 25))
+        pixel_id = data.get('pixel_id', '').strip()
 
-        execution_status[execution_id]['status'] = 'completed'
+        videos_path = data.get('videos_path', '')
+        csv_path = data.get('csv_path', '')
+        brand_name = data.get('brand_name', '')
+        website_url = data.get('website_url', '')
+        call_to_action = data.get('call_to_action', 'SHOP_NOW')
+
+        print(f"[ADSQUAD EXPANDER] Creating {num_adsets} ad squads in campaign {campaign_id}")
+
+        # Create ad sets (NO CAMPAIGN CREATION - USE EXISTING)
+        update_progress(15, 'creating_adsets', 'Creating ad squads...', f'Will create {num_adsets} ad squads')
+
+        from datetime import datetime, timezone
+        now = datetime.now(timezone.utc)
+        start_time = now.isoformat()
+
+        ad_sets = []
+
+        for ad_set_num in range(1, num_adsets + 1):
+            update_progress(15 + (ad_set_num * 5), 'creating_adsets', f'Creating ad squad {ad_set_num}/{num_adsets}...',
+                           f'Ad squad {ad_set_num}')
+
+            headers = tm.get_headers()
+
+            targeting_config = {
+                'regulated_content': False,
+                'geos': [{'country_code': country.lower()} for country in countries]
+            }
+
+            ad_set_data_api = {
+                'adsquads': [{
+                    'name': f'{campaign_name} - AdSquad {ad_set_num}',
+                    'status': 'ACTIVE',
+                    'campaign_id': campaign_id,
+                    'type': 'SNAP_ADS',
+                    'targeting': targeting_config,
+                    'placement_v2': {'config': 'AUTOMATIC'},
+                    'billing_event': 'IMPRESSION',
+                    'auto_bid': True,
+                    'optimization_goal': 'PIXEL_PURCHASE',
+                    'daily_budget_micro': int(adset_budget * 1000000),
+                    'start_time': start_time
+                }]
+            }
+
+            if pixel_id:
+                ad_set_data_api['adsquads'][0]['pixel_id'] = pixel_id
+
+            try:
+                ad_set_response = make_robust_api_request(
+                    'POST',
+                    f'https://adsapi.snapchat.com/v1/adaccounts/{ad_account_id}/adsquads',
+                    headers=headers,
+                    json_data=ad_set_data_api,
+                    max_retries=3
+                )
+
+                if ad_set_response.status_code == 200:
+                    ad_set_result = ad_set_response.json()
+                    ad_set_id = ad_set_result['adsquads'][0]['adsquad']['id']
+                    ad_sets.append(ad_set_id)
+                    print(f"[SUCCESS] Created ad squad {ad_set_num}: {ad_set_id}")
+                else:
+                    print(f"[ERROR] Failed to create ad squad {ad_set_num}: {ad_set_response.text}")
+            except Exception as e:
+                print(f"[ERROR] Exception creating ad squad {ad_set_num}: {e}")
+
+        if len(ad_sets) == 0:
+            update_progress(0, 'error', 'AdSquad Creation Failed', 'No ad squads created', error='Failed to create ad squads')
+            execution_status[execution_id]['status'] = 'error'
+            return
+
+        update_progress(45, 'adsets_created', f'Created {len(ad_sets)} ad squads!',
+                       f'{len(ad_sets)} ad squads created in existing campaign')
+
+        # Now upload media and create ads (same logic as folder_beast from line 1330+)
+        # Load videos and headlines
+        update_progress(50, 'loading_files', 'Loading videos and headlines...', 'Reading files from server')
+
+        try:
+            if not os.path.exists(videos_path):
+                update_progress(0, 'error', 'Videos Not Found', f'Video folder not found: {videos_path}', error='Videos not found')
+                execution_status[execution_id]['status'] = 'error'
+                return
+
+            video_files = [f for f in os.listdir(videos_path) if f.endswith('.mp4')][:200]
+
+            headlines = []
+            if os.path.exists(csv_path):
+                with open(csv_path, 'r', encoding='utf-8') as f:
+                    lines = f.readlines()
+                    for line in lines:
+                        headline = line.strip()
+                        if headline and len(headline) <= 34:
+                            headlines.append(headline)
+
+            headlines = headlines[:len(video_files)]
+
+            print(f"[DEBUG] Loaded {len(video_files)} videos and {len(headlines)} headlines")
+
+            # Upload media
+            update_progress(55, 'uploading_media', 'Uploading videos to Snapchat...', f'Uploading {len(video_files)} videos')
+
+            api_client = SnapchatAPIClient(ad_account_id, tm.get_valid_token())
+            uploaded_media = []
+
+            for i, video_file in enumerate(video_files, 1):
+                video_path = os.path.join(videos_path, video_file)
+                headline = headlines[i-1] if i-1 < len(headlines) else f"{brand_name} Ad {i}"
+
+                try:
+                    media_response = api_client.upload_media(ad_account_id, video_path, 'VIDEO', wait_for_ready=False)
+                    if media_response and 'media' in media_response:
+                        uploaded_media.append({
+                            'media_id': media_response['media']['id'],
+                            'headline': headline[:34],
+                            'video_name': video_file
+                        })
+                        if i % 20 == 0:
+                            update_progress(55 + int(i/len(video_files)*20), 'uploading_media',
+                                          f'Uploaded {i}/{len(video_files)} videos...', f'{i} videos uploaded')
+                except Exception as e:
+                    print(f"[ERROR] Failed to upload video {i}: {e}")
+                    continue
+
+            update_progress(75, 'media_uploaded', f'✅ Uploaded {len(uploaded_media)} videos!',
+                           f'{len(uploaded_media)} videos ready', media_uploaded=len(uploaded_media))
+
+            # Create ads
+            update_progress(80, 'creating_ads', 'Creating ads...', f'Creating {len(uploaded_media)} ads')
+
+            created_ads = 0
+            ads_per_set = len(uploaded_media) // len(ad_sets)
+
+            for ad_set_index, ad_set_id in enumerate(ad_sets):
+                start_index = ad_set_index * ads_per_set
+                end_index = start_index + ads_per_set if ad_set_index < len(ad_sets) - 1 else len(uploaded_media)
+                media_batch = uploaded_media[start_index:end_index]
+
+                for media_info in media_batch:
+                    try:
+                        headers = tm.get_headers()
+                        creative_data = {
+                            'creatives': [{
+                                'ad_account_id': ad_account_id,
+                                'name': f'{brand_name} - Creative {created_ads+1}',
+                                'type': 'WEB_VIEW',
+                                'headline': media_info['headline'],
+                                'brand_name': brand_name,
+                                'call_to_action': call_to_action,
+                                'top_snap_media_id': media_info['media_id'],
+                                'web_view_properties': {
+                                    'url': website_url,
+                                    'allow_snap_javascript_sdk': False,
+                                    'use_immersive_mode': False,
+                                    'deep_link_urls': [],
+                                    'block_preload': True
+                                },
+                                'shareable': False
+                            }]
+                        }
+
+                        creative_response = make_robust_api_request(
+                            'POST',
+                            f'https://adsapi.snapchat.com/v1/adaccounts/{ad_account_id}/creatives',
+                            headers=headers,
+                            json_data=creative_data,
+                            max_retries=3
+                        )
+
+                        if creative_response.status_code == 200:
+                            creative_id = creative_response.json()['creatives'][0]['creative']['id']
+
+                            # Create ad
+                            ad_data = {
+                                'ads': [{
+                                    'ad_squad_id': ad_set_id,
+                                    'creative_id': creative_id,
+                                    'name': f'{brand_name} - Ad {created_ads+1}',
+                                    'status': 'ACTIVE',
+                                    'type': 'SNAP_AD'
+                                }]
+                            }
+
+                            ad_response = make_robust_api_request(
+                                'POST',
+                                f'https://adsapi.snapchat.com/v1/adaccounts/{ad_account_id}/ads',
+                                headers=headers,
+                                json_data=ad_data,
+                                max_retries=3
+                            )
+
+                            if ad_response.status_code == 200:
+                                created_ads += 1
+                                if created_ads % 10 == 0:
+                                    update_progress(80 + int(created_ads/len(uploaded_media)*18), 'creating_ads',
+                                                  f'Created {created_ads}/{len(uploaded_media)} ads...',
+                                                  f'{created_ads} ads created', ads_created=created_ads)
+                    except Exception as e:
+                        print(f"[ERROR] Failed to create ad: {e}")
+                        continue
+
+            update_progress(100, 'completed', '✅ Ad squads expansion completed!',
+                           f'Added {len(ad_sets)} ad squads with {created_ads} ads to existing campaign!',
+                           ads_created=created_ads, campaign_id=campaign_id)
+
+            execution_status[execution_id]['status'] = 'completed'
+            execution_status[execution_id]['ads_target'] = len(uploaded_media)
+
+        except Exception as e:
+            print(f"[ERROR] File processing failed: {e}")
+            update_progress(0, 'error', 'File Error', str(e), error=str(e))
+            execution_status[execution_id]['status'] = 'error'
 
     except Exception as e:
         print(f"[ERROR] AdSquad Expander execution failed: {e}")
+        import traceback
+        traceback.print_exc()
         execution_status[execution_id]['status'] = 'error'
         execution_status[execution_id]['error'] = str(e)
 
