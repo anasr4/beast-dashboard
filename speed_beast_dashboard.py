@@ -2878,14 +2878,27 @@ def adsquad_expander_execute_real():
         data = session.get('adsquad_expander_data', {})
         execution_id = str(uuid.uuid4())
 
+        print(f"\n{'='*80}")
+        print(f"[ADSQUAD EXPANDER ROUTE] Starting execution route")
+        print(f"[ADSQUAD EXPANDER ROUTE] Execution ID: {execution_id}")
+        print(f"[ADSQUAD EXPANDER ROUTE] Session data keys: {list(data.keys())}")
+        print(f"[ADSQUAD EXPANDER ROUTE] Campaign ID: {data.get('campaign_id')}")
+        print(f"[ADSQUAD EXPANDER ROUTE] Campaign Name: {data.get('campaign_name')}")
+        print(f"{'='*80}\n")
+
         # Start execution in background thread
-        thread = threading.Thread(target=run_adsquad_expander_execution, args=(execution_id, data))
+        thread = threading.Thread(target=run_adsquad_expander_execution, args=(execution_id, data.copy()))
         thread.daemon = True
         thread.start()
+
+        print(f"[ADSQUAD EXPANDER ROUTE] Thread started successfully")
 
         return jsonify({'success': True, 'execution_id': execution_id})
 
     except Exception as e:
+        print(f"[ADSQUAD EXPANDER ROUTE ERROR] {str(e)}")
+        import traceback
+        traceback.print_exc()
         return jsonify({'success': False, 'error': str(e)})
 
 def run_adsquad_expander_execution(execution_id, data):
@@ -2895,7 +2908,10 @@ def run_adsquad_expander_execution(execution_id, data):
         print(f"[ADSQUAD EXPANDER] Starting execution: {execution_id}")
         print(f"[ADSQUAD EXPANDER] Selected Campaign ID: {data.get('campaign_id')}")
         print(f"[ADSQUAD EXPANDER] Selected Campaign Name: {data.get('campaign_name')}")
+        print(f"[ADSQUAD EXPANDER] Data keys: {list(data.keys())}")
         print(f"{'='*60}\n")
+        import sys
+        sys.stdout.flush()
 
         # Initialize execution status
         execution_status[execution_id] = {
