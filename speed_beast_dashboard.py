@@ -2916,37 +2916,50 @@ def run_adsquad_expander_execution(execution_id, data):
         import sys
         sys.stdout.flush()
 
-        # Initialize execution status
+        # Initialize execution status IMMEDIATELY
         execution_status[execution_id] = {
             'status': 'running',
-            'progress': 0,
-            'stage': 'Initializing...',
-            'message': 'Starting ad squad expansion...',
+            'progress': 1,
+            'stage': 'Started',
+            'message': 'Execution thread initialized',
             'execution_id': execution_id,
-            'campaign_id': data.get('campaign_id'),
-            'campaign_name': data.get('campaign_name'),
+            'campaign_id': data.get('campaign_id', 'unknown'),
+            'campaign_name': data.get('campaign_name', 'Unknown'),
             'ads_created': 0,
             'media_uploaded': 0,
             'media_ready': 0,
-            'log': []
+            'log': ['Execution started']
         }
+        print(f"[DEBUG] Initialized execution_status[{execution_id}]")
+        sys.stdout.flush()
 
         # Update function to update progress
         def update_progress(percent, stage, message, details='', **kwargs):
-            execution_status[execution_id].update({
-                'progress': percent,
-                'stage': stage,
-                'message': message,
-                'details': details,
-                **kwargs
-            })
-            execution_status[execution_id]['log'].append(f"[{stage}] {message}")
+            try:
+                print(f"[UPDATE] {percent}% - {stage}: {message}")
+                execution_status[execution_id].update({
+                    'progress': percent,
+                    'stage': stage,
+                    'message': message,
+                    'details': details,
+                    **kwargs
+                })
+                execution_status[execution_id]['log'].append(f"[{stage}] {message}")
+                sys.stdout.flush()
+            except Exception as e:
+                print(f"[ERROR] update_progress failed: {e}")
+                sys.stdout.flush()
 
         # Use the EXISTING campaign ID (DO NOT CREATE NEW CAMPAIGN)
         campaign_id = data.get('campaign_id')
         campaign_name = data.get('campaign_name')
 
+        print(f"[DEBUG] Campaign ID: {campaign_id}, Name: {campaign_name}")
+        sys.stdout.flush()
+
         if not campaign_id:
+            print(f"[ERROR] No campaign ID provided!")
+            sys.stdout.flush()
             update_progress(0, 'error', 'Missing Campaign ID', 'No campaign selected', error='No campaign ID')
             execution_status[execution_id]['status'] = 'error'
             return
