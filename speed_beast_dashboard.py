@@ -1125,17 +1125,21 @@ def execute_optimized_beast_mode(execution_id, data):
                 # AdSet data
                 adset_data = data.get('adsets', {})
                 num_adsets = int(adset_data.get('count', adset_data.get('num_adsets', 5)))  # Use dynamic count
-                min_age = int(adset_data.get('min_age', 20))
+                min_age_setting = adset_data.get('min_age', 20)
                 max_age_setting = adset_data.get('max_age', 55)
-                # Support 55+ targeting (no upper limit)
+
+                # Support 55+ targeting (55 and older)
                 if str(max_age_setting).endswith('+'):
-                    max_age = None  # No max_age = 55 and older (unlimited)
+                    # For 55+: set min_age to 55 and omit max_age entirely
+                    min_age = 55
+                    max_age = None
                 else:
+                    # Normal age range (e.g., 20-45, 20-55)
+                    min_age = int(min_age_setting)
                     try:
-                        max_age_val = int(max_age_setting)
-                        max_age = max_age_val
+                        max_age = int(max_age_setting)
                     except ValueError:
-                        max_age = 65  # Default fallback
+                        max_age = 55  # Default fallback
                 countries = adset_data.get('countries', ['SA'])
                 adset_budget = float(adset_data.get('adset_budget', 25))
 
@@ -1154,16 +1158,21 @@ def execute_optimized_beast_mode(execution_id, data):
 
                 # AdSet data
                 num_adsets = int(data.get('num_adsets', 5))
-                min_age = data.get('min_age', 20)
+                min_age_setting = data.get('min_age', 20)
                 max_age_setting = data.get('max_age', '55+')
+
+                # Support 55+ targeting (55 and older)
                 if str(max_age_setting).endswith('+'):
-                    max_age = None  # No max_age = 55 and older (unlimited)
+                    # For 55+: set min_age to 55 and omit max_age entirely
+                    min_age = 55
+                    max_age = None
                 else:
+                    # Normal age range
+                    min_age = int(min_age_setting)
                     try:
-                        max_age_val = int(max_age_setting)
-                        max_age = max_age_val
+                        max_age = int(max_age_setting)
                     except ValueError:
-                        max_age = 65  # Default fallback
+                        max_age = 55  # Default fallback
                 countries = data.get('countries', ['SA'])
                 adset_budget = data.get('adset_budget', 25)
 
@@ -3021,12 +3030,18 @@ def run_adsquad_expander_execution(execution_id, data):
         # Parse data
         num_adsets = int(data.get('num_adsets', 5))
         countries = data.get('countries', ['SA'])
-        min_age = int(data.get('min_age', 20))
+        min_age_setting = data.get('min_age', 20)
         max_age_setting = data.get('max_age', '55+')
+
+        # Support 55+ targeting (55 and older)
         if str(max_age_setting).endswith('+'):
-            max_age = None  # No max_age = 55 and older (unlimited)
+            # For 55+: set min_age to 55 and omit max_age entirely
+            min_age = 55
+            max_age = None
         else:
-            max_age = int(max_age_setting) if int(max_age_setting) < 65 else 65
+            # Normal age range
+            min_age = int(min_age_setting)
+            max_age = int(max_age_setting)
 
         adset_budget = float(data.get('adset_budget', 25))
         pixel_id = data.get('pixel_id', '').strip()
