@@ -48,6 +48,25 @@ Before starting, make sure you have:
 4. Copy this URL - you'll need it!
 5. ✅ URL is ready!
 
+### Step 4.5: Update Snapchat Redirect URL
+
+**IMPORTANT:** Update your Snapchat app settings with your Railway URL:
+
+1. Go to: https://business.snapchat.com/apps
+2. Click on your Snapchat app
+3. Find **"Redirect URIs"** or **"OAuth Settings"**
+4. Add your Railway URL + `/api/oauth/callback`:
+   ```
+   https://YOUR-RAILWAY-URL/api/oauth/callback
+   ```
+   Example: `https://beast-dashboard-production-xxxxx.up.railway.app/api/oauth/callback`
+5. Click **"Save"**
+6. ✅ OAuth redirect configured!
+
+**💡 Why?** The bot auto-detects your Railway URL for OAuth. Each deployment needs its own redirect URL in Snapchat.
+
+See `OAUTH_SETUP.md` for detailed instructions and troubleshooting.
+
 ### Step 5: Add Your Snapchat Credentials
 
 1. Open your Railway URL in browser

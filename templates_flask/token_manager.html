@@ -374,8 +374,9 @@
                 if (data.success) {
                     showAlert('Redirecting to Snapchat for authorization...', 'success');
 
-                    // Redirect to Snapchat OAuth (using Snap's configured redirect URI)
-                    const redirectUri = encodeURIComponent('https://web-production-95efb.up.railway.app/api/oauth/callback');
+                    // Redirect to Snapchat OAuth (auto-detects current Railway URL)
+                    const currentUrl = window.location.origin; // Auto-detects your Railway URL
+                    const redirectUri = encodeURIComponent(`${currentUrl}/api/oauth/callback`);
                     const scope = encodeURIComponent('snapchat-marketing-api');
                     const authUrl = `https://accounts.snapchat.com/login/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}`;
 

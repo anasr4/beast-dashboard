@@ -1945,13 +1945,17 @@ def api_oauth_callback():
 
         print(f"[OAUTH] Using client_id: {client_id[:20]}...")
 
+        # Auto-detect current Railway URL for redirect_uri
+        redirect_uri = request.host_url.rstrip('/') + '/api/oauth/callback'
+        print(f"[OAUTH] Using redirect_uri: {redirect_uri}")
+
         token_url = "https://accounts.snapchat.com/login/oauth2/access_token"
         token_data = {
             "client_id": client_id,
             "client_secret": client_secret,
             "code": auth_code,
             "grant_type": "authorization_code",
-            "redirect_uri": "https://web-production-95efb.up.railway.app/api/oauth/callback"
+            "redirect_uri": redirect_uri
         }
 
         print(f"[OAUTH] Exchanging code for token...")
