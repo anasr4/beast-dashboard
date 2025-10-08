@@ -1304,10 +1304,10 @@ def execute_optimized_beast_mode(execution_id, data):
                 # Use PIXEL_PURCHASE only if pixel_id is provided, otherwise use SWIPES
                 optimization_goal = 'PIXEL_PURCHASE' if (pixel_enabled and pixel_id) else 'SWIPES'
 
-                # ALWAYS include age targeting (minimum age 20)
-                demographics = {'min_age': str(min_age)}
+                # ALWAYS include age targeting - default to 55+ (Snapchat format: integers)
+                demographics = {'min_age': int(min_age)}
                 if max_age is not None:
-                    demographics['max_age'] = str(max_age)
+                    demographics['max_age'] = int(max_age)
                 # If max_age is None, Snapchat targets everyone min_age and older (55+)
 
                 targeting_config = {
@@ -3072,10 +3072,10 @@ def run_adsquad_expander_execution(execution_id, data):
             # Use PIXEL_PURCHASE if pixel_id is provided, otherwise use SWIPES
             optimization_goal = 'PIXEL_PURCHASE' if pixel_id else 'SWIPES'
 
-            # ALWAYS include age targeting (minimum age 20)
-            demographics = {'min_age': str(min_age)}
+            # ALWAYS include age targeting - default to 55+ (Snapchat format: integers)
+            demographics = {'min_age': int(min_age)}
             if max_age is not None:
-                demographics['max_age'] = str(max_age)
+                demographics['max_age'] = int(max_age)
             # If max_age is None, Snapchat targets everyone min_age and older (55+)
 
             targeting_config = {
