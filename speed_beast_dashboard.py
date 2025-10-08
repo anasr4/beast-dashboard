@@ -205,12 +205,11 @@ AUTH_PASSWORD = 'Rabiibeast2004@'
 compression_tasks = {}
 
 def require_auth(f):
-    """Decorator to require authentication for routes"""
+    """Decorator to require authentication for routes - DISABLED for easy access"""
     from functools import wraps
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if not session.get('authenticated'):
-            return redirect(url_for('login'))
+        # Authentication disabled - direct access allowed
         return f(*args, **kwargs)
     return decorated_function
 

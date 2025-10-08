@@ -51,20 +51,19 @@ Before starting, make sure you have:
 ### Step 5: Add Your Snapchat Credentials
 
 1. Open your Railway URL in browser
-2. You'll see the login page
-3. **Default password:** Ask the person who shared the bot with you
-4. After login, click **"Token Manager"** (🔑 icon)
-5. Click **"Refresh Token"** button
-6. Enter your Snapchat API credentials:
+2. **Dashboard loads directly** - no login required! 🎉
+3. Click **"Token Manager"** (🔑 icon in navbar)
+4. Click **"Refresh Token"** button
+5. Enter your Snapchat API credentials:
    ```
    Client ID: YOUR_CLIENT_ID
    Client Secret: YOUR_CLIENT_SECRET
    Refresh Token: YOUR_REFRESH_TOKEN
    Ad Account ID: YOUR_AD_ACCOUNT_ID
    ```
-7. Click **"Save Configuration"**
-8. Click **"Test Token"** to verify it works
-9. ✅ Credentials saved!
+6. Click **"Save Configuration"**
+7. Click **"Test Token"** to verify it works
+8. ✅ Credentials saved!
 
 ---
 

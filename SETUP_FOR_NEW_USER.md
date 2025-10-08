@@ -118,29 +118,18 @@ That's it! Railway will automatically detect it's a Python app.
 
 ### A. Access Your Bot
 1. Open your Railway URL in browser
-2. You'll see the login page
+2. **Dashboard loads directly** - no login required! 🎉
 
-### B. Create Login Password
-**First time only:**
-1. The bot creator needs to tell you the default password, OR
-2. You need to set your own password by editing the code:
-   - In Railway dashboard, open the **Code** editor
-   - Find file: `speed_beast_dashboard.py`
-   - Search for `DASHBOARD_PASSWORD`
-   - Change it to your password
-   - Redeploy
-
-### C. Login and Add API Credentials
-1. Login to your bot dashboard
-2. Click **"Token Manager"** (🔑 icon in navbar)
-3. Click **"Refresh Token"** button
-4. Enter your Snapchat credentials:
+### B. Add Your API Credentials
+1. Click **"Token Manager"** (🔑 icon in navbar)
+2. Click **"Refresh Token"** button
+3. Enter your Snapchat credentials:
    - Client ID
    - Client Secret
    - Refresh Token
    - Ad Account ID
-5. Click **"Save Configuration"**
-6. Test the token by clicking **"Test Token"**
+4. Click **"Save Configuration"**
+5. Test the token by clicking **"Test Token"**
 
 ---
 
@@ -282,9 +271,10 @@ Edit `speed_beast_dashboard.py`:
 - Verify file size (under 5MB recommended)
 - Check video dimensions (vertical format works best)
 
-**Issue: Can't login to dashboard**
-- Solution: Reset password in `speed_beast_dashboard.py`
-- Look for `DASHBOARD_PASSWORD` variable
+**Issue: Dashboard not loading**
+- Check Railway deployment status (should be green)
+- Check Railway logs for errors
+- Verify your Railway URL is correct
 
 **Issue: "min_age value must be between 13 and 45" error**
 - This is NORMAL! The bot automatically sets min_age=22
