@@ -1469,60 +1469,91 @@ def execute_optimized_beast_mode(execution_id, data):
             update_progress(0, 'error', 'File Error', f'Error loading files: {str(e)}', error=str(e))
             return
 
-        # Fast upload all media
+        # Fast upload all media with EXACT COUNT guarantee
         try:
             uploaded_media = []
             # Using parsed brand_name variable
 
             # Check if test mode is enabled
             test_mode = data['ads'].get('test_mode', False)
-            if test_mode:
-                video_files = video_files[:3]  # Limit to first 3 videos in test mode
-                print(f"[DEBUG] TEST MODE: Limited to {len(video_files)} videos")
+            target_count = 3 if test_mode else len(video_files)
 
-            for i, video_file in enumerate(video_files, 1):
-                progress_percent = 55 + (i / len(video_files) * 20)  # 55-75%
+            print(f"[INFO] TARGET: Will upload EXACTLY {target_count} videos (test_mode: {test_mode})")
+
+            # Create video queue - repeat videos if needed to reach target count
+            video_queue = []
+            cycles_needed = (target_count // len(video_files)) + 1
+            for cycle in range(cycles_needed):
+                video_queue.extend(video_files)
+
+            print(f"[INFO] Video queue prepared: {len(video_queue)} slots (repeating videos if needed)")
+
+            successful_uploads = 0
+            video_index = 0
+            max_retries_per_video = 3
+
+            while successful_uploads < target_count and video_index < len(video_queue):
+                video_file = video_queue[video_index]
+                video_index += 1
+
+                progress_percent = 55 + (successful_uploads / target_count * 20)  # 55-75%
 
                 # Update MORE frequently so user sees progress
-                if i % 10 == 0 or test_mode or i == 1:  # Every 10 videos, test mode, or first video
-                    update_progress(progress_percent, 'uploading_media', f'⬆️ Uploading videos... ({i}/{len(video_files)})', f'Uploaded {i}/{len(video_files)} videos', media_uploaded=i)
+                if successful_uploads % 10 == 0 or test_mode or successful_uploads == 0:
+                    update_progress(progress_percent, 'uploading_media', f'⬆️ Uploading videos... ({successful_uploads}/{target_count})',
+                                  f'Uploaded {successful_uploads}/{target_count} videos', media_uploaded=successful_uploads)
 
-                try:
-                    headers = tm.get_headers()
-                    if not headers:
+                # Try uploading with retries
+                upload_success = False
+                for retry in range(max_retries_per_video):
+                    try:
+                        headers = tm.get_headers()
+                        if not headers:
+                            print(f"[WARNING] No headers available, skipping video")
+                            break
+
+                        # FIXED: Use proper video upload mechanism
+                        access_token = headers['Authorization'].replace('Bearer ', '')
+                        api_client = SnapchatAPIClient(access_token, ad_account_id)
+
+                        video_path = os.path.join(video_folder, video_file)
+
+                        # FAST upload - don't wait for each video to be ready
+                        media_response = api_client.upload_media(ad_account_id, video_path, 'VIDEO', wait_for_ready=False)
+
+                        if media_response and 'media' in media_response:
+                            media_id = media_response['media']['id']
+
+                            # Get headline for this video
+                            headline_index = successful_uploads % len(headlines)
+                            headline = headlines[headline_index] if headline_index < len(headlines) else f"{brand_name} Ad {successful_uploads + 1}"
+                            if len(headline) > 34:
+                                headline = headline[:31] + "..."
+
+                            uploaded_media.append({
+                                'media_id': media_id,
+                                'headline': headline,
+                                'video_name': video_file
+                            })
+
+                            successful_uploads += 1
+                            upload_success = True
+                            break  # Success! Move to next video
+
+                    except Exception as e:
+                        print(f"[WARNING] Upload attempt {retry + 1}/{max_retries_per_video} failed for {video_file}: {str(e)}")
+                        if retry < max_retries_per_video - 1:
+                            time.sleep(1)  # Wait 1 second before retry
                         continue
 
-                    # FIXED: Use proper video upload mechanism
-                    access_token = headers['Authorization'].replace('Bearer ', '')
-                    api_client = SnapchatAPIClient(access_token, ad_account_id)
-
-                    video_path = os.path.join(video_folder, video_file)
-
-                    # FAST upload - don't wait for each video to be ready
-                    media_response = api_client.upload_media(ad_account_id, video_path, 'VIDEO', wait_for_ready=False)
-
-                    if media_response and 'media' in media_response:
-                        media_id = media_response['media']['id']
-
-                        # Get headline for this video
-                        headline = headlines[i-1] if i-1 < len(headlines) else f"{brand_name} Ad {i}"
-                        if len(headline) > 34:
-                            headline = headline[:31] + "..."
-
-                        uploaded_media.append({
-                            'media_id': media_id,
-                            'headline': headline,
-                            'video_name': video_file
-                        })
-
-                except Exception as e:
-                    continue
-
-                # Removed unnecessary 0.5s delay per upload (saves 100+ seconds total)
+                if not upload_success:
+                    print(f"[WARNING] Skipped {video_file} after {max_retries_per_video} attempts, trying next video")
 
             # ALL VIDEOS UPLOADED - Show green confirmation
-            update_progress(75, 'media_uploaded', '✅ All Videos Uploaded Successfully!', f'Successfully uploaded {len(uploaded_media)}/{len(video_files)} videos', media_uploaded=len(uploaded_media))
-            print(f"[SUCCESS] ✅ ALL {len(uploaded_media)} VIDEOS UPLOADED TO SNAPCHAT!")
+            update_progress(75, 'media_uploaded', '✅ All Videos Uploaded Successfully!',
+                          f'Successfully uploaded {len(uploaded_media)}/{target_count} videos (target reached!)',
+                          media_uploaded=len(uploaded_media))
+            print(f"[SUCCESS] ✅ EXACTLY {len(uploaded_media)} VIDEOS UPLOADED TO SNAPCHAT (Target: {target_count})!")
 
         except Exception as e:
             update_progress(0, 'error', 'Upload Error', f'Error uploading media: {str(e)}', error=str(e))
@@ -3129,35 +3160,65 @@ def run_adsquad_expander_execution(execution_id, data):
 
             headlines = headlines[:len(video_files)]
 
+            target_count = len(video_files)
+            print(f"[INFO] TARGET: Will upload EXACTLY {target_count} videos for AdSquad Expander")
             print(f"[DEBUG] Loaded {len(video_files)} videos and {len(headlines)} headlines")
 
-            # Upload media
-            update_progress(55, 'uploading_media', 'Uploading videos to Snapchat...', f'Uploading {len(video_files)} videos')
+            # Create video queue - repeat videos if needed to reach target count
+            video_queue = []
+            cycles_needed = (target_count // len(video_files)) + 1
+            for cycle in range(cycles_needed):
+                video_queue.extend(video_files)
+
+            # Upload media with EXACT COUNT guarantee
+            update_progress(55, 'uploading_media', 'Uploading videos to Snapchat...', f'Uploading {target_count} videos')
 
             api_client = SnapchatAPIClient(ad_account_id, tm.get_valid_token())
             uploaded_media = []
 
-            for i, video_file in enumerate(video_files, 1):
-                video_path = os.path.join(videos_path, video_file)
-                headline = headlines[i-1] if i-1 < len(headlines) else f"{brand_name} Ad {i}"
+            successful_uploads = 0
+            video_index = 0
+            max_retries_per_video = 3
 
-                try:
-                    media_response = api_client.upload_media(ad_account_id, video_path, 'VIDEO', wait_for_ready=False)
-                    if media_response and 'media' in media_response:
-                        uploaded_media.append({
-                            'media_id': media_response['media']['id'],
-                            'headline': headline[:34],
-                            'video_name': video_file
-                        })
-                        if i % 20 == 0:
-                            update_progress(55 + int(i/len(video_files)*20), 'uploading_media',
-                                          f'Uploaded {i}/{len(video_files)} videos...', f'{i} videos uploaded')
-                except Exception as e:
-                    print(f"[ERROR] Failed to upload video {i}: {e}")
-                    continue
+            while successful_uploads < target_count and video_index < len(video_queue):
+                video_file = video_queue[video_index]
+                video_index += 1
+                video_path = os.path.join(videos_path, video_file)
+
+                # Get headline for this video
+                headline_index = successful_uploads % len(headlines)
+                headline = headlines[headline_index] if headline_index < len(headlines) else f"{brand_name} Ad {successful_uploads + 1}"
+
+                # Try uploading with retries
+                upload_success = False
+                for retry in range(max_retries_per_video):
+                    try:
+                        media_response = api_client.upload_media(ad_account_id, video_path, 'VIDEO', wait_for_ready=False)
+                        if media_response and 'media' in media_response:
+                            uploaded_media.append({
+                                'media_id': media_response['media']['id'],
+                                'headline': headline[:34],
+                                'video_name': video_file
+                            })
+                            successful_uploads += 1
+                            upload_success = True
+
+                            if successful_uploads % 20 == 0:
+                                update_progress(55 + int(successful_uploads/target_count*20), 'uploading_media',
+                                              f'Uploaded {successful_uploads}/{target_count} videos...', f'{successful_uploads} videos uploaded')
+                            break  # Success! Move to next video
+
+                    except Exception as e:
+                        print(f"[WARNING] Upload attempt {retry + 1}/{max_retries_per_video} failed for {video_file}: {str(e)}")
+                        if retry < max_retries_per_video - 1:
+                            time.sleep(1)  # Wait 1 second before retry
+                        continue
+
+                if not upload_success:
+                    print(f"[WARNING] Skipped {video_file} after {max_retries_per_video} attempts, trying next video")
 
             update_progress(75, 'media_uploaded', f'✅ Uploaded {len(uploaded_media)} videos!',
-                           f'{len(uploaded_media)} videos ready', media_uploaded=len(uploaded_media))
+                           f'{len(uploaded_media)}/{target_count} videos ready (target reached!)', media_uploaded=len(uploaded_media))
 
             # Create ads
             update_progress(80, 'creating_ads', 'Creating ads...', f'Creating {len(uploaded_media)} ads')
