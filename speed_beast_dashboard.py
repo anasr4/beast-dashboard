@@ -1287,29 +1287,25 @@ def execute_optimized_beast_mode(execution_id, data):
 
                 headers = tm.get_headers()  # Refresh token
 
-                # For CONVERSIONS optimization, age targeting is not allowed
-                targeting_config = {
-                    'regulated_content': False,
-                    'geos': [{'country_code': country.lower()} for country in countries]
-                }
-
-                # Only add age demographics if NOT using CONVERSIONS
-                optimization_goal = 'CONVERSIONS'  # We're using conversions
-                if optimization_goal != 'CONVERSIONS':
-                    targeting_config['demographics'] = [{
-                        'min_age': min_age,
-                        'max_age': max_age
-                    }]
-                else:
-                    print(f"[DEBUG] Skipping age targeting for CONVERSIONS optimization")
-
-                # Get pixel configuration
+                # Get pixel configuration FIRST to determine optimization goal
                 adsets_data = data.get('adsets', {})
                 pixel_enabled = adsets_data.get('enable_pixel', 'true') == 'true'
                 pixel_id = adsets_data.get('pixel_id', '').strip()
 
                 # Use PIXEL_PURCHASE only if pixel_id is provided, otherwise use SWIPES
                 optimization_goal = 'PIXEL_PURCHASE' if (pixel_enabled and pixel_id) else 'SWIPES'
+
+                # ALWAYS include age targeting (minimum age 20)
+                targeting_config = {
+                    'regulated_content': False,
+                    'geos': [{'country_code': country.lower()} for country in countries],
+                    'demographics': [{
+                        'min_age': str(min_age),
+                        'max_age': str(max_age)
+                    }]
+                }
+
+                print(f"[DEBUG] Age targeting: {min_age}-{max_age} (optimization: {optimization_goal})")
 
                 ad_set_data_api = {
                     'adsquads': [{
@@ -3055,13 +3051,20 @@ def run_adsquad_expander_execution(execution_id, data):
 
             headers = tm.get_headers()
 
-            targeting_config = {
-                'regulated_content': False,
-                'geos': [{'country_code': country.lower()} for country in countries]
-            }
-
             # Use PIXEL_PURCHASE if pixel_id is provided, otherwise use SWIPES
             optimization_goal = 'PIXEL_PURCHASE' if pixel_id else 'SWIPES'
+
+            # ALWAYS include age targeting (minimum age 20)
+            targeting_config = {
+                'regulated_content': False,
+                'geos': [{'country_code': country.lower()} for country in countries],
+                'demographics': [{
+                    'min_age': str(min_age),
+                    'max_age': str(max_age)
+                }]
+            }
+
+            print(f"[DEBUG] AdSquad Expander - Age targeting: {min_age}-{max_age} (optimization: {optimization_goal})")
 
             ad_set_data_api = {
                 'adsquads': [{
