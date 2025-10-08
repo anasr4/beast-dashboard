@@ -1129,11 +1129,11 @@ def execute_optimized_beast_mode(execution_id, data):
                 max_age_setting = adset_data.get('max_age', 55)
                 # Support 55+ targeting (no upper limit)
                 if str(max_age_setting).endswith('+'):
-                    max_age = 65  # Use 65 as max for 55+ targeting
+                    max_age = None  # No max_age = 55 and older (unlimited)
                 else:
                     try:
                         max_age_val = int(max_age_setting)
-                        max_age = 65 if max_age_val >= 65 else max_age_val
+                        max_age = max_age_val
                     except ValueError:
                         max_age = 65  # Default fallback
                 countries = adset_data.get('countries', ['SA'])
@@ -1157,11 +1157,11 @@ def execute_optimized_beast_mode(execution_id, data):
                 min_age = data.get('min_age', 20)
                 max_age_setting = data.get('max_age', '55+')
                 if str(max_age_setting).endswith('+'):
-                    max_age = 65  # Use 65 as max for 55+ targeting
+                    max_age = None  # No max_age = 55 and older (unlimited)
                 else:
                     try:
                         max_age_val = int(max_age_setting)
-                        max_age = 65 if max_age_val >= 65 else max_age_val
+                        max_age = max_age_val
                     except ValueError:
                         max_age = 65  # Default fallback
                 countries = data.get('countries', ['SA'])
@@ -1296,16 +1296,19 @@ def execute_optimized_beast_mode(execution_id, data):
                 optimization_goal = 'PIXEL_PURCHASE' if (pixel_enabled and pixel_id) else 'SWIPES'
 
                 # ALWAYS include age targeting (minimum age 20)
+                demographics = {'min_age': str(min_age)}
+                if max_age is not None:
+                    demographics['max_age'] = str(max_age)
+                # If max_age is None, Snapchat targets everyone min_age and older (55+)
+
                 targeting_config = {
                     'regulated_content': False,
                     'geos': [{'country_code': country.lower()} for country in countries],
-                    'demographics': [{
-                        'min_age': str(min_age),
-                        'max_age': str(max_age)
-                    }]
+                    'demographics': [demographics]
                 }
 
-                print(f"[DEBUG] Age targeting: {min_age}-{max_age} (optimization: {optimization_goal})")
+                max_age_display = f"{max_age}" if max_age else "unlimited (55+)"
+                print(f"[DEBUG] Age targeting: {min_age}-{max_age_display} (optimization: {optimization_goal})")
 
                 ad_set_data_api = {
                     'adsquads': [{
@@ -3021,7 +3024,7 @@ def run_adsquad_expander_execution(execution_id, data):
         min_age = int(data.get('min_age', 20))
         max_age_setting = data.get('max_age', '55+')
         if str(max_age_setting).endswith('+'):
-            max_age = 65
+            max_age = None  # No max_age = 55 and older (unlimited)
         else:
             max_age = int(max_age_setting) if int(max_age_setting) < 65 else 65
 
@@ -3055,16 +3058,19 @@ def run_adsquad_expander_execution(execution_id, data):
             optimization_goal = 'PIXEL_PURCHASE' if pixel_id else 'SWIPES'
 
             # ALWAYS include age targeting (minimum age 20)
+            demographics = {'min_age': str(min_age)}
+            if max_age is not None:
+                demographics['max_age'] = str(max_age)
+            # If max_age is None, Snapchat targets everyone min_age and older (55+)
+
             targeting_config = {
                 'regulated_content': False,
                 'geos': [{'country_code': country.lower()} for country in countries],
-                'demographics': [{
-                    'min_age': str(min_age),
-                    'max_age': str(max_age)
-                }]
+                'demographics': [demographics]
             }
 
-            print(f"[DEBUG] AdSquad Expander - Age targeting: {min_age}-{max_age} (optimization: {optimization_goal})")
+            max_age_display = f"{max_age}" if max_age else "unlimited (55+)"
+            print(f"[DEBUG] AdSquad Expander - Age targeting: {min_age}-{max_age_display} (optimization: {optimization_goal})")
 
             ad_set_data_api = {
                 'adsquads': [{
