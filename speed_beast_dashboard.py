@@ -1308,6 +1308,9 @@ def execute_optimized_beast_mode(execution_id, data):
                 pixel_enabled = adsets_data.get('enable_pixel', 'true') == 'true'
                 pixel_id = adsets_data.get('pixel_id', '').strip()
 
+                # Use PIXEL_PURCHASE only if pixel_id is provided, otherwise use SWIPES
+                optimization_goal = 'PIXEL_PURCHASE' if (pixel_enabled and pixel_id) else 'SWIPES'
+
                 ad_set_data_api = {
                     'adsquads': [{
                         'name': f'{campaign_name} - Ad Set {str(ad_set_num)}',
@@ -1318,7 +1321,7 @@ def execute_optimized_beast_mode(execution_id, data):
                         'placement_v2': {'config': 'AUTOMATIC'},
                         'billing_event': 'IMPRESSION',
                         'auto_bid': True,
-                        'optimization_goal': 'PIXEL_PURCHASE',  # Changed from CONVERSIONS to PIXEL_PURCHASE
+                        'optimization_goal': optimization_goal,
                         'daily_budget_micro': int(float(adset_budget)) * 1000000,
                         'start_time': start_time
                         # NO end_time - ad squad runs indefinitely
@@ -1330,7 +1333,7 @@ def execute_optimized_beast_mode(execution_id, data):
                     ad_set_data_api['adsquads'][0]['pixel_id'] = pixel_id
                     print(f"[DEBUG] Pixel enabled for ad set {ad_set_num} with pixel_id: {pixel_id} (PIXEL_PURCHASE optimization)")
                 else:
-                    print(f"[DEBUG] WARNING: Pixel not added for ad set {ad_set_num}. Enabled: {pixel_enabled}, ID: '{pixel_id}'")
+                    print(f"[DEBUG] WARNING: Pixel not added for ad set {ad_set_num}. Enabled: {pixel_enabled}, ID: '{pixel_id}' - Using SWIPES optimization")
 
                 print(f"[DEBUG] Ad set {ad_set_num} JSON payload: {json.dumps(ad_set_data_api, indent=2)}")
 
