@@ -1128,18 +1128,10 @@ def execute_optimized_beast_mode(execution_id, data):
                 min_age_setting = adset_data.get('min_age', 20)
                 max_age_setting = adset_data.get('max_age', 55)
 
-                # Support 55+ targeting (55 and older)
-                if str(max_age_setting).endswith('+'):
-                    # For 55+: set min_age to 55 and omit max_age entirely
-                    min_age = 55
-                    max_age = None
-                else:
-                    # Normal age range (e.g., 20-45, 20-55)
-                    min_age = int(min_age_setting)
-                    try:
-                        max_age = int(max_age_setting)
-                    except ValueError:
-                        max_age = 55  # Default fallback
+                # Snapchat API limit: min_age must be 13-45, max_age up to 45
+                # Fixed: Always use min_age=22, max_age=45
+                min_age = 22
+                max_age = 45
                 countries = adset_data.get('countries', ['SA'])
                 adset_budget = float(adset_data.get('adset_budget', 25))
 
@@ -1161,18 +1153,10 @@ def execute_optimized_beast_mode(execution_id, data):
                 min_age_setting = data.get('min_age', 20)
                 max_age_setting = data.get('max_age', '55+')
 
-                # Support 55+ targeting (55 and older)
-                if str(max_age_setting).endswith('+'):
-                    # For 55+: set min_age to 55 and omit max_age entirely
-                    min_age = 55
-                    max_age = None
-                else:
-                    # Normal age range
-                    min_age = int(min_age_setting)
-                    try:
-                        max_age = int(max_age_setting)
-                    except ValueError:
-                        max_age = 55  # Default fallback
+                # Snapchat API limit: min_age must be 13-45, max_age up to 45
+                # Fixed: Always use min_age=22, max_age=45
+                min_age = 22
+                max_age = 45
                 countries = data.get('countries', ['SA'])
                 adset_budget = data.get('adset_budget', 25)
 
@@ -3033,15 +3017,10 @@ def run_adsquad_expander_execution(execution_id, data):
         min_age_setting = data.get('min_age', 20)
         max_age_setting = data.get('max_age', '55+')
 
-        # Support 55+ targeting (55 and older)
-        if str(max_age_setting).endswith('+'):
-            # For 55+: set min_age to 55 and omit max_age entirely
-            min_age = 55
-            max_age = None
-        else:
-            # Normal age range
-            min_age = int(min_age_setting)
-            max_age = int(max_age_setting)
+        # Snapchat API limit: min_age must be 13-45, max_age up to 45
+        # Fixed: Always use min_age=22, max_age=45
+        min_age = 22
+        max_age = 45
 
         adset_budget = float(data.get('adset_budget', 25))
         pixel_id = data.get('pixel_id', '').strip()
