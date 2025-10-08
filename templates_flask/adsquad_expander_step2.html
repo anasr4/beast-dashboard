@@ -531,19 +531,25 @@
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="enable_pixel">Enable Pixel Tracking</label>
+                            <label for="enable_pixel">📊 Enable Pixel Tracking (Recommended)</label>
                             <select id="enable_pixel" name="enable_pixel" required>
-                                <option value="true" {% if data.enable_pixel == 'true' %}selected{% endif %}>✅ Enable - Track conversions and optimize</option>
-                                <option value="false" {% if data.enable_pixel == 'false' %}selected{% endif %}>❌ Disable - Basic tracking only</option>
+                                <option value="true" {% if data.enable_pixel == 'true' %}selected{% endif %}>✅ Enable - Use PIXEL_PURCHASE optimization (Best Results)</option>
+                                <option value="false" {% if data.enable_pixel == 'false' %}selected{% endif %}>❌ Disable - Use SWIPES optimization (Basic)</option>
                             </select>
-                            <div class="help-text">Pixel tracking helps optimize ad performance</div>
+                            <div class="help-text">⚡ Pixel tracking enables PIXEL_PURCHASE optimization for better conversion rates</div>
                         </div>
-                        <div class="form-group" id="pixel_id_group" style="display: none;">
-                            <label for="pixel_id">🎯 Snapchat Pixel ID</label>
+                    </div>
+                    <div class="form-row" id="pixel_id_group" style="display: block;">
+                        <div class="form-group">
+                            <label for="pixel_id">🎯 Snapchat Pixel ID (Required for Pixel Tracking)</label>
                             <input type="text" id="pixel_id" name="pixel_id"
                                    value="{{ data.pixel_id or '' }}"
-                                   placeholder="e.g., 7eda10b7-a5fe-4ac6-80f4-417e68d748fb">
-                            <div class="help-text">Enter your Snapchat Pixel ID from your Snapchat Business account</div>
+                                   placeholder="e.g., 7eda10b7-a5fe-4ac6-80f4-417e68d748fb"
+                                   style="background: rgba(0, 245, 255, 0.05); border: 2px solid #00f5ff;">
+                            <div class="help-text" style="color: #00f5ff;">
+                                📍 <strong>Where to find:</strong> Snapchat Ads Manager → Events Manager → Select your Pixel → Copy the Pixel ID<br>
+                                ⚠️ <strong>Important:</strong> Without Pixel ID, optimization will fallback to SWIPES (less effective)
+                            </div>
                         </div>
                     </div>
                 </div>
