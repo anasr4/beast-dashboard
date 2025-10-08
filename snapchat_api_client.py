@@ -429,7 +429,7 @@ class SnapchatCampaignBuilder:
             'regulated_content': False,
             'demographics': [
                 {
-                    'min_age': '22',  # Age 22 to 55+ like manual
+                    'min_age': '20',  # Age 20 to 55+
                     'max_age': '55'
                 }
             ],
