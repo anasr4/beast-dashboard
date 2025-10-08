@@ -3026,6 +3026,9 @@ def run_adsquad_expander_execution(execution_id, data):
                 'geos': [{'country_code': country.lower()} for country in countries]
             }
 
+            # Use PIXEL_PURCHASE if pixel_id is provided, otherwise use SWIPES
+            optimization_goal = 'PIXEL_PURCHASE' if pixel_id else 'SWIPES'
+
             ad_set_data_api = {
                 'adsquads': [{
                     'name': f'{campaign_name} - AdSquad {ad_set_num}',
@@ -3036,7 +3039,7 @@ def run_adsquad_expander_execution(execution_id, data):
                     'placement_v2': {'config': 'AUTOMATIC'},
                     'billing_event': 'IMPRESSION',
                     'auto_bid': True,
-                    'optimization_goal': 'PIXEL_PURCHASE',
+                    'optimization_goal': optimization_goal,
                     'daily_budget_micro': int(adset_budget * 1000000),
                     'start_time': start_time
                 }]
@@ -3044,6 +3047,9 @@ def run_adsquad_expander_execution(execution_id, data):
 
             if pixel_id:
                 ad_set_data_api['adsquads'][0]['pixel_id'] = pixel_id
+                print(f"[DEBUG] Using PIXEL_PURCHASE optimization with pixel_id: {pixel_id}")
+            else:
+                print(f"[DEBUG] No pixel_id provided, using SWIPES optimization")
 
             try:
                 print(f"[DEBUG] Creating ad squad {ad_set_num} with data: {ad_set_data_api}")
