@@ -1,1 +1,39 @@
-# Force deployment Sat, Oct  4, 2025 10:15:33 PM
+# Sensitive files - DO NOT COMMIT
+config.json
+.env
+*.env
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Uploads and temporary files
+uploads/
+tmp/
+beast_uploads/
+compressed_videos/
+*.log
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Distribution
+build/
+dist/
+*.egg-info/
