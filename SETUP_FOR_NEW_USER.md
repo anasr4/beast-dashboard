@@ -1,6 +1,13 @@
-# 🚀 ANAS Beast Bot - Setup Guide for New Users
+# 🚀 ANAS Beast Bot - Complete Setup Guide for New Users
 
 This guide will help you set up your own copy of the ANAS Beast Bot with your own Snapchat API credentials.
+
+**📅 Last Updated:** October 8, 2025
+**✅ Latest Features:**
+- Exact ad count guarantee (request 100 = get 100!)
+- Age targeting: 22-55+ (optimized for Snapchat API)
+- Video retry mechanism (3 attempts per video)
+- PIXEL_PURCHASE optimization with fallback to SWIPES
 
 ## 📋 What You'll Need
 
@@ -278,6 +285,49 @@ Edit `speed_beast_dashboard.py`:
 **Issue: Can't login to dashboard**
 - Solution: Reset password in `speed_beast_dashboard.py`
 - Look for `DASHBOARD_PASSWORD` variable
+
+**Issue: "min_age value must be between 13 and 45" error**
+- This is NORMAL! The bot automatically sets min_age=22
+- Snapchat limit: min_age can only be 13-45
+- The bot uses min_age=22, max_age=55 (targets 22-55+)
+- No action needed - this is already fixed!
+
+**Issue: Not all videos uploading**
+- The bot now retries failed videos 3 times
+- If video fails 3 times, it moves to next video
+- Bot keeps going until exact count is reached
+- Example: Request 100 ads = exactly 100 ads created
+
+---
+
+## 🆕 October 2025 Updates
+
+### Latest Improvements:
+1. **Exact Ad Count Guarantee**
+   - Bot now guarantees exact number of ads requested
+   - Retries failed videos up to 3 times
+   - Repeats videos if needed to reach target count
+
+2. **Age Targeting Fixed**
+   - Hardcoded to 22-55 (Snapchat's optimal range)
+   - min_age: 22 (won't target under 22)
+   - max_age: 55 (targets up to 55+, including 60, 70, etc.)
+
+3. **Pixel Optimization**
+   - PIXEL_PURCHASE when Pixel ID provided (best results)
+   - SWIPES optimization when no Pixel ID (fallback)
+   - Clear instructions in UI for Pixel ID location
+
+4. **Video Retry System**
+   - Each video gets 3 upload attempts
+   - 1 second wait between retries
+   - Continues with next video after 3 failures
+   - Logs all retry attempts for debugging
+
+5. **UI Improvements**
+   - Pixel ID field always visible with cyan highlight
+   - Clear instructions: "Snapchat Ads Manager → Events Manager → Pixel ID"
+   - Better error messages and progress tracking
 
 ---
 

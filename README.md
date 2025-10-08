@@ -35,18 +35,23 @@ A powerful automation dashboard for creating and managing Snapchat advertising c
 
 ## 🚀 Quick Start
 
-**New user?** See [SETUP_FOR_NEW_USER.md](SETUP_FOR_NEW_USER.md) for complete setup instructions.
+**📖 Setup Guides:**
+- 🆕 **[Railway Deployment Guide](RAILWAY_DEPLOYMENT.md)** - Quick 30-minute setup for Railway
+- 📚 **[Complete Setup Guide](SETUP_FOR_NEW_USER.md)** - Detailed instructions with troubleshooting
+- 📦 **[GitHub Repository](https://github.com/anasr4/beast-dashboard)** - Fork and deploy
 
 ### Prerequisites
 - Snapchat Business account with API access
-- GitHub account
-- Railway account (for hosting)
+- GitHub account (free)
+- Railway account (free tier available)
 
-### Setup Summary
-1. Fork this repository
-2. Deploy on Railway
-3. Add your Snapchat API credentials
-4. Start creating campaigns!
+### Setup Summary (30 minutes)
+1. **Fork** this repository on GitHub
+2. **Deploy** on Railway (automatic)
+3. **Add** your Snapchat API credentials
+4. **Test** and start creating campaigns!
+
+**→ [Start here: Railway Deployment Guide](RAILWAY_DEPLOYMENT.md) ←**
 
 ## 📋 What You Need from Snapchat
 
