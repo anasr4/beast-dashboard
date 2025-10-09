@@ -167,9 +167,9 @@ Replace YOUR_CLIENT_ID, YOUR_CLIENT_SECRET, and YOUR_AUTH_CODE with your values.
 2. Look at the URL in your browser
 3. You'll see something like:
    ```
-   https://ads.snapchat.com/ads/accounts/27205503-c6b2-4aa7-89d1-3b8dd52f527d/dashboard
+   https://ads.snapchat.com/ads/accounts/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/dashboard
    ```
-4. The long string after `/accounts/` is your Ad Account ID
+4. The long string after `/accounts/` is your Ad Account ID (format: UUID)
 5. ✅ **Copy and save your Ad Account ID**
 
 ---

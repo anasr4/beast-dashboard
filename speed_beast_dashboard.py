@@ -899,8 +899,12 @@ def execute_test_bot_mode(execution_id, data):
             if not accounts:
                 raise Exception("No ad accounts found")
 
-            # Force use your specific ad account ID
-            ad_account_id = '27205503-c6b2-4aa7-89d1-3b8dd52f527d'
+            # Use ad account ID from Token Manager config
+            config = tm.load_config()
+            ad_account_id = config.get('ad_account_id')
+            if not ad_account_id:
+                raise Exception("Ad Account ID not found in configuration. Please set it in Token Manager.")
+
             update_test_progress(10, "Creating campaign...", ad_account=ad_account_id)
 
         except Exception as e:
@@ -1018,7 +1022,7 @@ def execute_test_bot_mode(execution_id, data):
                 'media': [{
                     'name': video_file,
                     'type': 'VIDEO',
-                    'ad_account_id': '27205503-c6b2-4aa7-89d1-3b8dd52f527d'
+                    'ad_account_id': ad_account_id
                 }]
             }
 
@@ -1217,8 +1221,13 @@ def execute_optimized_beast_mode(execution_id, data):
                 update_progress(0, 'error', 'Account Error', 'No ad accounts found', error='No ad accounts available')
                 return
 
-            # Force use your specific ad account ID
-            ad_account_id = '27205503-c6b2-4aa7-89d1-3b8dd52f527d'
+            # Use ad account ID from Token Manager config
+            config = tm.load_config()
+            ad_account_id = config.get('ad_account_id')
+            if not ad_account_id:
+                update_progress(0, 'error', 'Config Error', 'Ad Account ID not found in configuration. Please set it in Token Manager.', error='Missing ad_account_id')
+                return
+
             update_progress(15, 'creating_campaign', 'Creating campaign...', f'Using ad account: {ad_account_id}')
 
         except Exception as e:

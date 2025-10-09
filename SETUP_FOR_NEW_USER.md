@@ -53,8 +53,9 @@ https://accounts.snapchat.com/login/oauth2/authorize?response_type=code&client_i
 ### D. Get Your Ad Account ID
 1. Go to [Snapchat Ads Manager](https://ads.snapchat.com/)
 2. Look at the URL, it will contain your Ad Account ID
-3. Format: `27205503-c6b2-4aa7-89d1-3b8dd52f527d`
-4. ✅ Save your **Ad Account ID**
+3. Format: `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx` (UUID format)
+4. Example URL: `https://ads.snapchat.com/ads/accounts/YOUR-ACCOUNT-ID/dashboard`
+5. ✅ Save your **Ad Account ID**
 
 ---
 
