@@ -1620,6 +1620,9 @@ def execute_optimized_beast_mode(execution_id, data):
                                 'brand_name': brand_name,
                                 'call_to_action': call_to_action,
                                 'top_snap_media_id': media_info['media_id'],
+                                'profile_properties': {
+                                    'display_name': brand_name
+                                },
                                 'web_view_properties': {
                                     'url': website_url,
                                     'allow_snap_javascript_sdk': False,
@@ -3292,6 +3295,9 @@ def run_adsquad_expander_execution(execution_id, data):
                                 'brand_name': brand_name,
                                 'call_to_action': call_to_action,
                                 'top_snap_media_id': media_info['media_id'],
+                                'profile_properties': {
+                                    'display_name': brand_name
+                                },
                                 'web_view_properties': {
                                     'url': website_url,
                                     'allow_snap_javascript_sdk': False,
