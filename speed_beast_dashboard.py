@@ -1563,13 +1563,26 @@ def execute_optimized_beast_mode(execution_id, data):
         # Snapchat handles async processing automatically
         update_progress(80, 'creating_ads', '✅ Starting ad creation...', f'All videos uploaded! Creating {len(uploaded_media)} ads now...')
 
+        # DEBUG: Check uploaded_media
+        print(f"\n{'='*60}")
+        print(f"[DEBUG] PREPARING TO CREATE ADS:")
+        print(f"[DEBUG] Total uploaded_media: {len(uploaded_media)}")
+        print(f"[DEBUG] Total ad_sets: {len(ad_sets)}")
+        print(f"[DEBUG] Ad sets IDs: {ad_sets}")
+        print(f"[DEBUG] Sample media (first 3): {uploaded_media[:3] if len(uploaded_media) >= 3 else uploaded_media}")
+        print(f"{'='*60}\n")
+
         # Create ads with smart strategy
         try:
             created_ads = 0
             failed_ads = 0
             ads_per_set = ads_data.get('ads_per_adset', 40)  # Use dynamic value from campaign structure
 
+            print(f"[DEBUG] ads_per_set: {ads_per_set}")
+            print(f"[DEBUG] Starting ad creation loop...")
+
             for ad_set_index, ad_set_id in enumerate(ad_sets):
+                print(f"[DEBUG] Processing ad_set {ad_set_index + 1}/{len(ad_sets)}, ID: {ad_set_id}")
                 start_index = ad_set_index * ads_per_set
                 end_index = start_index + ads_per_set
 
@@ -1591,8 +1604,11 @@ def execute_optimized_beast_mode(execution_id, data):
                     try:
                         headers = tm.get_headers()
                         if not headers:
+                            print(f"[ERROR] No headers available for ad {ad_num}")
                             failed_ads += 1
                             continue
+
+                        print(f"[DEBUG] Creating creative for ad {ad_num} (media_id: {media_info['media_id']})")
 
                         # Create creative with uploaded media
                         creative_data = {
@@ -1624,14 +1640,18 @@ def execute_optimized_beast_mode(execution_id, data):
                             backoff_factor=2
                         )
 
+                        print(f"[DEBUG] Creative API response: {creative_response.status_code}")
+
                         if creative_response.status_code == 200:
                             creative_result = creative_response.json()
+                            print(f"[DEBUG] Creative result: {creative_result}")
 
                             if 'creatives' in creative_result and len(creative_result['creatives']) > 0:
                                 creative_item = creative_result['creatives'][0]
 
                                 if creative_item.get('sub_request_status') == 'SUCCESS':
                                     creative_id = creative_item['creative']['id']
+                                    print(f"[SUCCESS] Creative created: {creative_id}")
 
                                     # Create ad
                                     ad_data_api = {
@@ -1653,28 +1673,42 @@ def execute_optimized_beast_mode(execution_id, data):
                                         backoff_factor=2
                                     )
 
+                                    print(f"[DEBUG] Ad API response: {ad_response.status_code}")
+
                                     if ad_response.status_code == 200:
                                         ad_result = ad_response.json()
+                                        print(f"[DEBUG] Ad result: {ad_result}")
                                         if 'ads' in ad_result and len(ad_result['ads']) > 0:
                                             if ad_result['ads'][0].get('sub_request_status') == 'SUCCESS':
                                                 created_ads += 1
+                                                print(f"[SUCCESS] ✅ Ad {ad_num} created successfully!")
                                             else:
                                                 failed_ads += 1
                                                 error_reason = ad_result['ads'][0].get('sub_request_error_reason', 'Unknown')
+                                                print(f"[ERROR] Ad {ad_num} failed: {error_reason}")
                                                 if "hasn't been uploaded yet" in error_reason:
                                                     time.sleep(2)  # Wait for media processing
                                     else:
                                         failed_ads += 1
+                                        print(f"[ERROR] Ad API call failed with status {ad_response.status_code}: {ad_response.text}")
                                 else:
                                     failed_ads += 1
                                     error_reason = creative_item.get('sub_request_error_reason', 'Unknown')
+                                    print(f"[ERROR] Creative {ad_num} failed: {error_reason}")
                                     if "hasn't been uploaded yet" in error_reason:
                                         time.sleep(2)  # Wait for media processing
+                            else:
+                                failed_ads += 1
+                                print(f"[ERROR] Creative response missing 'creatives' key or empty")
                         else:
                             failed_ads += 1
+                            print(f"[ERROR] Creative API call failed with status {creative_response.status_code}: {creative_response.text}")
 
                     except Exception as e:
                         failed_ads += 1
+                        print(f"[EXCEPTION] Error creating ad {ad_num}: {str(e)}")
+                        import traceback
+                        traceback.print_exc()
 
                     time.sleep(0.02)  # Ultra-fast processing (saves 6+ seconds total)
 
