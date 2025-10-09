@@ -1228,6 +1228,22 @@ def execute_optimized_beast_mode(execution_id, data):
                 update_progress(0, 'error', 'Config Error', 'Ad Account ID not found in configuration. Please set it in Token Manager.', error='Missing ad_account_id')
                 return
 
+            # Get Public Profile ID (required for creatives as of Feb 2024)
+            profile_id = None
+            try:
+                profiles_response = requests.get(f'https://adsapi.snapchat.com/v1/adaccounts/{ad_account_id}/profiles', headers=headers)
+                if profiles_response.status_code == 200:
+                    profiles_data = profiles_response.json()
+                    if 'profiles' in profiles_data and len(profiles_data['profiles']) > 0:
+                        profile_id = profiles_data['profiles'][0]['profile']['id']
+                        print(f"[INFO] Found Public Profile ID: {profile_id}")
+                    else:
+                        print("[WARNING] No Public Profile found for this ad account. Ads may fail without a Public Profile.")
+                else:
+                    print(f"[WARNING] Could not fetch profiles: {profiles_response.status_code}")
+            except Exception as e:
+                print(f"[WARNING] Error fetching profile ID: {str(e)}")
+
             update_progress(15, 'creating_campaign', 'Creating campaign...', f'Using ad account: {ad_account_id}')
 
         except Exception as e:
@@ -1611,25 +1627,30 @@ def execute_optimized_beast_mode(execution_id, data):
                         print(f"[DEBUG] Creating creative for ad {ad_num} (media_id: {media_info['media_id']})")
 
                         # Create creative with uploaded media
-                        creative_data = {
-                            'creatives': [{
-                                'ad_account_id': ad_account_id,
-                                'name': f'{brand_name} - Creative {ad_num}',
-                                'type': 'WEB_VIEW',
-                                'headline': media_info['headline'],
-                                'brand_name': brand_name,
-                                'call_to_action': call_to_action,
-                                'top_snap_media_id': media_info['media_id'],
-                                'web_view_properties': {
-                                    'url': website_url,
-                                    'allow_snap_javascript_sdk': False,
-                                    'use_immersive_mode': False,
-                                    'deep_link_urls': [],
-                                    'block_preload': True
-                                },
-                                'shareable': False
-                            }]
+                        creative_payload = {
+                            'ad_account_id': ad_account_id,
+                            'name': f'{brand_name} - Creative {ad_num}',
+                            'type': 'WEB_VIEW',
+                            'headline': media_info['headline'],
+                            'brand_name': brand_name,
+                            'call_to_action': call_to_action,
+                            'top_snap_media_id': media_info['media_id'],
+                            'web_view_properties': {
+                                'url': website_url,
+                                'allow_snap_javascript_sdk': False,
+                                'use_immersive_mode': False,
+                                'deep_link_urls': [],
+                                'block_preload': True
+                            },
+                            'shareable': False
                         }
+
+                        # Add profile_id if available (required for accounts with Public Profile)
+                        if profile_id:
+                            creative_payload['profile_properties'] = {'profile_id': profile_id}
+                            print(f"[DEBUG] Using Public Profile ID: {profile_id}")
+
+                        creative_data = {'creatives': [creative_payload]}
 
                         creative_response = make_robust_api_request(
                             'POST',
@@ -3057,6 +3078,22 @@ def run_adsquad_expander_execution(execution_id, data):
             execution_status[execution_id]['status'] = 'error'
             return
 
+        # Get Public Profile ID (required for creatives as of Feb 2024)
+        profile_id = None
+        try:
+            profiles_response = requests.get(f'https://adsapi.snapchat.com/v1/adaccounts/{ad_account_id}/profiles', headers=headers)
+            if profiles_response.status_code == 200:
+                profiles_data = profiles_response.json()
+                if 'profiles' in profiles_data and len(profiles_data['profiles']) > 0:
+                    profile_id = profiles_data['profiles'][0]['profile']['id']
+                    print(f"[INFO] Found Public Profile ID: {profile_id}")
+                else:
+                    print("[WARNING] No Public Profile found for this ad account. Ads may fail without a Public Profile.")
+            else:
+                print(f"[WARNING] Could not fetch profiles: {profiles_response.status_code}")
+        except Exception as e:
+            print(f"[WARNING] Error fetching profile ID: {str(e)}")
+
         # Parse data
         num_adsets = int(data.get('num_adsets', 5))
         countries = data.get('countries', ['SA'])
@@ -3283,25 +3320,31 @@ def run_adsquad_expander_execution(execution_id, data):
                 for media_info in media_batch:
                     try:
                         headers = tm.get_headers()
-                        creative_data = {
-                            'creatives': [{
-                                'ad_account_id': ad_account_id,
-                                'name': f'{brand_name} - Creative {created_ads+1}',
-                                'type': 'WEB_VIEW',
-                                'headline': media_info['headline'],
-                                'brand_name': brand_name,
-                                'call_to_action': call_to_action,
-                                'top_snap_media_id': media_info['media_id'],
-                                'web_view_properties': {
-                                    'url': website_url,
-                                    'allow_snap_javascript_sdk': False,
-                                    'use_immersive_mode': False,
-                                    'deep_link_urls': [],
-                                    'block_preload': True
-                                },
-                                'shareable': False
-                            }]
+
+                        # Build creative payload
+                        creative_payload = {
+                            'ad_account_id': ad_account_id,
+                            'name': f'{brand_name} - Creative {created_ads+1}',
+                            'type': 'WEB_VIEW',
+                            'headline': media_info['headline'],
+                            'brand_name': brand_name,
+                            'call_to_action': call_to_action,
+                            'top_snap_media_id': media_info['media_id'],
+                            'web_view_properties': {
+                                'url': website_url,
+                                'allow_snap_javascript_sdk': False,
+                                'use_immersive_mode': False,
+                                'deep_link_urls': [],
+                                'block_preload': True
+                            },
+                            'shareable': False
                         }
+
+                        # Add profile_id if available (required for accounts with Public Profile)
+                        if profile_id:
+                            creative_payload['profile_properties'] = {'profile_id': profile_id}
+
+                        creative_data = {'creatives': [creative_payload]}
 
                         creative_response = make_robust_api_request(
                             'POST',
