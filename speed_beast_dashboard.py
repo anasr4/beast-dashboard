@@ -2223,8 +2223,8 @@ def compress_video_variants(input_path, num_variants, callback=None):
 
             scale = f"{target_width}:{target_height}"
 
-            base_name = os.path.splitext(os.path.basename(input_path))[0]
-            output_file = f"{base_name}_{unique_id}_variant_{i:03d}_{target_width}x{target_height}_{target_mb:.1f}MB.mp4"
+            # Simple naming: creative_1.mp4, creative_2.mp4, etc.
+            output_file = f"creative_{i}.mp4"
             output_path = os.path.join(output_folder, output_file)
 
             # Use higher CRF for smaller files based on target size
